@@ -8,8 +8,10 @@ Reads MONGODB_URI / MONGODB_DB from backend/.env. Never run against production.
 
 import sys
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from pymongo import MongoClient
+from pymongo.database import Database
 
 from app.settings import Settings
 
@@ -18,7 +20,8 @@ def main() -> None:
     settings = Settings()
     if settings.env == "prod":
         raise SystemExit("refusing to run with ENV=prod")
-    db = MongoClient(settings.mongodb_uri)[settings.mongodb_db]
+    client: MongoClient[dict[str, Any]] = MongoClient(settings.mongodb_uri)
+    db: Database[dict[str, Any]] = client[settings.mongodb_db]
     query: dict[str, object] = {"mastered": False}
     if len(sys.argv) > 1:
         profile = db.profiles.find_one({"device_id": sys.argv[1]})

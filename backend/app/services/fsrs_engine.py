@@ -1,6 +1,6 @@
 """FSRS scheduling via py-fsrs. No learning steps: a card is reviewed in sessions, not minutes."""
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any, cast
 
 from fsrs import Card, Rating, Scheduler
@@ -19,13 +19,14 @@ RATINGS: dict[str, Rating] = {
     "easy": Rating.Easy,
 }
 
-# The stumble itself is the card's first review. A freeze or a miss means the word wasn't there at
-# all; a correction means it was nearly there.
-INITIAL_RATING: dict[str, Rating] = {
-    "freeze": Rating.Again,
-    "miss": Rating.Again,
-    "code_switch": Rating.Again,
-    "correction": Rating.Hard,
+# The stumble is the card's birth, not a review: the card stays FSRS-new so its first real review
+# gets the full spread of intervals. The stumble type only decides how soon it comes back. A freeze
+# or a miss means the word wasn't there at all; a correction means it was nearly there.
+INITIAL_DELAY: dict[str, timedelta] = {
+    "freeze": timedelta(days=1),
+    "miss": timedelta(days=1),
+    "code_switch": timedelta(days=1),
+    "correction": timedelta(days=2),
 }
 
 State = dict[str, Any]
@@ -45,10 +46,8 @@ def _state(card: Card) -> State:
 
 
 def initial_state(stumble_type: str, now: datetime) -> tuple[State, datetime]:
-    card, _ = _scheduler.review_card(
-        Card(), INITIAL_RATING.get(stumble_type, Rating.Again), review_datetime=now
-    )
-    return _state(card), _due(card)
+    card = Card(due=now)
+    return _state(card), now + INITIAL_DELAY.get(stumble_type, timedelta(days=1))
 
 
 def review(state: State | None, rating: str, now: datetime) -> tuple[State, datetime]:

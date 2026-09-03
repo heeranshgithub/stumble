@@ -5,11 +5,20 @@ from app.services import fsrs_engine
 
 def test_initial_state_by_stumble_type() -> None:
     now = datetime.now(UTC)
-    _, freeze_due = fsrs_engine.initial_state("freeze", now)
-    correction_state, correction_due = fsrs_engine.initial_state("correction", now)
-    assert timedelta(hours=20) <= freeze_due - now <= timedelta(days=2)
-    assert correction_due >= freeze_due
-    assert correction_state["stability"] > 0
+    freeze_state, freeze_due = fsrs_engine.initial_state("freeze", now)
+    _, correction_due = fsrs_engine.initial_state("correction", now)
+    assert freeze_due - now == timedelta(days=1)
+    assert correction_due - now == timedelta(days=2)
+    # Born new: the first real review is the first FSRS review.
+    assert freeze_state["last_review"] is None
+
+
+def test_first_review_spreads_the_intervals() -> None:
+    now = datetime.now(UTC)
+    state, due = fsrs_engine.initial_state("code_switch", now)
+    labels = fsrs_engine.preview(state, due)
+    assert labels["good"] != labels["easy"]
+    assert labels["again"] == "1d"
 
 
 def test_review_grows_interval() -> None:
