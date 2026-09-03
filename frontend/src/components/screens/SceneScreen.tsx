@@ -11,6 +11,7 @@ import { PillButton } from "@/components/stumble/PillButton";
 import { useHoldToTalk, type Capture } from "@/hooks/useHoldToTalk";
 import { useSpeaker } from "@/hooks/useSpeaker";
 import { getErrorMessage } from "@/lib/errors";
+import { getPatience } from "@/lib/patience";
 import { useSendTurnMutation, useStartSessionMutation } from "@/store/endpoints/sessions";
 import type { SessionDto, StumbleDto, TurnDto } from "@/types/api";
 
@@ -59,7 +60,7 @@ export function SceneScreen({ sceneId }: { sceneId: string }) {
   useEffect(() => {
     if (startedRef.current) return;
     startedRef.current = true;
-    startSession({ sceneId })
+    startSession({ sceneId, patience: getPatience() })
       .unwrap()
       .then((s) => {
         setSession(s);

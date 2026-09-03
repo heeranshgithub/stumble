@@ -1,8 +1,10 @@
 "use client";
 
-import { Mic } from "lucide-react";
+import { Lock, Mic } from "lucide-react";
+import Link from "next/link";
 
 import { Blob } from "@/components/stumble/Blob";
+import { Chip } from "@/components/stumble/Chip";
 import { LyricLine } from "@/components/stumble/LyricLine";
 import { PillButton } from "@/components/stumble/PillButton";
 import { getErrorMessage } from "@/lib/errors";
@@ -30,48 +32,66 @@ export function TodayScreen() {
   }
 
   const scene = data.nextScene;
+  const hasReview = data.reviewDue > 0;
   const sceneColor = scene?.color ?? "cafe";
+  const sceneHref = `/scene/${scene?.id ?? "cafe"}`;
   const reviewLabel = data.reviewDue === 1 ? "1 stumble." : `${data.reviewDue} stumbles.`;
+  const uses = scene?.usesDueCards ?? [];
 
   return (
-    <div className="flex flex-1 flex-col" data-scene={sceneColor}>
+    <div className="flex flex-1 flex-col" data-scene={hasReview ? "review" : sceneColor}>
       <Blob color="scene" className="flex flex-[1.3] flex-col justify-end pt-14">
         <p className="text-xs font-bold text-ink-2">
           {weekday.format(new Date())} · Day {data.dayNumber}
         </p>
         <h1 className="mt-2 text-[34px] font-extrabold leading-[1] tracking-[-0.03em]">
-          {data.reviewDue > 0 ? (
+          {hasReview ? (
             <>
               Review
               <br />
               {reviewLabel}
             </>
-          ) : (
+          ) : scene ? (
             <>
               Nothing to review.
               <br />
               Go speak.
             </>
+          ) : (
+            <>
+              Every scene
+              <br />
+              cleared.
+            </>
           )}
         </h1>
         <p className="mt-2 text-xs font-bold text-ink-2">
-          {data.reviewDue > 0 ? "~90 seconds" : "Your first stumbles will come from the scene."}
+          {hasReview
+            ? `~${Math.max(1, Math.round(data.reviewDue * 13))} seconds · then ${scene?.title ?? "the next scene"} unlocks`
+            : scene
+              ? data.deck.caught === 0
+                ? "Your first stumbles will come from the scene."
+                : "Nothing due. The next scene is open."
+              : "Replay any scene from the Scenes tab."}
         </p>
-        <PillButton href={data.reviewDue > 0 ? "/review" : `/scene/${scene?.id ?? "cafe"}`} className="mt-4">
+        <PillButton href={hasReview ? "/review" : sceneHref} className="mt-4">
           <Mic className="size-5" strokeWidth={2.25} />
-          {data.reviewDue > 0 ? "Start review" : `Start ${scene?.title ?? "the first scene"}`}
+          {hasReview ? "Start review" : `Start ${scene?.title ?? "a scene"}`}
         </PillButton>
       </Blob>
 
-      <Blob color="apartment" className="flex flex-[0.9] flex-col justify-center">
-        <p className="text-xs font-bold text-ink-2">{data.reviewDue > 0 ? "Then" : "Next"} · Scene {scene?.order ?? 1}</p>
-        <p className="mt-1 text-xl font-bold tracking-[-0.01em]">{scene?.title ?? "Café"}</p>
-        <p className="text-xs font-bold text-ink-2">
-          {scene && scene.usesDueCards.length > 0
-            ? `Uses ${scene.usesDueCards.length} of today's cards`
-            : (scene?.goal ?? "")}
-        </p>
-      </Blob>
+      {scene ? (
+        <NextSceneBlob
+          title={scene.title}
+          order={scene.order}
+          goal={scene.goal}
+          color={scene.color}
+          uses={uses}
+          unlocked={data.sceneUnlocked}
+          href={sceneHref}
+          label={hasReview ? "Then" : "Next"}
+        />
+      ) : null}
 
       <Blob color="paper" className="flex-[0.8]">
         <div className="flex items-baseline justify-between text-xs font-bold text-ink/60">
@@ -85,10 +105,66 @@ export function TodayScreen() {
             Every word you reach for and miss lands here.
           </p>
         ) : (
-          <LyricLine size="sm" className="mt-2" words={[]} />
+          <>
+            <LyricLine
+              size="sm"
+              className="mt-2"
+              words={uses.map((t) => ({ text: t, state: "miss" as const }))}
+            />
+            <Link href="/deck" className="mt-2 inline-block text-xs font-extrabold text-ink/60 underline-offset-2 hover:underline">
+              open the deck
+            </Link>
+          </>
         )}
       </Blob>
     </div>
+  );
+}
+
+function NextSceneBlob({
+  title,
+  order,
+  goal,
+  color,
+  uses,
+  unlocked,
+  href,
+  label,
+}: {
+  title: string;
+  order: number;
+  goal: string;
+  color: "cafe" | "pharmacie" | "apartment" | "bill" | "doctor" | "interview";
+  uses: string[];
+  unlocked: boolean;
+  href: string;
+  label: string;
+}) {
+  const body = (
+    <Blob color={color} className={`flex flex-[0.9] flex-col justify-center ${unlocked ? "" : "opacity-90"}`}>
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-bold text-ink-2">
+          {label} · Scene {order}
+        </p>
+        {unlocked ? null : (
+          <Chip tone="ink">
+            <Lock className="size-3" strokeWidth={2.5} />
+            after review
+          </Chip>
+        )}
+      </div>
+      <p className="mt-1 text-xl font-bold tracking-[-0.01em]">{title}</p>
+      <p className="text-xs font-bold text-ink-2">
+        {uses.length > 0 ? `Uses ${uses.length} of today's cards: ${uses.slice(0, 3).join(" · ")}` : goal}
+      </p>
+    </Blob>
+  );
+  return unlocked ? (
+    <Link href={href} className="flex flex-[0.9] flex-col">
+      {body}
+    </Link>
+  ) : (
+    body
   );
 }
 

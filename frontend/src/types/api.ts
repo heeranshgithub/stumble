@@ -28,8 +28,54 @@ export interface DeckStatsDto {
 export interface TodayDto {
   dayNumber: number;
   reviewDue: number;
+  sceneUnlocked: boolean;
   nextScene: SceneDto | null;
   deck: DeckStatsDto;
+}
+
+export type Grade = "again" | "hard" | "good" | "easy";
+
+export interface IntervalsDto {
+  again: string;
+  hard: string;
+  good: string;
+  easy: string;
+}
+
+export interface ReviewCardDto {
+  id: string | null;
+  sceneId: string;
+  sceneTitle: string;
+  sceneColor: SceneColor | "review";
+  characterName: string;
+  type: StumbleType;
+  said: string;
+  target: string;
+  context: string;
+  promptLine: string;
+  due: string;
+  reps: number;
+  lapses: number;
+  intervals: IntervalsDto;
+  audioUrl: string;
+}
+
+export interface ReviewListDto {
+  cards: ReviewCardDto[];
+  totalDue: number;
+}
+
+export interface GradeResultDto {
+  cardId: string;
+  rating: Grade;
+  due: string;
+  interval: string;
+  remainingDue: number;
+}
+
+export interface AttemptDto {
+  heard: string;
+  matched: boolean;
 }
 
 export interface ProfileDto {
