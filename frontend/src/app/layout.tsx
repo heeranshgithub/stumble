@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Gabarito } from "next/font/google";
 
-import { TabBar } from "@/components/stumble/TabBar";
+import { AppShell } from "@/components/shell/AppShell";
 import { Providers } from "@/store/providers";
 
 import "./globals.css";
@@ -33,10 +33,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${gabarito.variable} h-full`}>
       <body className="min-h-dvh">
         <Providers>
-          <div className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col bg-paper">
-            <main className="flex flex-1 flex-col">{children}</main>
-            <TabBar />
-          </div>
+          <AppShell>{children}</AppShell>
         </Providers>
       </body>
     </html>
