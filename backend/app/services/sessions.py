@@ -96,6 +96,11 @@ def _messages(session: Document, scene: Scene, settings: Settings) -> list[ChatM
     return msgs
 
 
+def _clean_context(context: str) -> str:
+    """A card's context is the learner's sentence only, never the pause metadata for the model."""
+    return context.split("\n\n[", 1)[0].strip()
+
+
 def _parse_stumbles(raw: Any) -> list[Document]:
     out: list[Document] = []
     for item in raw if isinstance(raw, list) else []:
@@ -105,7 +110,7 @@ def _parse_stumbles(raw: Any) -> list[Document]:
             log.warning("stumble_dropped", item=item)
             continue
         if s.target.strip():
-            out.append(s.model_dump())
+            out.append(s.model_copy(update={"context": _clean_context(s.context)}).model_dump())
     return out
 
 

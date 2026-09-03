@@ -40,7 +40,8 @@ class FakeChat:
 
     async def complete_json(self, messages: list[ChatMessage]) -> dict[str, Any]:
         learner_turns = [m for m in messages if m.role == "user"]
-        last = learner_turns[-1].content if learner_turns else ""
+        # The pause annotation is metadata for the model, never part of the learner's sentence.
+        last = learner_turns[-1].content.split("\n\n[", 1)[0] if learner_turns else ""
         lowered = last.lower()
         stumbles: list[dict[str, Any]] = []
         for en, fr in _EN_FR.items():

@@ -69,6 +69,8 @@ async def test_audio_turn_is_transcribed(client: AsyncClient) -> None:
     learner = res.json()["turns"][1]
     assert learner["text"].startswith("Je voudrais")
     assert learner["pauseMs"] == 4200
+    # The pause annotation reaches the model, never the card.
+    assert "pause_ms" not in learner["stumbles"][0]["context"]
 
 
 async def test_empty_turn_is_400(client: AsyncClient) -> None:
