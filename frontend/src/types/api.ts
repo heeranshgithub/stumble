@@ -39,6 +39,57 @@ export interface ProfileDto {
   createdAt: string;
 }
 
+export type StumbleType = "freeze" | "code_switch" | "correction" | "miss";
+export type Patience = "relaxed" | "normal" | "real";
+export type TtsProvider = "elevenlabs" | "browser";
+
+export interface StumbleDto {
+  type: StumbleType;
+  said: string;
+  target: string;
+  context: string;
+  promptLine: string;
+  confidence: number;
+}
+
+export interface WinDto {
+  phrase: string;
+  cardId: string | null;
+}
+
+export interface TurnDto {
+  id: string;
+  role: "character" | "learner";
+  text: string;
+  textEn: string | null;
+  stumbles: StumbleDto[];
+  wins: WinDto[];
+  goalProgress: number;
+  audioUrl: string | null;
+  pauseMs: number;
+  createdAt: string;
+}
+
+export interface SessionDto {
+  id: string | null;
+  sceneId: string;
+  sceneTitle: string;
+  sceneColor: SceneColor;
+  characterName: string;
+  characterRole: string;
+  goal: string;
+  patience: Patience;
+  goalProgress: number;
+  done: boolean;
+  ttsProvider: TtsProvider;
+  turns: TurnDto[];
+}
+
+export interface StartSessionRequest {
+  sceneId: string;
+  patience?: Patience;
+}
+
 export interface ApiErrorEnvelope {
   error: {
     code: string;
