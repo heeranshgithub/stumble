@@ -33,7 +33,7 @@ def create_app(
         app.state.db = client[settings.mongodb_db]
         owns_providers = providers is None
         app.state.providers = providers or build_providers(settings)
-        log.info("startup", providers=app.state.providers.mode, **settings.redact())
+        log.info("startup", provider_mode=app.state.providers.mode, **settings.redact())
         try:
             yield
         finally:
