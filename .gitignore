@@ -1,0 +1,31 @@
+# env
+.env
+.env.*
+!.env.example
+
+# node
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+.pnpm-store/
+
+# python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# os / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# local
+.impeccable/
