@@ -90,6 +90,46 @@ export interface StartSessionRequest {
   patience?: Patience;
 }
 
+export interface CardDto {
+  id: string | null;
+  sceneId: string;
+  type: StumbleType;
+  said: string;
+  target: string;
+  context: string;
+  promptLine: string;
+  due: string;
+  reps: number;
+  lapses: number;
+  produced: number;
+  mastered: boolean;
+  createdAt: string;
+}
+
+export interface DebriefStumbleDto extends StumbleDto {
+  cardId: string;
+  isNew: boolean;
+}
+
+export interface DebriefDto {
+  sessionId: string;
+  sceneId: string;
+  sceneTitle: string;
+  sceneColor: SceneColor;
+  characterName: string;
+  goal: string;
+  goalReached: boolean;
+  goalProgress: number;
+  durationS: number;
+  turnsSpoken: number;
+  stumbles: DebriefStumbleDto[];
+  wins: WinDto[];
+  cardsAdded: number;
+  cardsRelapsed: number;
+  nextReviewAt: string | null;
+  deck: DeckStatsDto;
+}
+
 export interface ApiErrorEnvelope {
   error: {
     code: string;

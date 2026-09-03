@@ -1,7 +1,8 @@
 "use client";
 
-import { ChevronLeft, Keyboard, Mic, Send } from "lucide-react";
+import { ChevronLeft, Keyboard, Mic, Send, X } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Chip } from "@/components/stumble/Chip";
@@ -47,10 +48,12 @@ export function SceneScreen({ sceneId }: { sceneId: string }) {
   const [latencyMs, setLatencyMs] = useState<number | null>(null);
   const [shownTranslation, setShownTranslation] = useState<string | null>(null);
 
+  const router = useRouter();
   const startedRef = useRef(false);
   const t0Ref = useRef(0);
   const listRef = useRef<HTMLDivElement>(null);
   const speaker = useSpeaker(session?.ttsProvider ?? "browser");
+  const debriefHref = session?.id ? `/scene/${sceneId}/debrief?session=${session.id}` : "/";
 
   // One session per visit. The ref guards React's double-invoked dev effects.
   useEffect(() => {
@@ -166,6 +169,19 @@ export function SceneScreen({ sceneId }: { sceneId: string }) {
           <Chip>
             {name} · {fmt(elapsed)}
           </Chip>
+          {session?.id && phase !== "done" ? (
+            <button
+              type="button"
+              aria-label="End scene"
+              onClick={() => {
+                speaker.stop();
+                router.push(debriefHref);
+              }}
+              className="grid size-7 place-items-center rounded-pill bg-ink/10 text-ink"
+            >
+              <X className="size-4" strokeWidth={2.5} />
+            </button>
+          ) : null}
         </div>
       </header>
 
@@ -203,11 +219,11 @@ export function SceneScreen({ sceneId }: { sceneId: string }) {
           <section className="-mx-5 mt-2 bg-ink px-5 py-5 text-paper">
             <p className="text-2xl font-extrabold tracking-tight">Scene cleared.</p>
             <p className="mt-1 text-sm text-paper-2">
-              {session?.turns.reduce((n, t) => n + t.stumbles.length, 0) ?? 0} stumbles caught. The debrief
-              lands tomorrow; for now, the words are saved.
+              {session?.turns.reduce((n, t) => n + t.stumbles.length, 0) ?? 0} stumbles caught. See what they
+              were and when you&apos;ll meet them again.
             </p>
-            <PillButton href="/" variant="paper" className="mt-4">
-              Back to Today
+            <PillButton href={debriefHref} variant="paper" className="mt-4">
+              See what got caught
             </PillButton>
           </section>
         ) : null}

@@ -1,5 +1,5 @@
 import { api } from "@/store/api";
-import type { SessionDto, StartSessionRequest } from "@/types/api";
+import type { DebriefDto, SessionDto, StartSessionRequest } from "@/types/api";
 
 export const sessionsApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -19,7 +19,22 @@ export const sessionsApi = api.injectEndpoints({
         dispatch(sessionsApi.util.upsertQueryData("getSession", id, data));
       },
     }),
+    // Idempotent: ends the scene, turns stumbles into cards. Today and Progress change as a result.
+    finishSession: build.mutation<DebriefDto, string>({
+      query: (id) => ({ url: `/sessions/${id}/finish`, method: "POST" }),
+      invalidatesTags: (_r, _e, id) => [
+        { type: "Session", id },
+        "Today",
+        "Card",
+        "Progress",
+      ],
+    }),
   }),
 });
 
-export const { useStartSessionMutation, useGetSessionQuery, useSendTurnMutation } = sessionsApi;
+export const {
+  useStartSessionMutation,
+  useGetSessionQuery,
+  useSendTurnMutation,
+  useFinishSessionMutation,
+} = sessionsApi;
