@@ -1,6 +1,14 @@
+from datetime import UTC, datetime
 from typing import Annotated, Any
 
-from pydantic import AliasChoices, BaseModel, BeforeValidator, ConfigDict, Field
+from pydantic import (
+    AliasChoices,
+    BaseModel,
+    BeforeValidator,
+    ConfigDict,
+    Field,
+    field_validator,
+)
 from pydantic.alias_generators import to_camel
 
 
@@ -12,6 +20,14 @@ class ApiModel(BaseModel):
         populate_by_name=True,
         from_attributes=True,
     )
+
+    @field_validator("*", mode="after")
+    @classmethod
+    def _utc_datetimes(cls, value: Any) -> Any:
+        """Mongo returns naive datetimes; the wire always carries an offset. Naive means UTC."""
+        if isinstance(value, datetime) and value.tzinfo is None:
+            return value.replace(tzinfo=UTC)
+        return value
 
 
 class RequestModel(ApiModel):

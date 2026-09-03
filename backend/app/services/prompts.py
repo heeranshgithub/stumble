@@ -33,6 +33,17 @@ STUMBLE TYPES: freeze | code_switch | correction | miss
 - "confidence": 0 to 1. Only report stumbles you are confident about.
 Also report "wins": target-vocabulary or due words the learner produced correctly.
 
+EXAMPLES (learner turn → stumbles)
+- "Je voudrais un coffee au lait." → code_switch, said "coffee", target "café",
+  context "Je voudrais un ___ au lait."
+- "Euh… le… [pause_ms: 4100]" after you asked "Vous payez comment ?" → freeze, said "",
+  target "par carte", context "Je paie ___.", prompt_line "Vous payez comment ?"
+- "Je suis allé au le marché." → correction, said "au le marché", target "au marché",
+  context "Je suis allé ___."
+- "Je veux manger le loyer." (asked about rent) → miss, said "manger le loyer",
+  target "payer le loyer", context "Je veux ___."
+- A clean "C'est combien ?" when it is a target or due word → wins: [{"phrase": "C'est combien"}]
+
 Respond with ONLY a JSON object:
 {"reply": "...", "reply_en": "English translation of reply", "goal_progress": 0.0,
  "done": false,

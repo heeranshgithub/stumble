@@ -1,4 +1,5 @@
 from collections.abc import AsyncIterator
+from datetime import timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, File, Form, Request, UploadFile
@@ -6,9 +7,10 @@ from fastapi.responses import Response, StreamingResponse
 
 from app.deps import DbDep, ProfileDep, SettingsDep
 from app.errors import AppError, BadRequest, NotFound
+from app.models.card import DebriefDto
 from app.models.session import SessionDto, StartSessionRequest
 from app.scenes.data import get_scene
-from app.services import sessions
+from app.services import debrief, sessions
 from app.services.audio_cache import AudioCache
 from app.services.providers import ProviderError
 from app.services.registry import Providers
@@ -83,6 +85,15 @@ async def take_turn(
             f"{exc.provider} failed: {exc.message}", code="provider_error", status_code=502
         ) from exc
     return sessions.to_dto(updated, _providers(request))
+
+
+@router.post("/sessions/{session_id}/finish", response_model=DebriefDto)
+async def finish_session(
+    session_id: str, db: DbDep, profile: ProfileDep, settings: SettingsDep
+) -> DebriefDto:
+    """Ends the scene, reached or not; stumbles become cards; returns the debrief. Idempotent."""
+    doc = await sessions.get_owned(db, profile, session_id)
+    return await debrief.finish(db, profile, doc, timedelta(hours=settings.due_window_hours))
 
 
 @router.get("/sessions/{session_id}/turns/{turn_id}/audio")

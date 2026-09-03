@@ -34,6 +34,8 @@ class Settings(BaseSettings):
 
     # A silence this long while the mic is held is a freeze.
     freeze_threshold_ms: int = 3000
+    # A card counts as due this many hours early, so "tomorrow" means the next session, not 24h.
+    due_window_hours: int = 8
 
     @computed_field  # type: ignore[prop-decorator]
     @property
