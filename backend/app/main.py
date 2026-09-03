@@ -8,14 +8,20 @@ from app.db import Client, make_client
 from app.errors import register_handlers
 from app.log import configure_logging, get_logger
 from app.middleware import RequestIdMiddleware
-from app.routers import health, profiles, today
+from app.routers import health, profiles, sessions, today
+from app.services.audio_cache import AudioCache
+from app.services.registry import Providers, build_providers
 from app.settings import Settings
 
 # Quick tunnels get a new hostname on every restart; in dev, allow them all.
 _DEV_ORIGIN_REGEX = r"https://.*\.trycloudflare\.com"
 
 
-def create_app(settings: Settings | None = None, db_client: Client | None = None) -> FastAPI:
+def create_app(
+    settings: Settings | None = None,
+    db_client: Client | None = None,
+    providers: Providers | None = None,
+) -> FastAPI:
     settings = settings or Settings()
     configure_logging(settings.env)
     log = get_logger(__name__)
@@ -25,18 +31,25 @@ def create_app(settings: Settings | None = None, db_client: Client | None = None
         owns_client = db_client is None
         client = db_client or make_client(settings.mongodb_uri)
         app.state.db = client[settings.mongodb_db]
-        log.info("startup", **settings.redact())
+        owns_providers = providers is None
+        app.state.providers = providers or build_providers(settings)
+        log.info("startup", providers=app.state.providers.mode, **settings.redact())
         try:
             yield
         finally:
+            if owns_providers:
+                await app.state.providers.aclose()
             if owns_client:
                 client.close()
 
     app = FastAPI(title="Stumble API", version="0.1.0", lifespan=lifespan)
     app.state.settings = settings
+    app.state.audio_cache = AudioCache()
     if db_client is not None:
-        # Tests inject a client and never run lifespan.
+        # Tests inject a client and providers and never run lifespan.
         app.state.db = db_client[settings.mongodb_db]
+    if providers is not None:
+        app.state.providers = providers
 
     app.add_middleware(
         CORSMiddleware,
@@ -53,6 +66,7 @@ def create_app(settings: Settings | None = None, db_client: Client | None = None
     app.include_router(health.router)
     app.include_router(profiles.router)
     app.include_router(today.router)
+    app.include_router(sessions.router)
     return app
 
 

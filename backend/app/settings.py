@@ -18,14 +18,22 @@ class Settings(BaseSettings):
 
     cors_origins_raw: str = Field(default="http://localhost:3000", validation_alias="cors_origins")
 
+    # auto: real where a key exists, fake otherwise. real: fail on a missing key. fake: no network.
+    providers: Literal["auto", "real", "fake"] = "auto"
+
     openrouter_api_key: str | None = None
     openrouter_model: str = ""
 
     groq_api_key: str | None = None
+    groq_stt_model: str = "whisper-large-v3-turbo"
 
     elevenlabs_api_key: str | None = None
     elevenlabs_voice_id: str | None = None
+    elevenlabs_model: str = "eleven_flash_v2_5"
     tts_provider: Literal["elevenlabs", "browser"] = "elevenlabs"
+
+    # A silence this long while the mic is held is a freeze.
+    freeze_threshold_ms: int = 3000
 
     @computed_field  # type: ignore[prop-decorator]
     @property
