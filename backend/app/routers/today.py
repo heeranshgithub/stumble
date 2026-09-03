@@ -40,6 +40,7 @@ async def today(db: DbDep, profile: ProfileDep, settings: SettingsDep) -> TodayD
     return TodayDto(
         day_number=_day_number(profile["created_at"]),
         review_due=deck["due"],
+        scene_unlocked=deck["due"] == 0,
         next_scene=await next_scene(db, profile, window),
         deck=DeckStatsDto(**deck),
     )

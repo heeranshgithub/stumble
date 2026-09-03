@@ -8,7 +8,7 @@ from app.db import Client, make_client
 from app.errors import register_handlers
 from app.log import configure_logging, get_logger
 from app.middleware import RequestIdMiddleware
-from app.routers import health, profiles, sessions, today
+from app.routers import health, profiles, reviews, scenes, sessions, today
 from app.services.audio_cache import AudioCache
 from app.services.registry import Providers, build_providers
 from app.settings import Settings
@@ -67,6 +67,8 @@ def create_app(
     app.include_router(profiles.router)
     app.include_router(today.router)
     app.include_router(sessions.router)
+    app.include_router(scenes.router)
+    app.include_router(reviews.router)
     return app
 
 

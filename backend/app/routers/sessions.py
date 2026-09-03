@@ -1,17 +1,15 @@
-from collections.abc import AsyncIterator
 from datetime import timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, File, Form, Request, UploadFile
-from fastapi.responses import Response, StreamingResponse
+from fastapi.responses import Response
 
 from app.deps import DbDep, ProfileDep, SettingsDep
 from app.errors import AppError, BadRequest, NotFound
 from app.models.card import DebriefDto
 from app.models.session import SessionDto, StartSessionRequest
 from app.scenes.data import get_scene
-from app.services import debrief, sessions
-from app.services.audio_cache import AudioCache
+from app.services import cards, debrief, sessions, tts
 from app.services.providers import ProviderError
 from app.services.registry import Providers
 
@@ -25,19 +23,21 @@ def _providers(request: Request) -> Providers:
     return providers
 
 
-def _cache(request: Request) -> AudioCache:
-    cache: AudioCache = request.app.state.audio_cache
-    return cache
-
-
 @router.post("/sessions", response_model=SessionDto)
 async def start_session(
-    body: StartSessionRequest, db: DbDep, profile: ProfileDep, request: Request
+    body: StartSessionRequest,
+    db: DbDep,
+    profile: ProfileDep,
+    settings: SettingsDep,
+    request: Request,
 ) -> SessionDto:
     scene = get_scene(body.scene_id)
     if scene is None:
         raise NotFound("Scene not found.", code="scene_not_found")
-    doc = await sessions.start(db, profile, scene, body.patience)
+    # The character is told which words are due, so the scene steers toward them.
+    window = timedelta(hours=settings.due_window_hours)
+    due = [c["target"] for c in await cards.due_cards(db, profile["_id"], window, limit=5)]
+    doc = await sessions.start(db, profile, scene, body.patience, due_cards=due)
     return sessions.to_dto(doc, _providers(request))
 
 
@@ -103,26 +103,4 @@ async def turn_audio(session_id: str, turn_id: str, db: DbDep, request: Request)
     turn = next((t for t in doc["turns"] if t["id"] == turn_id and t["role"] == "character"), None)
     if turn is None:
         raise NotFound("Turn not found.", code="turn_not_found")
-
-    providers = _providers(request)
-    cache = _cache(request)
-    key = f"{session_id}:{turn_id}"
-    headers = {"Cache-Control": "private, max-age=86400"}
-
-    cached = cache.get(key)
-    if cached is not None:
-        return Response(
-            content=cached, media_type=providers.synthesizer.content_type, headers=headers
-        )
-
-    async def body() -> AsyncIterator[bytes]:
-        chunks: list[bytes] = []
-        try:
-            async for chunk in providers.synthesizer.stream(turn["text"]):
-                chunks.append(chunk)
-                yield chunk
-        except ProviderError:
-            return
-        cache.put(key, b"".join(chunks))
-
-    return StreamingResponse(body(), media_type=providers.synthesizer.content_type, headers=headers)
+    return tts.stream_cached(request, f"{session_id}:{turn_id}", turn["text"])

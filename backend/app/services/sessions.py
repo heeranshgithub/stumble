@@ -38,7 +38,13 @@ def _turn(role: str, text: str, goal_progress: float, **extra: Any) -> Document:
     }
 
 
-async def start(db: Database, profile: Document, scene: Scene, patience: str) -> Document:
+async def start(
+    db: Database,
+    profile: Document,
+    scene: Scene,
+    patience: str,
+    due_cards: list[str] | None = None,
+) -> Document:
     opening = _turn("character", scene.opening_line, 0.0, text_en=None)
     doc: Document = {
         "profile_id": profile["_id"],
@@ -46,7 +52,7 @@ async def start(db: Database, profile: Document, scene: Scene, patience: str) ->
         "patience": patience,
         "status": "active",
         "goal_progress": 0.0,
-        "due_cards": [],
+        "due_cards": due_cards or [],
         "turns": [opening],
         "created_at": _now(),
         "finished_at": None,

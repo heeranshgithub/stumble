@@ -47,7 +47,14 @@ def test_today_dto_keys() -> None:
     dto = TodayDto(
         day_number=1,
         review_due=0,
+        scene_unlocked=True,
         next_scene=None,
         deck=DeckStatsDto(caught=0, mastered=0, due=0),
     )
-    assert set(dto.model_dump(by_alias=True)) == {"dayNumber", "reviewDue", "nextScene", "deck"}
+    assert set(dto.model_dump(by_alias=True)) == {
+        "dayNumber",
+        "reviewDue",
+        "sceneUnlocked",
+        "nextScene",
+        "deck",
+    }
