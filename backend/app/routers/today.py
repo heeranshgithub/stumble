@@ -39,6 +39,7 @@ async def today(db: DbDep, profile: ProfileDep, settings: SettingsDep) -> TodayD
     deck = await cards.stats(db, profile["_id"], window)
     return TodayDto(
         day_number=_day_number(profile["created_at"]),
+        onboarded=bool(profile.get("onboarded", False)),
         review_due=deck["due"],
         scene_unlocked=deck["due"] == 0,
         next_scene=await next_scene(db, profile, window),

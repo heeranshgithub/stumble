@@ -24,9 +24,12 @@ class ApiModel(BaseModel):
     @field_validator("*", mode="after")
     @classmethod
     def _utc_datetimes(cls, value: Any) -> Any:
-        """Mongo returns naive datetimes; the wire always carries an offset. Naive means UTC."""
-        if isinstance(value, datetime) and value.tzinfo is None:
-            return value.replace(tzinfo=UTC)
+        """Wire datetimes always carry an offset and millisecond precision, matching what Mongo
+        stores, so a value is identical before and after a round trip. Naive means UTC."""
+        if isinstance(value, datetime):
+            if value.tzinfo is None:
+                value = value.replace(tzinfo=UTC)
+            return value.replace(microsecond=value.microsecond // 1000 * 1000)
         return value
 
 

@@ -15,7 +15,7 @@ def test_profile_dto_keys() -> None:
         created_at=datetime.now(UTC),
     )
     dumped = dto.model_dump(by_alias=True)
-    assert set(dumped) == {"id", "deviceId", "language", "createdAt"}
+    assert set(dumped) == {"id", "deviceId", "language", "createdAt", "onboarded", "level"}
     assert dumped["id"] == "507f1f77bcf86cd799439011"
 
 
@@ -46,6 +46,7 @@ def test_scene_dto_keys() -> None:
 def test_today_dto_keys() -> None:
     dto = TodayDto(
         day_number=1,
+        onboarded=False,
         review_due=0,
         scene_unlocked=True,
         next_scene=None,
@@ -53,6 +54,7 @@ def test_today_dto_keys() -> None:
     )
     assert set(dto.model_dump(by_alias=True)) == {
         "dayNumber",
+        "onboarded",
         "reviewDue",
         "sceneUnlocked",
         "nextScene",

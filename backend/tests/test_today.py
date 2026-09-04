@@ -27,4 +27,5 @@ async def test_profile_is_idempotent(client: AsyncClient) -> None:
     second = await client.post("/profiles", headers={"X-Device-Id": DEVICE})
     assert first.status_code == second.status_code == 200
     assert first.json()["id"] == second.json()["id"]
-    assert set(first.json()) == {"id", "deviceId", "language", "createdAt"}
+    assert set(first.json()) == {"id", "deviceId", "language", "createdAt", "onboarded", "level"}
+    assert first.json()["onboarded"] is False

@@ -35,28 +35,47 @@ class FakeTranscriber:
         return Transcript(text=self.text, duration_s=max(0.5, len(audio) / 32000))
 
 
+_FAKE_BRIEF: dict[str, Any] = {
+    "patterns": [
+        {
+            "title": "English fallback for café vocabulary",
+            "detail": "Reached for 'coffee' and 'please' mid-sentence; the French forms exist "
+            "but aren't automatic yet.",
+            "count": 2,
+        },
+        {
+            "title": "Freezes on prices",
+            "detail": "Stalled when asked to pay; 'C'est combien ?' is the missing formula.",
+            "count": 1,
+        },
+    ],
+    "strengths": ["Greets and opens naturally", "Keeps talking after a stumble"],
+    "suggested_session": [
+        "Role-play a market with prices from 2 to 50 euros.",
+        "Drill the five café formulas until automatic.",
+        "Five minutes on 'je voudrais' + noun for ordering.",
+    ],
+}
+
+
 class FakeChat:
     """Rule-based stand-in: recasts English words, advances the goal a third per turn."""
 
     async def complete_json(self, messages: list[ChatMessage]) -> dict[str, Any]:
+        system = next((m.content for m in messages if m.role == "system"), "")
+        if system.startswith("TUTOR BRIEF"):
+            return dict(_FAKE_BRIEF)
+        if system.startswith("PLACEMENT"):
+            heard = next((m.content for m in reversed(messages) if m.role == "user"), "")
+            return {
+                "level": "A2",
+                "note": "You kept going, which is the whole game. Let's find the gaps.",
+                "stumbles": _code_switches(heard),
+            }
         learner_turns = [m for m in messages if m.role == "user"]
         # The pause annotation is metadata for the model, never part of the learner's sentence.
         last = learner_turns[-1].content.split("\n\n[", 1)[0] if learner_turns else ""
-        lowered = last.lower()
-        stumbles: list[dict[str, Any]] = []
-        for en, fr in _EN_FR.items():
-            if en in lowered:
-                context = _cloze(last, en)
-                stumbles.append(
-                    {
-                        "type": "code_switch",
-                        "said": en,
-                        "target": fr,
-                        "context": context,
-                        "prompt_line": "",
-                        "confidence": 0.95,
-                    }
-                )
+        stumbles = _code_switches(last)
         n = len(learner_turns)
         reply, reply_en = _REPLIES[min(n - 1, len(_REPLIES) - 1)] if n else _REPLIES[0]
         progress = min(1.0, round(n / 3, 2))
@@ -68,6 +87,24 @@ class FakeChat:
             "stumbles": stumbles,
             "wins": [],
         }
+
+
+def _code_switches(sentence: str) -> list[dict[str, Any]]:
+    lowered = sentence.lower()
+    out: list[dict[str, Any]] = []
+    for en, fr in _EN_FR.items():
+        if en in lowered:
+            out.append(
+                {
+                    "type": "code_switch",
+                    "said": en,
+                    "target": fr,
+                    "context": _cloze(sentence, en),
+                    "prompt_line": "",
+                    "confidence": 0.95,
+                }
+            )
+    return out
 
 
 def _cloze(sentence: str, word: str) -> str:
