@@ -27,6 +27,7 @@ export interface DeckStatsDto {
 
 export interface TodayDto {
   dayNumber: number;
+  onboarded: boolean;
   reviewDue: number;
   sceneUnlocked: boolean;
   nextScene: SceneDto | null;
@@ -83,6 +84,80 @@ export interface ProfileDto {
   deviceId: string;
   language: string;
   createdAt: string;
+  onboarded: boolean;
+  level: string | null;
+}
+
+export type WordState = "on" | "off" | "miss";
+
+export interface SeriesPointDto {
+  date: string;
+  caught: number;
+  mastered: number;
+  struggling: number;
+}
+
+export interface UnderPressureDto {
+  target: string;
+  type: StumbleType;
+  lapses: number;
+  producedIn: string[];
+}
+
+export interface ProgressDto {
+  caught: number;
+  mastered: number;
+  due: number;
+  scenesCleared: number;
+  sessions: number;
+  minutesSpoken: number;
+  series: SeriesPointDto[];
+  underPressure: UnderPressureDto[];
+}
+
+export interface DeckCardDto {
+  id: string;
+  target: string;
+  state: WordState;
+  type: StumbleType;
+  sceneId: string;
+  sceneTitle: string;
+  context: string;
+  due: string;
+  lapses: number;
+  produced: number;
+}
+
+export interface DeckDto {
+  cards: DeckCardDto[];
+  caught: number;
+  mastered: number;
+  due: number;
+}
+
+export interface BriefPatternDto {
+  title: string;
+  detail: string;
+  count: number;
+}
+
+export interface TutorBriefDto {
+  weekLabel: string;
+  generatedAt: string;
+  cardsAnalysed: number;
+  scenesPlayed: number;
+  patterns: BriefPatternDto[];
+  strengths: string[];
+  suggestedSession: string[];
+  asText: string;
+}
+
+export interface PlacementDto {
+  level: "A1" | "A2" | "B1";
+  heard: string;
+  note: string;
+  stumbles: StumbleDto[];
+  cardsAdded: number;
 }
 
 export type StumbleType = "freeze" | "code_switch" | "correction" | "miss";

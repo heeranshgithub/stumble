@@ -17,6 +17,7 @@ export const metadata: Metadata = {
   description: "Speak French. The words you can't find become the words you review.",
   applicationName: "Stumble",
   manifest: "/manifest.webmanifest",
+  icons: { icon: "/icons/icon-192.png", apple: "/icons/icon-192.png" },
   appleWebApp: { capable: true, statusBarStyle: "default", title: "Stumble" },
   formatDetection: { telephone: false },
 };

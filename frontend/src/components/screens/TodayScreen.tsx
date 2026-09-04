@@ -2,6 +2,8 @@
 
 import { Lock, Mic } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 import { Blob } from "@/components/stumble/Blob";
 import { Chip } from "@/components/stumble/Chip";
@@ -14,8 +16,15 @@ const weekday = new Intl.DateTimeFormat("en", { weekday: "long" });
 
 export function TodayScreen() {
   const { data, error, isLoading, refetch } = useGetTodayQuery();
+  const router = useRouter();
+  const needsOnboarding = !!data && !data.onboarded;
 
-  if (isLoading) return <TodaySkeleton />;
+  // First open on this device: the twenty-second placement comes before anything else.
+  useEffect(() => {
+    if (needsOnboarding) router.replace("/onboarding");
+  }, [needsOnboarding, router]);
+
+  if (isLoading || needsOnboarding) return <TodaySkeleton />;
 
   if (error || !data) {
     const e = getErrorMessage(error);

@@ -29,8 +29,9 @@ function pickMime(): string | undefined {
 /**
  * Hold-to-talk on a pointer (or the space bar). Records with MediaRecorder and measures silence with an
  * AnalyserNode while held, so a freeze is known on the client before the audio even uploads.
+ * `maxMs` auto-releases (the twenty-second placement).
  */
-export function useHoldToTalk(onCapture: (c: Capture) => void, disabled = false) {
+export function useHoldToTalk(onCapture: (c: Capture) => void, disabled = false, maxMs?: number) {
   const [holding, setHolding] = useState(false);
   const [level, setLevel] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -40,6 +41,7 @@ export function useHoldToTalk(onCapture: (c: Capture) => void, disabled = false)
   const chunksRef = useRef<Blob[]>([]);
   const ctxRef = useRef<AudioContext | null>(null);
   const rafRef = useRef<number>(0);
+  const maxTimerRef = useRef<number>(0);
   const statsRef = useRef<Stats | null>(null);
   const activeRef = useRef(false);
   const onCaptureRef = useRef(onCapture);
@@ -99,6 +101,18 @@ export function useHoldToTalk(onCapture: (c: Capture) => void, disabled = false)
     rafRef.current = requestAnimationFrame(tick);
   }, []);
 
+  const stop = useCallback(() => {
+    if (!activeRef.current) return;
+    activeRef.current = false;
+    cancelAnimationFrame(rafRef.current);
+    window.clearTimeout(maxTimerRef.current);
+    setHolding(false);
+    setLevel(0);
+    const r = recorderRef.current;
+    if (r && r.state !== "inactive") r.stop();
+    recorderRef.current = null;
+  }, []);
+
   const start = useCallback(async () => {
     if (disabled || activeRef.current || !supported) return;
     activeRef.current = true;
@@ -134,27 +148,18 @@ export function useHoldToTalk(onCapture: (c: Capture) => void, disabled = false)
       recorder.start(250);
       meter(stream);
       setHolding(true);
+      if (maxMs) maxTimerRef.current = window.setTimeout(stop, maxMs);
     } catch (e) {
       activeRef.current = false;
       setError(e instanceof Error && e.name === "NotAllowedError" ? "Microphone blocked. Type instead." : "Mic unavailable.");
     }
-  }, [disabled, supported, getStream, meter]);
-
-  const stop = useCallback(() => {
-    if (!activeRef.current) return;
-    activeRef.current = false;
-    cancelAnimationFrame(rafRef.current);
-    setHolding(false);
-    setLevel(0);
-    const r = recorderRef.current;
-    if (r && r.state !== "inactive") r.stop();
-    recorderRef.current = null;
-  }, []);
+  }, [disabled, supported, getStream, meter, maxMs, stop]);
 
   useEffect(() => {
     return () => {
       activeRef.current = false;
       cancelAnimationFrame(rafRef.current);
+      window.clearTimeout(maxTimerRef.current);
       const r = recorderRef.current;
       if (r && r.state !== "inactive") r.stop();
       streamRef.current?.getTracks().forEach((t) => t.stop());
