@@ -27,7 +27,7 @@ export function TabBar() {
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`flex flex-col items-center gap-1 px-3 py-1 text-[10px] font-extrabold ${active ? "text-ink" : "text-ink/45"}`}
+                className={`flex flex-col items-center gap-1 px-3 py-1 text-[10px] font-extrabold ${active ? "text-ink" : "text-ink/65"}`}
               >
                 <Icon className="size-5" strokeWidth={active ? 2.5 : 2} />
                 {label}

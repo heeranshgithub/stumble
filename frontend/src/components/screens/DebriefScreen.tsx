@@ -88,7 +88,7 @@ export function DebriefScreen({ sceneId, sessionId }: { sceneId: string; session
                 </span>
                 <div className="min-w-0">
                   <p className="text-[15px] font-extrabold leading-tight">{win.phrase}</p>
-                  <p className="text-xs font-bold text-ink/55">
+                  <p className="text-xs font-bold text-ink/65">
                     {win.cardId ? "a card you'd stumbled on, produced clean" : "clean, first try"}
                   </p>
                 </div>
@@ -97,7 +97,7 @@ export function DebriefScreen({ sceneId, sessionId }: { sceneId: string; session
           </ul>
         ) : (
           <div className="px-5 py-6">
-            <p className="text-[18px] font-extrabold leading-snug text-ink/40">
+            <p className="text-[18px] font-extrabold leading-snug text-ink/65">
               Nothing to catch this time. Try the next scene at a harder patience.
             </p>
           </div>
@@ -141,11 +141,11 @@ function StumbleRow({ s }: { s: DebriefStumbleDto }) {
         <p className="text-[15px] font-extrabold leading-tight">
           {s.type === "freeze" ? s.target : (
             <>
-              <span className="text-ink/50 line-through decoration-stumble decoration-2">{s.said}</span> → {s.target}
+              <span className="text-ink/65 line-through decoration-stumble decoration-2">{s.said}</span> → {s.target}
             </>
           )}
         </p>
-        <p className="truncate text-xs font-bold text-ink/55">
+        <p className="truncate text-xs font-bold text-ink/65">
           {s.context ? `"${s.context}"` : s.promptLine ? `after "${s.promptLine}"` : ""} · {label[s.type]}
           {s.isNew ? "" : " · again"}
         </p>

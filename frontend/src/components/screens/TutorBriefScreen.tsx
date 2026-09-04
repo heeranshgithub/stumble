@@ -65,7 +65,7 @@ export function TutorBriefScreen() {
 
       <div className="flex flex-1 flex-col gap-5 px-5 pt-5 pb-4">
         <section>
-          <p className="text-xs font-bold text-ink/60">Patterns</p>
+          <p className="text-xs font-bold text-ink/65">Patterns</p>
           <ul className="mt-1 divide-y divide-ink/10">
             {data.patterns.map((p) => (
               <li key={p.title} className="flex gap-3 py-3">
@@ -74,7 +74,7 @@ export function TutorBriefScreen() {
                 </span>
                 <div>
                   <p className="text-[15px] font-extrabold leading-tight">{p.title}</p>
-                  <p className="mt-0.5 text-xs font-bold text-ink/55">{p.detail}</p>
+                  <p className="mt-0.5 text-xs font-bold text-ink/65">{p.detail}</p>
                 </div>
               </li>
             ))}
@@ -83,7 +83,7 @@ export function TutorBriefScreen() {
 
         {data.strengths.length > 0 ? (
           <section className="rounded-2xl bg-pharmacie/60 px-4 py-3">
-            <p className="text-xs font-bold text-ink/60">Strong</p>
+            <p className="text-xs font-bold text-ink/65">Strong</p>
             <p className="mt-1 text-[14px] font-extrabold leading-snug">{data.strengths.join(" · ")}</p>
           </section>
         ) : null}
@@ -108,7 +108,7 @@ export function TutorBriefScreen() {
           {copied ? <Check className="size-5" strokeWidth={2.5} /> : <Copy className="size-5" strokeWidth={2.25} />}
           {copied ? "Copied" : "Copy as text for my tutor"}
         </PillButton>
-        <p className="mt-2 text-center text-[11px] font-bold text-ink/50">Paste it into your next Varsity Tutors session.</p>
+        <p className="mt-2 text-center text-[11px] font-bold text-ink/65">Paste it into your next Varsity Tutors session.</p>
       </div>
     </div>
   );

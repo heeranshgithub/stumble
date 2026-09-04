@@ -123,7 +123,7 @@ function Card({
         {card.promptLine ? (
           <>
             <p className="text-xs font-bold text-ink-2">{card.characterName || "They"} asked</p>
-            <p className="text-[18px] font-extrabold leading-tight tracking-[-0.01em] text-ink/50">
+            <p className="text-[18px] font-extrabold leading-tight tracking-[-0.01em] text-ink/65">
               « {card.promptLine} »
             </p>
           </>
@@ -134,7 +134,7 @@ function Card({
         <p className="mt-1 text-[28px] font-extrabold leading-[1.15] tracking-[-0.02em]">
           {before}
           {revealed ? (
-            <span className="text-ink underline decoration-ink decoration-[3px] underline-offset-[6px]">
+            <span className="lyr-word-in text-ink underline decoration-ink decoration-[3px] underline-offset-[6px]">
               {card.target}
             </span>
           ) : (
@@ -190,7 +190,7 @@ function Card({
       </div>
 
       {revealed ? (
-        <section className="rounded-t-[28px] bg-ink px-5 pt-5 pb-8 text-paper">
+        <section className="sheet-up rounded-t-[28px] bg-ink px-5 pt-5 pb-8 text-paper">
           <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-paper-2">Answer</p>
           <div className="flex items-center justify-between gap-3">
             <p className="text-[34px] font-extrabold leading-none tracking-tight">{card.target}</p>

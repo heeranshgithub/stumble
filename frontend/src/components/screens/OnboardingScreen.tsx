@@ -151,7 +151,7 @@ export function OnboardingScreen() {
               onChange={(e) => setDraft(e.target.value)}
               placeholder="Bonjour, je m'appelle…"
               lang="fr"
-              className="h-12 flex-1 rounded-pill bg-paper px-4 text-[15px] font-bold text-ink outline-none placeholder:text-ink/40"
+              className="h-12 flex-1 rounded-pill bg-paper px-4 text-[15px] font-bold text-ink outline-none placeholder:text-ink/65"
             />
             <button
               type="submit"

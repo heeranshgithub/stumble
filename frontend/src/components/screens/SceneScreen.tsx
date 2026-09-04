@@ -188,11 +188,12 @@ export function SceneScreen({ sceneId }: { sceneId: string }) {
 
       <div ref={listRef} className="flex flex-1 flex-col gap-4 overflow-y-auto px-5 pt-3 pb-4">
         {session ? (
-          session.turns.map((t) => (
+          session.turns.map((t, i) => (
             <TurnView
               key={t.id}
               turn={t}
               name={name}
+              latest={i >= session.turns.length - 2}
               showTranslation={shownTranslation === t.id}
               onToggleTranslation={() => setShownTranslation((cur) => (cur === t.id ? null : t.id))}
               onReplay={() => void speaker.play(t.audioUrl, t.text)}
@@ -248,7 +249,7 @@ export function SceneScreen({ sceneId }: { sceneId: string }) {
                 onChange={(e) => setDraft(e.target.value)}
                 placeholder="Écris ta réponse…"
                 lang="fr"
-                className="h-12 flex-1 rounded-pill bg-paper px-4 text-[15px] font-bold text-ink outline-none placeholder:text-ink/40"
+                className="h-12 flex-1 rounded-pill bg-paper px-4 text-[15px] font-bold text-ink outline-none placeholder:text-ink/65"
               />
               <button
                 type="submit"
@@ -294,22 +295,25 @@ export function SceneScreen({ sceneId }: { sceneId: string }) {
 function TurnView({
   turn,
   name,
+  latest,
   showTranslation,
   onToggleTranslation,
   onReplay,
 }: {
   turn: TurnDto;
   name: string;
+  /** The last exchange: the learner line fills in word by word, the reply fades in. */
+  latest: boolean;
   showTranslation: boolean;
   onToggleTranslation: () => void;
   onReplay: () => void;
 }) {
   if (turn.role === "character") {
     return (
-      <div>
+      <div className={latest ? "fade-in" : undefined}>
         <p className="text-xs font-bold text-ink-2">{name}</p>
         <button type="button" onClick={onToggleTranslation} className="block text-left">
-          <p className="text-[20px] font-extrabold leading-[1.2] tracking-[-0.02em] text-ink/55">{turn.text}</p>
+          <p className="text-[20px] font-extrabold leading-[1.2] tracking-[-0.02em] text-ink/65">{turn.text}</p>
         </button>
         {showTranslation && turn.textEn ? <p className="mt-1 text-sm font-bold text-ink-2">{turn.textEn}</p> : null}
         <button type="button" onClick={onReplay} className="mt-1 text-[11px] font-extrabold text-ink-2 underline-offset-2 hover:underline">
@@ -323,7 +327,9 @@ function TurnView({
   return (
     <div>
       <p className="text-xs font-bold text-ink-2">You</p>
-      {turn.text ? <LyricLine className="mt-0.5" words={learnerWords(turn.text, turn.stumbles)} /> : null}
+      {turn.text ? (
+        <LyricLine className="mt-0.5" animate={latest} words={learnerWords(turn.text, turn.stumbles)} />
+      ) : null}
       {turn.stumbles.length > 0 || turn.wins.length > 0 ? (
         <div className="mt-2 flex flex-wrap gap-2">
           {others.map((s, i) => (

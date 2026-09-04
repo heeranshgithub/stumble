@@ -80,7 +80,8 @@ body {
   text-underline-offset: 0.22em;
 }
 @utility lyr-off-sm {
-  color: color-mix(in oklch, var(--color-ink) 32%, transparent);
+  /* 50% ink on paper is ≈3.4:1, the large-text floor for these 18px+ bold words. */
+  color: color-mix(in oklch, var(--color-ink) 50%, transparent);
 }
 @utility lyr-miss-sm {
   color: var(--color-stumble);
@@ -89,4 +90,57 @@ body {
 /* Safe area for the home indicator. */
 @utility pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+/*
+ * The one authored motion. Words fill in like lyrics as a turn lands (staggered per word), and the
+ * answer sheet rises from the bottom of a review card. Exponential ease-out from a visible default;
+ * nothing else in the app animates on its own.
+ */
+@keyframes lyr-word-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.35em);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+@keyframes sheet-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@utility lyr-word-in {
+  display: inline-block;
+  animation: lyr-word-in 520ms var(--ease-out-expo) both;
+}
+@utility sheet-up {
+  animation: sheet-up 560ms var(--ease-out-expo) both;
+}
+@utility fade-in {
+  animation: fade-in 420ms var(--ease-out-expo) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lyr-word-in,
+  .sheet-up,
+  .fade-in {
+    animation: none;
+  }
 }

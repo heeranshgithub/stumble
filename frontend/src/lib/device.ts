@@ -1,25 +1,25 @@
 const KEY = "stumble.device";
 
 /**
- * No accounts. The device id is the identity, minted once per browser and sent on every request.
- * Returns "" during server rendering; every data hook runs on the client.
+ * No accounts: the device id is the identity, minted once and kept in localStorage.
+ * `?device=<id>` in the URL adopts that id for this browser (used to open the seeded demo profile).
  */
 export function getDeviceId(): string {
   if (typeof window === "undefined") return "";
   try {
-    const existing = window.localStorage.getItem(KEY);
-    if (existing) return existing;
-    const fresh = crypto.randomUUID();
-    window.localStorage.setItem(KEY, fresh);
-    return fresh;
+    const fromUrl = new URLSearchParams(window.location.search).get("device");
+    if (fromUrl) {
+      window.localStorage.setItem(KEY, fromUrl);
+      return fromUrl;
+    }
+    let id = window.localStorage.getItem(KEY);
+    if (!id) {
+      id = crypto.randomUUID();
+      window.localStorage.setItem(KEY, id);
+    }
+    return id;
   } catch {
-    // Private mode or blocked storage: a per-session id still lets the app work.
-    return sessionId();
+    // Storage blocked (private mode, strict settings): a per-page identity is better than none.
+    return "no-storage";
   }
-}
-
-let memo = "";
-function sessionId(): string {
-  if (!memo) memo = crypto.randomUUID();
-  return memo;
 }

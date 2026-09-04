@@ -72,7 +72,7 @@ export function Kitchen() {
           </Blob>
 
           <Blob color="paper">
-            <p className="text-xs font-bold text-ink/60">deck sheet on paper</p>
+            <p className="text-xs font-bold text-ink/65">deck sheet on paper</p>
             <LyricLine size="sm" className="mt-1" words={[...sheet]} />
           </Blob>
 

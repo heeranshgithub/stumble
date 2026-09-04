@@ -103,7 +103,7 @@ export function TodayScreen() {
       ) : null}
 
       <Blob color="paper" className="flex-[0.8]">
-        <div className="flex items-baseline justify-between text-xs font-bold text-ink/60">
+        <div className="flex items-baseline justify-between text-xs font-bold text-ink/65">
           <span>Your deck</span>
           <span>
             {data.deck.caught} caught · {data.deck.mastered} mastered
@@ -120,7 +120,7 @@ export function TodayScreen() {
               className="mt-2"
               words={uses.map((t) => ({ text: t, state: "miss" as const }))}
             />
-            <Link href="/deck" className="mt-2 inline-block text-xs font-extrabold text-ink/60 underline-offset-2 hover:underline">
+            <Link href="/deck" className="mt-2 inline-block text-xs font-extrabold text-ink/65 underline-offset-2 hover:underline">
               open the deck
             </Link>
           </>

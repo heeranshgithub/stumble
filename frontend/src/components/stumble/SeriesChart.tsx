@@ -119,7 +119,7 @@ export function SeriesChart({ points }: { points: SeriesPointDto[] }) {
           </div>
         ) : null}
       </div>
-      <figcaption className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-bold text-ink/60">
+      <figcaption className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-bold text-ink/65">
         {SERIES.map((s) => (
           <span key={s.key} className="flex items-center gap-1.5">
             <i className="inline-block h-0.5 w-3 rounded-full" style={{ background: s.color }} />
@@ -128,10 +128,10 @@ export function SeriesChart({ points }: { points: SeriesPointDto[] }) {
         ))}
       </figcaption>
       <details className="mt-2 text-xs">
-        <summary className="cursor-pointer font-bold text-ink/60">as a table</summary>
+        <summary className="cursor-pointer font-bold text-ink/65">as a table</summary>
         <table className="mt-1 w-full text-left">
           <thead>
-            <tr className="text-ink/60">
+            <tr className="text-ink/65">
               <th className="font-bold">day</th>
               {SERIES.map((s) => (
                 <th key={s.key} className="font-bold">

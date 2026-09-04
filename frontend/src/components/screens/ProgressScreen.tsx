@@ -50,7 +50,7 @@ export function ProgressScreen() {
       </Blob>
 
       <Blob color="paper">
-        <p className="text-xs font-bold text-ink/60">Caught vs. mastered vs. still due</p>
+        <p className="text-xs font-bold text-ink/65">Caught vs. mastered vs. still due</p>
         <div className="mt-2 text-ink">
           <SeriesChart points={data.series} />
         </div>
@@ -58,7 +58,7 @@ export function ProgressScreen() {
 
       {data.underPressure.length > 0 ? (
         <Blob color="paper" className="pt-0">
-          <p className="text-xs font-bold text-ink/60">Words you found under pressure</p>
+          <p className="text-xs font-bold text-ink/65">Words you found under pressure</p>
           <ul className="mt-1 divide-y divide-ink/10">
             {data.underPressure.map((u) => (
               <li key={u.target} className="flex items-center gap-3 py-2.5">
@@ -67,7 +67,7 @@ export function ProgressScreen() {
                 </span>
                 <div className="min-w-0">
                   <p className="text-[15px] font-extrabold leading-tight">{u.target}</p>
-                  <p className="truncate text-xs font-bold text-ink/55">
+                  <p className="truncate text-xs font-bold text-ink/65">
                     {u.lapses > 0 ? `stumbled ×${u.lapses + 1}` : "stumbled once"} → produced clean
                     {u.producedIn.length ? ` in ${u.producedIn.join(", ")}` : ""}
                   </p>
@@ -96,7 +96,7 @@ function Stat({ n, label, tone = "ink" }: { n: number; label: string; tone?: "in
   return (
     <div className="rounded-2xl bg-paper px-3 py-2.5 text-center">
       <p className={`text-[24px] font-extrabold leading-none tracking-tight ${color}`}>{n}</p>
-      <p className="mt-1 text-[11px] font-bold text-ink/55">{label}</p>
+      <p className="mt-1 text-[11px] font-bold text-ink/65">{label}</p>
     </div>
   );
 }

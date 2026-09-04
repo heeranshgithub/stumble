@@ -51,7 +51,7 @@ export function ScenesScreen() {
       </ul>
 
       <div className="mt-auto px-5 pb-8 pt-6">
-        <p className="text-xs font-bold text-ink/60">Character patience</p>
+        <p className="text-xs font-bold text-ink/65">Character patience</p>
         <div className="mt-2 grid grid-cols-3 gap-2" role="radiogroup" aria-label="Character patience">
           {(Object.keys(patienceLabel) as Patience[]).map((p) => {
             const on = p === patience;
@@ -65,7 +65,7 @@ export function ScenesScreen() {
                 className={`rounded-2xl px-3 py-2.5 text-left transition-colors ${on ? "bg-ink text-paper" : "bg-ink/8 text-ink"}`}
               >
                 <span className="block text-[13px] font-extrabold">{patienceLabel[p].title}</span>
-                <span className={`block text-[11px] font-bold ${on ? "text-paper-2" : "text-ink/55"}`}>{patienceLabel[p].body}</span>
+                <span className={`block text-[11px] font-bold ${on ? "text-paper-2" : "text-ink/65"}`}>{patienceLabel[p].body}</span>
               </button>
             );
           })}
@@ -89,7 +89,7 @@ function SceneRow({ scene }: { scene: SceneDto }) {
       </span>
       <div className="min-w-0 flex-1">
         <p className="text-[16px] font-extrabold leading-tight">{scene.title}</p>
-        <p className="truncate text-xs font-bold text-ink/55">
+        <p className="truncate text-xs font-bold text-ink/65">
           {isNext && scene.usesDueCards.length > 0
             ? `Uses your due cards: ${scene.usesDueCards.join(" · ")}`
             : cleared
