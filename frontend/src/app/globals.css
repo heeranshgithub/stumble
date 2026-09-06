@@ -36,7 +36,7 @@
 [data-scene="review"] { --scene: var(--color-review); }
 
 html {
-  min-height: 100dvh;
+  height: 100dvh;
 }
 
 body {

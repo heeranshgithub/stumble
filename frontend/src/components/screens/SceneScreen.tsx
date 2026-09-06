@@ -156,7 +156,7 @@ export function SceneScreen({ sceneId }: { sceneId: string }) {
 
   return (
     <div
-      className="flex flex-1 flex-col bg-scene"
+      className="flex min-h-0 flex-1 flex-col bg-scene"
       data-scene={color}
       onPointerDownCapture={onFirstTap}
     >
@@ -186,7 +186,10 @@ export function SceneScreen({ sceneId }: { sceneId: string }) {
         </div>
       </header>
 
-      <div ref={listRef} className="flex flex-1 flex-col gap-4 overflow-y-auto px-5 pt-3 pb-4">
+      <div
+        ref={listRef}
+        className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-5 pt-3 pb-4"
+      >
         {session ? (
           session.turns.map((t, i) => (
             <TurnView

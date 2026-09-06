@@ -18,7 +18,7 @@ export function TabBar() {
   if (hiddenOn.some((p) => pathname.startsWith(p))) return null;
 
   return (
-    <nav aria-label="Primary" className="border-t border-ink/10 bg-paper pb-safe">
+    <nav aria-label="Primary" className="shrink-0 border-t border-ink/10 bg-paper pb-safe">
       <ul className="flex justify-around px-2 pt-2 pb-2">
         {tabs.map(({ href, label, Icon }) => {
           const active = href === "/" ? pathname === "/" : pathname.startsWith(href);

@@ -32,7 +32,8 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${gabarito.variable} h-full`}>
-      <body className="min-h-dvh">
+      {/* The shell owns the viewport and scrolls internally; the page itself never scrolls. */}
+      <body className="h-dvh overflow-hidden">
         <Providers>
           <AppShell>{children}</AppShell>
         </Providers>
