@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { Blob } from "@/components/stumble/Blob";
 import { PillButton } from "@/components/stumble/PillButton";
+import { SampleLink } from "@/components/stumble/SampleLink";
 import { SeriesChart } from "@/components/stumble/SeriesChart";
 import { getErrorMessage } from "@/lib/errors";
 import { useGetProgressQuery } from "@/store/endpoints/progress";
@@ -47,6 +48,7 @@ export function ProgressScreen() {
           <Stat n={data.mastered} label="mastered" tone="mint" />
           <Stat n={data.due} label="still due" tone="stumble" />
         </div>
+        {data.caught === 0 ? <SampleLink className="mt-3" /> : null}
       </Blob>
 
       <Blob color="paper">

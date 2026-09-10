@@ -1,4 +1,5 @@
 import { QrCode } from "@/components/shell/QrCode";
+import { SampleBanner } from "@/components/shell/SampleBanner";
 import { TabBar } from "@/components/stumble/TabBar";
 
 /**
@@ -30,6 +31,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <div className="h-full md:h-[min(844px,calc(100dvh-4rem))] md:w-[410px] md:flex-none md:rounded-[54px] md:bg-black md:p-[10px] md:shadow-[0_40px_80px_-30px_rgba(0,0,0,0.8)]">
         <div className="flex h-full w-full flex-col overflow-hidden bg-paper md:rounded-[44px]">
+          <SampleBanner />
           <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain md:[scrollbar-width:none]">
             <div className="flex min-h-full flex-col">{children}</div>
           </main>

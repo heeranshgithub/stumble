@@ -9,6 +9,7 @@ import { Blob } from "@/components/stumble/Blob";
 import { Chip } from "@/components/stumble/Chip";
 import { LyricLine } from "@/components/stumble/LyricLine";
 import { PillButton } from "@/components/stumble/PillButton";
+import { SampleLink } from "@/components/stumble/SampleLink";
 import { getErrorMessage } from "@/lib/errors";
 import { useGetTodayQuery } from "@/store/endpoints/today";
 
@@ -110,9 +111,12 @@ export function TodayScreen() {
           </span>
         </div>
         {data.deck.caught === 0 ? (
-          <p className="mt-2 text-[18px] font-extrabold leading-snug lyr-off-sm">
-            Every word you reach for and miss lands here.
-          </p>
+          <>
+            <p className="mt-2 text-[18px] font-extrabold leading-snug lyr-off-sm">
+              Every word you reach for and miss lands here.
+            </p>
+            <SampleLink className="mt-2" />
+          </>
         ) : (
           <>
             <LyricLine

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Blob } from "@/components/stumble/Blob";
 import { Chip } from "@/components/stumble/Chip";
 import { PillButton } from "@/components/stumble/PillButton";
+import { SampleLink } from "@/components/stumble/SampleLink";
 import { getErrorMessage } from "@/lib/errors";
 import { useGetDeckQuery } from "@/store/endpoints/progress";
 import type { DeckCardDto } from "@/types/api";
@@ -45,9 +46,12 @@ export function DeckScreen() {
 
       <Blob color="paper" className="flex-1">
         {data.cards.length === 0 ? (
-          <p className="text-[18px] font-extrabold leading-snug lyr-off-sm">
-            Every word you reach for and miss lands here.
-          </p>
+          <>
+            <p className="text-[18px] font-extrabold leading-snug lyr-off-sm">
+              Every word you reach for and miss lands here.
+            </p>
+            <SampleLink className="mt-3" />
+          </>
         ) : (
           <p className="text-[19px] font-extrabold leading-[1.5] tracking-[-0.01em]">
             {data.cards.map((c, i) => (

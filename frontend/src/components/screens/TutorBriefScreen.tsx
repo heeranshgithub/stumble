@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { Blob } from "@/components/stumble/Blob";
 import { PillButton } from "@/components/stumble/PillButton";
+import { SampleLink } from "@/components/stumble/SampleLink";
 import { getErrorMessage } from "@/lib/errors";
 import { useGetTutorBriefQuery } from "@/store/endpoints/progress";
 
@@ -45,6 +46,7 @@ export function TutorBriefScreen() {
             Nothing to report yet.
           </h1>
           <p className="mt-2 text-xs font-bold text-ink-2">Play a scene or two and the patterns will show up here.</p>
+          <SampleLink className="mt-3" />
         </Blob>
         <div className="px-5 pb-8 pt-4">
           <PillButton href="/">Back to Today</PillButton>
