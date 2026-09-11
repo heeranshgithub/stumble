@@ -1,11 +1,12 @@
 "use client";
 
-import { Keyboard, Mic, Send } from "lucide-react";
+import { Keyboard, Mic, Send, Square } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Blob } from "@/components/stumble/Blob";
 import { Chip } from "@/components/stumble/Chip";
+import { LyricLine, type LyricWord } from "@/components/stumble/LyricLine";
 import { PillButton } from "@/components/stumble/PillButton";
 import { useHoldToTalk, type Capture } from "@/hooks/useHoldToTalk";
 import { getErrorMessage } from "@/lib/errors";
@@ -14,6 +15,47 @@ import type { PlacementDto } from "@/types/api";
 
 const MAX_MS = 20_000;
 
+/**
+ * Something to attempt, so the mic isn't a blank page. Deliberately English tasks and never French
+ * sentences: a French example would get read aloud, and reading is not producing — it would place
+ * the learner far above where they can actually hold a scene. Ordered easy to hard.
+ */
+const TASKS = [
+  { title: "Say hello and your name", hint: "Then your age, if it comes." },
+  { title: "Count as high as you can", hint: "Stop wherever you run out." },
+  { title: "Order a coffee", hint: "Ask what it costs too." },
+  { title: "Say what you did yesterday", hint: "Two or three sentences." },
+];
+
+/**
+ * The headline's claim, shown instead of asserted: one café line, the word that got reached for in
+ * English, and the card it becomes. Built from the same components the scene and deck use, so the
+ * pitch doubles as an honest preview of the real UI.
+ */
+const CAUGHT_LINE: LyricWord[] = [
+  { text: "Je", state: "on" },
+  { text: "voudrais", state: "on" },
+  { text: "un", state: "on" },
+  { text: "coffee", state: "miss" },
+  { text: "au", state: "on" },
+  { text: "lait.", state: "on" },
+];
+
+function LoopPreview() {
+  return (
+    <div className="w-full">
+      <p className="text-[11px] font-extrabold text-ink-2">Léa · barista</p>
+      <p className="mt-1 text-[15px] font-bold text-ink-2">Qu&apos;est-ce que je vous sers ?</p>
+      <p className="mt-5 text-[11px] font-extrabold text-ink-2">You</p>
+      <LyricLine className="mt-1" words={CAUGHT_LINE} animate />
+      <div className="mt-5 fade-in" style={{ animationDelay: "560ms" }}>
+        <Chip tone="stumble">caught · coffee → café</Chip>
+        <p className="mt-2 text-[11px] font-extrabold text-ink-2">Due tomorrow, in your own sentence.</p>
+      </div>
+    </div>
+  );
+}
+
 type Step = "intro" | "speak" | "result";
 
 export function OnboardingScreen() {
@@ -21,6 +63,7 @@ export function OnboardingScreen() {
   const [step, setStep] = useState<Step>("intro");
   const [typing, setTyping] = useState(false);
   const [draft, setDraft] = useState("");
+  const [picked, setPicked] = useState<number | null>(null);
   const [result, setResult] = useState<PlacementDto | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [placement, placementState] = usePlacementMutation();
@@ -42,7 +85,7 @@ export function OnboardingScreen() {
   const onCapture = useCallback(
     (c: Capture) => {
       if (c.durationMs < 1200) {
-        setFailure("That was quick. Hold and say a few words.");
+        setFailure("That was quick. Tap again and say a few words.");
         return;
       }
       const form = new FormData();
@@ -52,6 +95,26 @@ export function OnboardingScreen() {
     [submit],
   );
   const mic = useHoldToTalk(onCapture, placementState.isLoading, MAX_MS);
+
+  // Placement is composed, not reacted to: you need both hands free to think, so it is tap to start
+  // and tap to stop rather than hold. Without the press to feel, the time left has to be visible.
+  const [span, setSpan] = useState({ startedAt: 0, now: 0 });
+  useEffect(() => {
+    if (!mic.holding) return;
+    const id = window.setInterval(() => setSpan((s) => ({ ...s, now: Date.now() })), 200);
+    return () => window.clearInterval(id);
+  }, [mic.holding]);
+  const leftMs = Math.max(0, MAX_MS - (span.now - span.startedAt));
+
+  const onMicTap = () => {
+    if (mic.holding) {
+      mic.stop();
+      return;
+    }
+    const t = Date.now();
+    setSpan({ startedAt: t, now: t });
+    void mic.start();
+  };
 
   const sendTyped = () => {
     const text = draft.trim();
@@ -64,7 +127,10 @@ export function OnboardingScreen() {
   if (step === "intro") {
     return (
       <div className="flex flex-1 flex-col" data-scene="cafe">
-        <Blob color="scene" className="flex flex-1 flex-col justify-end pt-14 pb-6">
+        <Blob color="scene" className="flex flex-1 flex-col pt-14 pb-6">
+          <div className="flex min-h-0 flex-1 items-center overflow-hidden pb-8">
+            <LoopPreview />
+          </div>
           <p className="text-[44px] font-black leading-none tracking-[-0.03em]">
             Stumble<span className="text-stumble">.</span>
           </p>
@@ -135,7 +201,29 @@ export function OnboardingScreen() {
           Even just <em>bonjour</em>. Up to twenty seconds. No test, no score: it picks your first scene and catches the
           first words you reach for and miss.
         </p>
-        <div className="flex-1" />
+
+        <div className="mt-5 flex-1">
+          <p className="text-xs font-bold text-ink-2">Nothing coming? Try one of these.</p>
+          <div className="mt-2 grid gap-2" role="radiogroup" aria-label="Something to try">
+            {TASKS.map((t, i) => {
+              const on = i === picked;
+              return (
+                <button
+                  key={t.title}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  onClick={() => setPicked(on ? null : i)}
+                  className={`rounded-2xl px-3 py-2.5 text-left transition-colors ${on ? "bg-ink text-paper" : "bg-ink/8 text-ink"}`}
+                >
+                  <span className="block text-[13px] font-extrabold">{t.title}</span>
+                  <span className={`block text-[11px] font-bold ${on ? "text-paper-2" : "text-ink/65"}`}>{t.hint}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {failure || mic.error ? <p className="mb-3 text-center text-xs font-bold text-stumble">{failure ?? mic.error}</p> : null}
         {typing ? (
           <form
@@ -166,20 +254,26 @@ export function OnboardingScreen() {
           <div className="mb-6">
             <button
               type="button"
-              aria-label="Hold to speak"
+              aria-label={mic.holding ? "Stop recording" : "Start recording"}
               aria-pressed={mic.holding}
               disabled={!mic.supported || placementState.isLoading}
-              {...mic.handlers}
+              onClick={onMicTap}
               className={`mx-auto grid size-[84px] touch-none select-none place-items-center rounded-pill text-paper transition-[background-color,box-shadow,transform] duration-200 ease-out-expo disabled:opacity-50 ${
                 mic.holding
                   ? "scale-105 bg-stumble shadow-[0_0_0_16px_color-mix(in_oklch,var(--color-stumble)_25%,transparent)]"
                   : "bg-ink shadow-[0_0_0_12px_color-mix(in_oklch,var(--color-ink)_12%,transparent)]"
               }`}
             >
-              <Mic className="size-8" strokeWidth={2.25} />
+              {mic.holding ? <Square className="size-7 fill-current" strokeWidth={2.25} /> : <Mic className="size-8" strokeWidth={2.25} />}
             </button>
             <div className="mt-4 flex items-center justify-center gap-4 text-[11px] font-extrabold text-ink-2">
-              <span>{placementState.isLoading ? "listening…" : mic.holding ? "release when done" : "hold to speak"}</span>
+              <span>
+                {placementState.isLoading
+                  ? "listening…"
+                  : mic.holding
+                    ? `tap when done · ${Math.ceil(leftMs / 1000)}s left`
+                    : "tap to start"}
+              </span>
               <span aria-hidden="true">·</span>
               <button type="button" className="flex items-center gap-1 underline-offset-2 hover:underline" onClick={() => setTyping(true)}>
                 <Keyboard className="size-3.5" strokeWidth={2.5} />

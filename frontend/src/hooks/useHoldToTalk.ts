@@ -188,5 +188,5 @@ export function useHoldToTalk(onCapture: (c: Capture) => void, disabled = false,
     },
   };
 
-  return { holding, level, error, supported, handlers };
+  return { holding, level, error, supported, handlers, start, stop };
 }
