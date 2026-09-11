@@ -11,8 +11,9 @@ const small: Record<WordState, string> = { on: "lyr-on", off: "lyr-off-sm", miss
 const STAGGER_MS = 55;
 
 /**
- * A line of words with fill states. `on` is filled ink, `off` is not yet produced, `miss` is a stumble.
- * `lg` (scene, review) uses outlines; `sm` (deck sheet) uses faded fill because outlines smear at small sizes.
+ * A line of words with fill states. `on` is filled ink, `off` is not yet produced, `miss` is a stumble:
+ * filled like `on` so the learner's own words stay readable, marked by a wavy stumble-pink underline.
+ * `lg` (scene, review) outlines `off`; `sm` (deck sheet) fades it because outlines smear at small sizes.
  * `animate` fills the words in one after another, the lyric moment, for a line that just landed.
  */
 export function LyricLine({

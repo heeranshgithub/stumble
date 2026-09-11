@@ -65,7 +65,12 @@ body {
   color: color-mix(in oklch, var(--color-paper) 70%, var(--color-ink));
 }
 
-/* Lyric states. Large lines use an outline; small lines use a faded fill (outlines smear below ~24px). */
+/*
+ * Lyric states. `off` (not yet produced) is an ink outline on large lines and a faded fill on small
+ * ones, since outlines smear below ~24px. `miss` stays filled: it is the learner's own words and has
+ * to be readable, so the stumble is carried by the wavy pink mark underneath rather than by hollowing
+ * the letters. (A pink outline is ~2:1 on café yellow and near-invisible on the interview pink.)
+ */
 @utility lyr-on {
   color: var(--color-ink);
 }
@@ -74,10 +79,11 @@ body {
   -webkit-text-stroke: 1.5px var(--color-ink);
 }
 @utility lyr-miss {
-  color: transparent;
-  -webkit-text-stroke: 1.5px var(--color-stumble);
+  color: var(--color-ink);
   text-decoration: underline wavy var(--color-stumble);
-  text-underline-offset: 0.22em;
+  text-decoration-thickness: 2px;
+  text-decoration-skip-ink: none;
+  text-underline-offset: 0.16em;
 }
 @utility lyr-off-sm {
   /* 50% ink on paper is ≈3.4:1, the large-text floor for these 18px+ bold words. */
