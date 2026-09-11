@@ -15,7 +15,6 @@ async def test_start_session_has_opening_line_and_audio_url(client: AsyncClient)
     assert body["sceneId"] == "cafe"
     assert body["characterName"] == "Léa"
     assert body["done"] is False
-    assert body["ttsProvider"] == "browser"
     assert set(body) >= {"id", "turns", "goalProgress", "patience", "sceneColor"}
     opening = body["turns"][0]
     assert opening["role"] == "character"
@@ -113,3 +112,23 @@ async def test_session_is_owned(client: AsyncClient) -> None:
     res = await client.get(f"/sessions/{session['id']}", headers={"X-Device-Id": "someone-else"})
     assert res.status_code == 404
     assert res.json()["error"]["code"] == "session_not_found"
+
+
+async def test_stumble_audio_streams_the_target(client: AsyncClient) -> None:
+    session = await _start(client)
+    res = await client.post(
+        f"/sessions/{session['id']}/turns",
+        data={"text": "Je voudrais un coffee au lait.", "clientPauseMs": "0"},
+        headers=HEADERS,
+    )
+    learner = res.json()["turns"][1]
+    stumble = learner["stumbles"][0]
+    assert (
+        stumble["audioUrl"] == f"/sessions/{session['id']}/turns/{learner['id']}/stumbles/0/audio"
+    )
+    audio = await client.get(stumble["audioUrl"])
+    assert audio.status_code == 200
+    assert audio.headers["content-type"].startswith("audio/")
+    missing = await client.get(stumble["audioUrl"].replace("/stumbles/0/", "/stumbles/9/"))
+    assert missing.status_code == 404
+    assert missing.json()["error"]["code"] == "stumble_not_found"

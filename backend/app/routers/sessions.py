@@ -5,12 +5,11 @@ from fastapi import APIRouter, File, Form, Request, UploadFile
 from fastapi.responses import Response
 
 from app.deps import DbDep, ProfileDep, SettingsDep
-from app.errors import AppError, BadRequest, NotFound
+from app.errors import BadRequest, NotFound
 from app.models.card import DebriefDto
 from app.models.session import SessionDto, StartSessionRequest
 from app.scenes.data import get_scene
 from app.services import cards, debrief, sessions, tts
-from app.services.providers import ProviderError
 from app.services.registry import Providers
 
 router = APIRouter()
@@ -38,7 +37,7 @@ async def start_session(
     window = timedelta(hours=settings.due_window_hours)
     due = [c["target"] for c in await cards.due_cards(db, profile["_id"], window, limit=5)]
     doc = await sessions.start(db, profile, scene, body.patience, due_cards=due)
-    return sessions.to_dto(doc, _providers(request))
+    return sessions.to_dto(doc)
 
 
 @router.get("/sessions/{session_id}", response_model=SessionDto)
@@ -46,7 +45,7 @@ async def get_session(
     session_id: str, db: DbDep, profile: ProfileDep, request: Request
 ) -> SessionDto:
     doc = await sessions.get_owned(db, profile, session_id)
-    return sessions.to_dto(doc, _providers(request))
+    return sessions.to_dto(doc)
 
 
 @router.post("/sessions/{session_id}/turns", response_model=SessionDto)
@@ -69,22 +68,17 @@ async def take_turn(
         if len(audio_bytes) > MAX_AUDIO_BYTES:
             raise BadRequest("Audio is too large.", code="audio_too_large")
         mime = audio.content_type
-    try:
-        updated = await sessions.take_turn(
-            db,
-            _providers(request),
-            settings,
-            doc,
-            audio=audio_bytes,
-            mime=mime,
-            text=text,
-            pause_ms=max(0, client_pause_ms),
-        )
-    except ProviderError as exc:
-        raise AppError(
-            f"{exc.provider} failed: {exc.message}", code="provider_error", status_code=502
-        ) from exc
-    return sessions.to_dto(updated, _providers(request))
+    updated = await sessions.take_turn(
+        db,
+        _providers(request),
+        settings,
+        doc,
+        audio=audio_bytes,
+        mime=mime,
+        text=text,
+        pause_ms=max(0, client_pause_ms),
+    )
+    return sessions.to_dto(updated)
 
 
 @router.post("/sessions/{session_id}/finish", response_model=DebriefDto)
@@ -103,4 +97,19 @@ async def turn_audio(session_id: str, turn_id: str, db: DbDep, request: Request)
     turn = next((t for t in doc["turns"] if t["id"] == turn_id and t["role"] == "character"), None)
     if turn is None:
         raise NotFound("Turn not found.", code="turn_not_found")
-    return tts.stream_cached(request, f"{session_id}:{turn_id}", turn["text"])
+    return await tts.stream_cached(request, f"{session_id}:{turn_id}", turn["text"])
+
+
+@router.get("/sessions/{session_id}/turns/{turn_id}/stumbles/{index}/audio")
+async def stumble_audio(
+    session_id: str, turn_id: str, index: int, db: DbDep, request: Request
+) -> Response:
+    """One stumble's target, spoken. Fetched by an <audio> element, so no device header here."""
+    doc = await sessions.get_any(db, session_id)
+    turn = next((t for t in doc["turns"] if t["id"] == turn_id and t["role"] == "learner"), None)
+    stumbles = turn.get("stumbles", []) if turn else []
+    if not 0 <= index < len(stumbles):
+        raise NotFound("Stumble not found.", code="stumble_not_found")
+    return await tts.stream_cached(
+        request, f"{session_id}:{turn_id}:s{index}", stumbles[index]["target"]
+    )

@@ -45,7 +45,7 @@ async def start(
     patience: str,
     due_cards: list[str] | None = None,
 ) -> Document:
-    opening = _turn("character", scene.opening_line, 0.0, text_en=None)
+    opening = _turn("character", scene.opening_line, 0.0, text_en=scene.opening_line_en)
     doc: Document = {
         "profile_id": profile["_id"],
         "scene_id": scene.id,
@@ -203,7 +203,17 @@ async def take_turn(
     return session
 
 
-def to_dto(session: Document, providers: Providers) -> SessionDto:
+def _stumble_dtos(sid: str, turn: Document) -> list[StumbleDto]:
+    """Each target can be heard; the URL is by index, as the turn's own audio is by id."""
+    return [
+        StumbleDto.model_validate(
+            {**s, "audio_url": f"/sessions/{sid}/turns/{turn['id']}/stumbles/{i}/audio"}
+        )
+        for i, s in enumerate(turn.get("stumbles", []))
+    ]
+
+
+def to_dto(session: Document) -> SessionDto:
     scene = get_scene(session["scene_id"])
     if scene is None:  # pragma: no cover
         raise NotFound("Scene not found.", code="scene_not_found")
@@ -214,7 +224,7 @@ def to_dto(session: Document, providers: Providers) -> SessionDto:
             role=t["role"],
             text=t["text"],
             text_en=t.get("text_en"),
-            stumbles=[StumbleDto.model_validate(s) for s in t.get("stumbles", [])],
+            stumbles=_stumble_dtos(sid, t),
             wins=[WinDto.model_validate(w) for w in t.get("wins", [])],
             goal_progress=t["goal_progress"],
             audio_url=f"/sessions/{sid}/turns/{t['id']}/audio"
@@ -236,6 +246,5 @@ def to_dto(session: Document, providers: Providers) -> SessionDto:
         patience=session["patience"],
         goal_progress=session["goal_progress"],
         done=session["status"] == "finished",
-        tts_provider="browser" if providers.tts_provider == "browser" else "elevenlabs",
         turns=turns,
     )

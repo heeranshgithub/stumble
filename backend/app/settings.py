@@ -18,8 +18,9 @@ class Settings(BaseSettings):
 
     cors_origins_raw: str = Field(default="http://localhost:3000", validation_alias="cors_origins")
 
-    # auto: real where a key exists, fake otherwise. real: fail on a missing key. fake: no network.
-    providers: Literal["auto", "real", "fake"] = "auto"
+    # real: every key required, refuse to start otherwise. fake: offline stand-ins, only when asked.
+    # There is no in-between: a missing key is a startup error, never a silent downgrade.
+    providers: Literal["real", "fake"] = "real"
 
     openrouter_api_key: str | None = None
     openrouter_model: str = ""
@@ -30,7 +31,6 @@ class Settings(BaseSettings):
     elevenlabs_api_key: str | None = None
     elevenlabs_voice_id: str | None = None
     elevenlabs_model: str = "eleven_flash_v2_5"
-    tts_provider: Literal["elevenlabs", "browser"] = "elevenlabs"
 
     # A silence this long while the mic is held is a freeze.
     freeze_threshold_ms: int = 3000

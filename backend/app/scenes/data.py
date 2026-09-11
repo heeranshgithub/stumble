@@ -14,6 +14,7 @@ class Scene(BaseModel):
     character_name: str
     character_role: str
     opening_line: str
+    opening_line_en: str
     vocab: list[str]
     order: int
 
@@ -28,6 +29,7 @@ SCENES: list[Scene] = [
         character_name="Léa",
         character_role="barista",
         opening_line="Bonjour ! Qu'est-ce que je vous sers ?",
+        opening_line_en="Hello! What can I get you?",
         vocab=["café", "au lait", "combien", "s'il vous plaît", "l'addition"],
         order=1,
     ),
@@ -40,6 +42,7 @@ SCENES: list[Scene] = [
         character_name="Karim",
         character_role="pharmacist",
         opening_line="Bonjour, je peux vous aider ?",
+        opening_line_en="Hello, can I help you?",
         vocab=["mal à la tête", "ordonnance", "sirop", "comprimé", "combien de fois"],
         order=2,
     ),
@@ -52,6 +55,9 @@ SCENES: list[Scene] = [
         character_name="Mme Roux",
         character_role="landlady",
         opening_line="Entrez, entrez. Alors, voilà le salon. Vous cherchez depuis longtemps ?",
+        opening_line_en=(
+            "Come in, come in. So, this is the living room. Have you been looking for long?"
+        ),
         vocab=["loyer", "appart", "mois", "charges", "je peux"],
         order=3,
     ),
@@ -64,6 +70,7 @@ SCENES: list[Scene] = [
         character_name="Agent",
         character_role="customer service agent",
         opening_line="Service client, bonjour. C'est à quel sujet ?",
+        opening_line_en="Customer service, hello. What is it about?",
         vocab=["facture", "prélèvement", "rembourser", "je ne comprends pas"],
         order=4,
     ),
@@ -76,6 +83,7 @@ SCENES: list[Scene] = [
         character_name="Dr Lemaire",
         character_role="doctor",
         opening_line="Bonjour, asseyez-vous. Qu'est-ce qui vous amène ?",
+        opening_line_en="Hello, have a seat. What brings you in?",
         vocab=["depuis", "douleur", "fièvre", "ça fait mal"],
         order=5,
     ),
@@ -88,6 +96,7 @@ SCENES: list[Scene] = [
         character_name="Sophie",
         character_role="recruiter",
         opening_line="Merci d'être venu. Pour commencer, parlez-moi un peu de vous.",
+        opening_line_en="Thanks for coming. To start, tell me a little about yourself.",
         vocab=["expérience", "j'ai travaillé", "pourquoi", "disponible"],
         order=6,
     ),

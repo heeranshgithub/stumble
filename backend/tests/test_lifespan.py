@@ -1,5 +1,6 @@
 """The lifespan runs for real in production and never in the other tests; exercise it once here."""
 
+import pytest
 from mongomock_motor import AsyncMongoMockClient
 
 from app.main import create_app
@@ -16,13 +17,20 @@ async def test_lifespan_starts_and_stops(
         assert app.state.providers.mode == "fake"
 
 
-def test_fake_mode_needs_no_keys(settings: Settings) -> None:
+def test_fake_mode_is_explicit_and_needs_no_keys(settings: Settings) -> None:
     built = build_providers(settings)
     assert built.mode == "fake"
-    assert built.tts_provider == "browser"
 
 
-def test_auto_mode_without_keys_is_fake_and_tells_client_to_use_browser_tts() -> None:
-    built = build_providers(Settings(env="test", providers="auto"))
-    assert built.mode == "fake"
-    assert built.tts_provider == "browser"
+def test_real_mode_is_the_default_and_refuses_to_start_without_keys() -> None:
+    # No silent downgrade: a missing key stops the process and names what is missing.
+    bare = Settings(
+        _env_file=None,
+        env="test",
+        groq_api_key=None,
+        openrouter_api_key=None,
+        elevenlabs_api_key=None,
+    )
+    assert bare.providers == "real"
+    with pytest.raises(RuntimeError, match="PROVIDERS=real but missing: GROQ_API_KEY, OPENROUTER"):
+        build_providers(bare)

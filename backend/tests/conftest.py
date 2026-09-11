@@ -31,7 +31,7 @@ def mock_client() -> AsyncMongoMockClient:
 
 @pytest.fixture
 def providers() -> Providers:
-    return Providers(FakeTranscriber(), FakeChat(), FakeSynthesizer(), "browser", "fake")
+    return Providers(FakeTranscriber(), FakeChat(), FakeSynthesizer(), "fake")
 
 
 @pytest.fixture

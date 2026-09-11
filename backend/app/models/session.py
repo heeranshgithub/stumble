@@ -21,6 +21,8 @@ class StumbleDto(ApiModel):
     context: str
     prompt_line: str
     confidence: float
+    # The target, spoken. Set on the wire only; a stumble in the database has no URL.
+    audio_url: str | None = None
 
 
 class WinDto(ApiModel):
@@ -51,5 +53,4 @@ class SessionDto(MongoModel):
     patience: Patience
     goal_progress: float
     done: bool
-    tts_provider: Literal["elevenlabs", "browser"]
     turns: list[TurnDto]

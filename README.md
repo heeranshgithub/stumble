@@ -54,7 +54,7 @@ flowchart LR
 | Data | MongoDB |
 | Speech to text | Groq `whisper-large-v3-turbo` |
 | LLM | OpenRouter (model id in env) |
-| Text to speech | ElevenLabs Flash v2.5, streamed and cached; browser `speechSynthesis` as fallback |
+| Text to speech | ElevenLabs Flash v2.5, streamed and cached |
 | Hosting | AWS Amplify (frontend), AWS App Runner (backend) |
 
 No accounts: a device id minted in the browser is the identity.
@@ -77,7 +77,7 @@ pnpm install
 pnpm dev -p 3001
 ```
 
-Without API keys the backend runs in **fake mode**: a rule-based stand-in catches English words, the character answers with canned lines, and the browser speaks them. The whole loop works offline; only the quality is fake. `PROVIDERS=real` refuses to start with a missing key.
+The backend refuses to start with a missing key. There are no silent fallbacks: if a provider is down mid-session the API answers 503 naming it, the scene shows it, and `GET /ready` says which providers the process is running on. `PROVIDERS=fake` is an explicit offline mode with canned replies, for tests and for working without keys on purpose; it is reported by `/ready` and flagged in the app.
 
 Handy scripts, dev only:
 

@@ -8,6 +8,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.log import get_logger
 from app.middleware import request_id_of
 from app.models.base import ApiModel
+from app.services.providers import ProviderError
 
 log = get_logger(__name__)
 
@@ -74,6 +75,19 @@ def register_handlers(app: FastAPI) -> None:
         return JSONResponse(
             status_code=exc.status_code,
             content=_envelope(request, code=exc.code, message=exc.message, details=exc.details),
+        )
+
+    @app.exception_handler(ProviderError)
+    async def _provider(request: Request, exc: ProviderError) -> JSONResponse:
+        log.warning("provider_error", provider=exc.provider, error=exc.message)
+        return JSONResponse(
+            status_code=502,
+            content=_envelope(
+                request,
+                code="provider_error",
+                message=f"{exc.provider} failed: {exc.message}",
+                details={"provider": exc.provider},
+            ),
         )
 
     @app.exception_handler(RequestValidationError)

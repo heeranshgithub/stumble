@@ -5,10 +5,9 @@ from fastapi import APIRouter, File, Form, Request, UploadFile
 from fastapi.responses import Response
 
 from app.deps import DbDep, ProfileDep, SettingsDep
-from app.errors import AppError, BadRequest
+from app.errors import BadRequest
 from app.models.review import AttemptDto, GradeRequest, GradeResultDto, ReviewListDto
 from app.services import cards, reviews, tts
-from app.services.providers import ProviderError
 from app.services.registry import Providers
 
 router = APIRouter()
@@ -53,14 +52,9 @@ async def attempt_card(
     providers: Providers = request.app.state.providers
     if audio is not None:
         data = await audio.read()
-        try:
-            transcript = await providers.transcriber.transcribe(
-                data, audio.content_type or "audio/webm", language="fr"
-            )
-        except ProviderError as exc:
-            raise AppError(
-                f"{exc.provider} failed: {exc.message}", code="provider_error", status_code=502
-            ) from exc
+        transcript = await providers.transcriber.transcribe(
+            data, audio.content_type or "audio/webm", language="fr"
+        )
         heard = transcript.text
     else:
         heard = (text or "").strip()
@@ -73,4 +67,4 @@ async def attempt_card(
 async def card_audio(card_id: str, db: DbDep, request: Request) -> Response:
     """The target phrase, spoken. Fetched by an <audio> element, so no device header here."""
     card = await reviews.get_any_card(db, card_id)
-    return tts.stream_cached(request, f"card:{card_id}", card["target"])
+    return await tts.stream_cached(request, f"card:{card_id}", card["target"])

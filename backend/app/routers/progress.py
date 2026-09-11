@@ -4,10 +4,9 @@ from typing import Annotated
 from fastapi import APIRouter, File, Form, Request, UploadFile
 
 from app.deps import DbDep, ProfileDep, SettingsDep
-from app.errors import AppError, BadRequest
+from app.errors import BadRequest
 from app.models.progress import DeckDto, PlacementDto, ProgressDto, TutorBriefDto
 from app.services import placement, progress, tutor
-from app.services.providers import ProviderError
 from app.services.registry import Providers
 
 router = APIRouter()
@@ -33,12 +32,7 @@ async def get_deck(db: DbDep, profile: ProfileDep, settings: SettingsDep) -> Dec
 @router.get("/tutor-brief", response_model=TutorBriefDto)
 async def get_tutor_brief(db: DbDep, profile: ProfileDep, request: Request) -> TutorBriefDto:
     """The weekly one-pager for a human tutor. Cached per week until new cards appear."""
-    try:
-        return await tutor.brief(db, profile, _providers(request))
-    except ProviderError as exc:
-        raise AppError(
-            f"{exc.provider} failed: {exc.message}", code="provider_error", status_code=502
-        ) from exc
+    return await tutor.brief(db, profile, _providers(request))
 
 
 @router.post("/placement", response_model=PlacementDto)
@@ -51,19 +45,14 @@ async def post_placement(
 ) -> PlacementDto:
     """Onboarding: twenty seconds of anything. Places the learner and catches the first stumbles."""
     providers = _providers(request)
-    try:
-        if audio is not None:
-            data = await audio.read()
-            transcript = await providers.transcriber.transcribe(
-                data, audio.content_type or "audio/webm", language="fr"
-            )
-            heard = transcript.text
-        else:
-            heard = (text or "").strip()
-        if not heard:
-            raise BadRequest("Nothing was said.", code="empty_placement")
-        return await placement.place(db, profile, providers, heard)
-    except ProviderError as exc:
-        raise AppError(
-            f"{exc.provider} failed: {exc.message}", code="provider_error", status_code=502
-        ) from exc
+    if audio is not None:
+        data = await audio.read()
+        transcript = await providers.transcriber.transcribe(
+            data, audio.content_type or "audio/webm", language="fr"
+        )
+        heard = transcript.text
+    else:
+        heard = (text or "").strip()
+    if not heard:
+        raise BadRequest("Nothing was said.", code="empty_placement")
+    return await placement.place(db, profile, providers, heard)
