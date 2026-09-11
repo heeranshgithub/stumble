@@ -162,7 +162,6 @@ export interface PlacementDto {
 
 export type StumbleType = "freeze" | "code_switch" | "correction" | "miss";
 export type Patience = "relaxed" | "normal" | "real";
-export type TtsProvider = "elevenlabs" | "browser";
 
 export interface StumbleDto {
   type: StumbleType;
@@ -171,6 +170,8 @@ export interface StumbleDto {
   context: string;
   promptLine: string;
   confidence: number;
+  /** The target, spoken. */
+  audioUrl: string | null;
 }
 
 export interface WinDto {
@@ -202,8 +203,16 @@ export interface SessionDto {
   patience: Patience;
   goalProgress: number;
   done: boolean;
-  ttsProvider: TtsProvider;
   turns: TurnDto[];
+}
+
+/** GET /ready: what the backend process is actually running on. */
+export interface ReadyDto {
+  status: string;
+  providers: "real" | "fake";
+  stt: string;
+  llm: string;
+  tts: string;
 }
 
 export interface StartSessionRequest {

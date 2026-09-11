@@ -3,9 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { env } from "@/lib/env";
-import type { TtsProvider } from "@/types/api";
 
-// 0.1 s of silence. Playing it inside the first tap unlocks audio on iOS for the rest of the session.
+// An empty WAV. Playing it inside the first tap unlocks audio on iOS for the rest of the session.
 const SILENT_WAV =
   "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=";
 
@@ -14,10 +13,15 @@ export interface Played {
   startedAt: number | null;
 }
 
-/** One audio element for the character's voice, plus the browser's own synthesizer as fallback. */
-export function useSpeaker(provider: TtsProvider) {
+/**
+ * One audio element for the character's voice. There is no fallback voice on purpose: when the
+ * stream fails the line is still on screen, `error` says so, and nothing pretends otherwise.
+ */
+export function useSpeaker() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const playSeqRef = useRef(0);
   const [speaking, setSpeaking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const getAudio = useCallback(() => {
     if (audioRef.current) return audioRef.current;
@@ -32,74 +36,50 @@ export function useSpeaker(provider: TtsProvider) {
     const a = getAudio();
     a.src = SILENT_WAV;
     void a.play().catch(() => undefined);
-    if ("speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance("");
-      u.volume = 0;
-      window.speechSynthesis.speak(u);
-    }
   }, [getAudio]);
 
-  const speakWithBrowser = useCallback(
-    (text: string): Promise<Played> =>
-      new Promise((resolve) => {
-        if (!("speechSynthesis" in window)) return resolve({ startedAt: null });
-        const synth = window.speechSynthesis;
-        synth.cancel();
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = "fr-FR";
-        u.rate = 0.95;
-        const fr = synth.getVoices().find((v) => v.lang.toLowerCase().startsWith("fr"));
-        if (fr) u.voice = fr;
-        let startedAt: number | null = null;
-        u.onstart = () => {
-          startedAt = performance.now();
-          setSpeaking(true);
-        };
-        u.onend = () => {
-          setSpeaking(false);
-          resolve({ startedAt });
-        };
-        u.onerror = () => {
-          setSpeaking(false);
-          resolve({ startedAt });
-        };
-        synth.speak(u);
-      }),
-    [],
-  );
-
   const play = useCallback(
-    (audioUrl: string | null, text: string): Promise<Played> => {
-      if (provider === "browser" || !audioUrl) return speakWithBrowser(text);
+    (audioUrl: string | null): Promise<Played> => {
+      if (!audioUrl) return Promise.resolve({ startedAt: null });
+      // A newer play() (or stop()) supersedes this one: the element's pending play() promise then
+      // rejects with AbortError. That is not the stream failing and is not an error.
+      const my = ++playSeqRef.current;
+      const current = () => playSeqRef.current === my;
       return new Promise((resolve) => {
         const a = getAudio();
         let startedAt: number | null = null;
         const done = () => {
-          a.onplaying = null;
-          a.onended = null;
-          a.onerror = null;
-          setSpeaking(false);
+          if (current()) {
+            a.onplaying = null;
+            a.onended = null;
+            a.onerror = null;
+            setSpeaking(false);
+          }
           resolve({ startedAt });
+        };
+        const failed = (why: string) => {
+          if (current()) setError(`Voice unavailable (${why}). The line is still on screen.`);
+          done();
         };
         a.onplaying = () => {
           startedAt = performance.now();
+          setError(null);
           setSpeaking(true);
         };
         a.onended = done;
-        a.onerror = () => {
-          // The stream failed (quota, network). Say the line anyway.
-          done();
-          void speakWithBrowser(text);
-        };
+        // A 503 from the API, or a cut stream, both land here.
+        a.onerror = () => failed(a.error?.code === MediaError.MEDIA_ERR_NETWORK ? "network" : "stream failed");
         a.src = `${env.NEXT_PUBLIC_API_BASE_URL}${audioUrl}`;
-        void a.play().catch(() => {
-          done();
-          void speakWithBrowser(text);
+        void a.play().catch((e: unknown) => {
+          if (!current() || (e instanceof DOMException && e.name === "AbortError")) {
+            done();
+            return;
+          }
+          failed(e instanceof DOMException && e.name === "NotAllowedError" ? "tap the screen first" : "playback blocked");
         });
       });
     },
-    [provider, getAudio, speakWithBrowser],
+    [getAudio],
   );
 
   const stop = useCallback(() => {
@@ -108,11 +88,10 @@ export function useSpeaker(provider: TtsProvider) {
       a.pause();
       a.currentTime = 0;
     }
-    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     setSpeaking(false);
   }, []);
 
   useEffect(() => stop, [stop]);
 
-  return { unlock, play, stop, speaking };
+  return { unlock, play, stop, speaking, error };
 }

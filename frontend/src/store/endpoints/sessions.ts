@@ -35,6 +35,7 @@ export const sessionsApi = api.injectEndpoints({
 export const {
   useStartSessionMutation,
   useGetSessionQuery,
+  useLazyGetSessionQuery,
   useSendTurnMutation,
   useFinishSessionMutation,
 } = sessionsApi;

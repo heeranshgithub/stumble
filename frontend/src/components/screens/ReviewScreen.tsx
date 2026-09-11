@@ -68,7 +68,7 @@ function Card({
   const [failure, setFailure] = useState<string | null>(null);
   const [attemptCard, attemptState] = useAttemptCardMutation();
   const [gradeCard, gradeState] = useGradeCardMutation();
-  const speaker = useSpeaker("browser");
+  const speaker = useSpeaker();
   const cardId = card.id ?? "";
 
   const onCapture = useCallback(
@@ -197,12 +197,13 @@ function Card({
             <button
               type="button"
               aria-label="Play"
-              onClick={() => void speaker.play(card.audioUrl, card.target)}
+              onClick={() => void speaker.play(card.audioUrl)}
               className="grid size-11 flex-none place-items-center rounded-pill bg-paper/15 text-paper"
             >
               <Play className="size-5 fill-current" strokeWidth={0} />
             </button>
           </div>
+          {speaker.error ? <p className="mt-2 text-xs font-bold text-paper-2">{speaker.error}</p> : null}
           {!isFreeze && card.said ? (
             <p className="mt-1 text-sm text-paper-2">
               not &ldquo;{card.said}&rdquo;

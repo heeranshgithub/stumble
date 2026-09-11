@@ -1,9 +1,10 @@
 "use client";
 
-import { ChevronLeft, Keyboard, Mic, Send, X } from "lucide-react";
+import { ChevronLeft, Keyboard, Mic, Send, Volume2, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { PointerEvent } from "react";
 
 import { Chip } from "@/components/stumble/Chip";
 import { LyricLine, type LyricWord } from "@/components/stumble/LyricLine";
@@ -12,7 +13,8 @@ import { useHoldToTalk, type Capture } from "@/hooks/useHoldToTalk";
 import { useSpeaker } from "@/hooks/useSpeaker";
 import { getErrorMessage } from "@/lib/errors";
 import { getPatience } from "@/lib/patience";
-import { useSendTurnMutation, useStartSessionMutation } from "@/store/endpoints/sessions";
+import { useGetReadyQuery } from "@/store/endpoints/health";
+import { useLazyGetSessionQuery, useSendTurnMutation, useStartSessionMutation } from "@/store/endpoints/sessions";
 import type { SessionDto, StumbleDto, TurnDto } from "@/types/api";
 
 type Phase = "starting" | "idle" | "recording" | "thinking" | "speaking" | "done" | "failed";
@@ -32,13 +34,23 @@ function learnerWords(text: string, stumbles: StumbleDto[]): LyricWord[] {
     .map((w) => ({ text: w, state: missed.has(strip(w)) ? "miss" : "on" }));
 }
 
+function scrollParent(el: HTMLElement | null): HTMLElement | null {
+  for (let n = el?.parentElement ?? null; n; n = n.parentElement) {
+    const { overflowY } = getComputedStyle(n);
+    if (overflowY === "auto" || overflowY === "scroll") return n;
+  }
+  return null;
+}
+
 function fmt(ms: number) {
   const s = Math.max(0, Math.floor(ms / 1000));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
 
-export function SceneScreen({ sceneId }: { sceneId: string }) {
+/** `resumeId` is the `?session=` from the URL: an earlier session of this scene to pick back up. */
+export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: string | null }) {
   const [startSession, startState] = useStartSessionMutation();
+  const [getSession] = useLazyGetSessionQuery();
   const [sendTurn] = useSendTurnMutation();
   const [session, setSession] = useState<SessionDto | null>(null);
   const [phase, setPhase] = useState<Phase>("starting");
@@ -53,32 +65,57 @@ export function SceneScreen({ sceneId }: { sceneId: string }) {
   const startedRef = useRef(false);
   const t0Ref = useRef(0);
   const listRef = useRef<HTMLDivElement>(null);
-  const speaker = useSpeaker(session?.ttsProvider ?? "browser");
+  const speaker = useSpeaker();
+  // Fake providers are a deliberate offline mode; when they're on, say so where the reviewer looks.
+  const ready = useGetReadyQuery();
   const debriefHref = session?.id ? `/scene/${sceneId}/debrief?session=${session.id}` : "/";
 
-  // One session per visit. The ref guards React's double-invoked dev effects.
+  // One session per URL: a fresh visit starts one and writes its id into the query string, so a
+  // refresh resumes the conversation instead of abandoning it (and its stumbles) for a new one.
+  // The ref guards React's double-invoked dev effects.
   useEffect(() => {
     if (startedRef.current) return;
     startedRef.current = true;
-    startSession({ sceneId, patience: getPatience() })
-      .unwrap()
-      .then((s) => {
-        setSession(s);
-        setPhase("idle");
-      })
-      .catch((e: unknown) => {
-        setFailure(getErrorMessage(e as Parameters<typeof getErrorMessage>[0]).message);
-        setPhase("failed");
-      });
-  }, [sceneId, startSession]);
+    const fresh = () =>
+      startSession({ sceneId, patience: getPatience() })
+        .unwrap()
+        .then((s) => {
+          setSession(s);
+          setPhase("idle");
+          if (s.id) {
+            const url = new URL(window.location.href);
+            url.searchParams.set("session", s.id);
+            window.history.replaceState(null, "", url);
+          }
+        });
+    const resume = (id: string) =>
+      getSession(id)
+        .unwrap()
+        .then((s) => {
+          if (s.sceneId !== sceneId) throw new Error("session belongs to another scene");
+          setSession(s);
+          setPhase(s.done ? "done" : "idle");
+          const first = s.turns[0]?.createdAt;
+          if (first) setElapsed(Math.max(0, Date.now() - Date.parse(first)));
+        })
+        // Gone, or another device's: start over rather than show an error for a stale link.
+        .catch(() => fresh());
+    (resumeId ? resume(resumeId) : fresh()).catch((e: unknown) => {
+      setFailure(getErrorMessage(e as Parameters<typeof getErrorMessage>[0]).message);
+      setPhase("failed");
+    });
+  }, [sceneId, resumeId, startSession, getSession]);
 
   useEffect(() => {
     const id = window.setInterval(() => setElapsed((e) => e + 1000), 1000);
     return () => window.clearInterval(id);
   }, []);
 
+  // The shell's `main` is the only scroller and the header and mic are pinned inside it, so a new
+  // turn (or the live meter) scrolls it to the bottom: the latest line lands just above the mic.
   useEffect(() => {
-    listRef.current?.lastElementChild?.scrollIntoView({ block: "end", behavior: "smooth" });
+    const scroller = scrollParent(listRef.current);
+    scroller?.scrollTo({ top: scroller.scrollHeight, behavior: "smooth" });
   }, [session?.turns.length, phase]);
 
   const sessionId = session?.id ?? null;
@@ -93,7 +130,7 @@ export function SceneScreen({ sceneId }: { sceneId: string }) {
         const reply = updated.turns[updated.turns.length - 1];
         if (reply && reply.role === "character") {
           setPhase("speaking");
-          const { startedAt } = await speaker.play(reply.audioUrl, reply.text);
+          const { startedAt } = await speaker.play(reply.audioUrl);
           if (startedAt !== null) setLatencyMs(Math.round(startedAt - t0Ref.current));
         }
         setPhase(updated.done ? "done" : "idle");
@@ -118,15 +155,20 @@ export function SceneScreen({ sceneId }: { sceneId: string }) {
   const busy = phase !== "idle";
   const mic = useHoldToTalk(onCapture, busy);
 
-  // The first tap on the screen unlocks audio; also (re)plays the opening line once.
+  // The first tap on the screen unlocks audio; also (re)plays the opening line once. A tap on
+  // something that speaks by itself (replay, a stumble chip) is left to it, so nothing starts twice.
   const openedRef = useRef(false);
-  const onFirstTap = useCallback(() => {
-    if (openedRef.current || !session) return;
-    openedRef.current = true;
-    speaker.unlock();
-    const opening = session.turns[0];
-    if (opening) void speaker.play(opening.audioUrl, opening.text);
-  }, [session, speaker]);
+  const onFirstTap = useCallback(
+    (e: PointerEvent<HTMLElement>) => {
+      if (openedRef.current || !session) return;
+      openedRef.current = true;
+      speaker.unlock();
+      if ((e.target as HTMLElement).closest("[data-speaks]")) return;
+      const opening = session.turns[0];
+      if (opening) void speaker.play(opening.audioUrl);
+    },
+    [session, speaker],
+  );
 
   const sendTyped = () => {
     const text = draft.trim();
@@ -160,12 +202,13 @@ export function SceneScreen({ sceneId }: { sceneId: string }) {
       data-scene={color}
       onPointerDownCapture={onFirstTap}
     >
-      <header className="flex items-center justify-between px-5 pt-12 pb-2">
+      <header className="sticky top-0 z-10 flex items-center justify-between bg-scene px-5 pt-12 pb-2">
         <Link href="/" className="flex items-center gap-1 text-xs font-extrabold">
           <ChevronLeft className="size-4" strokeWidth={2.5} />
           {session?.sceneTitle ?? "Scene"}
         </Link>
         <div className="flex items-center gap-2">
+          {ready.data && ready.data.providers !== "real" ? <Chip tone="stumble">{ready.data.providers} providers</Chip> : null}
           {isDev && latencyMs !== null ? <Chip tone="stumble">{latencyMs} ms</Chip> : null}
           <Chip>
             {name} · {fmt(elapsed)}
@@ -186,9 +229,15 @@ export function SceneScreen({ sceneId }: { sceneId: string }) {
         </div>
       </header>
 
+      {session ? (
+        <p className="px-5 pb-2 text-xs font-bold text-ink-2">
+          Goal · {session.goal.toLowerCase().replace(/\.$/, "")}
+        </p>
+      ) : null}
+
       <div
         ref={listRef}
-        className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-5 pt-3 pb-4"
+        className="flex flex-1 flex-col gap-4 px-5 pt-3 pb-4"
       >
         {session ? (
           session.turns.map((t, i) => (
@@ -199,7 +248,8 @@ export function SceneScreen({ sceneId }: { sceneId: string }) {
               latest={i >= session.turns.length - 2}
               showTranslation={shownTranslation === t.id}
               onToggleTranslation={() => setShownTranslation((cur) => (cur === t.id ? null : t.id))}
-              onReplay={() => void speaker.play(t.audioUrl, t.text)}
+              onReplay={() => void speaker.play(t.audioUrl)}
+              onSay={(audioUrl) => void speaker.play(audioUrl)}
             />
           ))
         ) : (
@@ -235,8 +285,9 @@ export function SceneScreen({ sceneId }: { sceneId: string }) {
       </div>
 
       {phase !== "done" ? (
-        <footer className="px-5 pb-8 pt-2">
+        <footer className="sticky bottom-0 z-10 bg-scene px-5 pb-8 pt-2">
           {failure && phase === "idle" ? <p className="mb-2 text-center text-xs font-bold text-stumble">{failure}</p> : null}
+          {speaker.error ? <p className="mb-2 text-center text-xs font-bold text-stumble">{speaker.error}</p> : null}
           {mic.error ? <p className="mb-2 text-center text-xs font-bold text-stumble">{mic.error}</p> : null}
           {typing ? (
             <form
@@ -302,14 +353,18 @@ function TurnView({
   showTranslation,
   onToggleTranslation,
   onReplay,
+  onSay,
 }: {
   turn: TurnDto;
   name: string;
   /** The last exchange: the learner line fills in word by word, the reply fades in. */
   latest: boolean;
+  /** Off by default on purpose: a little friction, so the learner listens first and reads only when stuck. */
   showTranslation: boolean;
   onToggleTranslation: () => void;
   onReplay: () => void;
+  /** Speak a target phrase: tapping a stumble chip is how the learner hears what they should have said. */
+  onSay: (audioUrl: string | null) => void;
 }) {
   if (turn.role === "character") {
     return (
@@ -319,7 +374,12 @@ function TurnView({
           <p className="text-[20px] font-extrabold leading-[1.2] tracking-[-0.02em] text-ink/65">{turn.text}</p>
         </button>
         {showTranslation && turn.textEn ? <p className="mt-1 text-sm font-bold text-ink-2">{turn.textEn}</p> : null}
-        <button type="button" onClick={onReplay} className="mt-1 text-[11px] font-extrabold text-ink-2 underline-offset-2 hover:underline">
+        <button
+          type="button"
+          data-speaks
+          onClick={onReplay}
+          className="mt-1 text-[11px] font-extrabold text-ink-2 underline-offset-2 hover:underline"
+        >
           replay{turn.textEn ? " · tap line to translate" : ""}
         </button>
       </div>
@@ -336,14 +396,20 @@ function TurnView({
       {turn.stumbles.length > 0 || turn.wins.length > 0 ? (
         <div className="mt-2 flex flex-wrap gap-2">
           {others.map((s, i) => (
-            <Chip key={i} tone="ink">
-              caught · {s.said} → {s.target}
-            </Chip>
+            <button key={i} type="button" data-speaks onClick={() => onSay(s.audioUrl)} aria-label={`Hear ${s.target}`}>
+              <Chip tone="ink">
+                <Volume2 className="size-3" strokeWidth={2.5} />
+                caught · {s.said} → {s.target}
+              </Chip>
+            </button>
           ))}
           {freeze ? (
-            <Chip tone="stumble">
-              you froze · {(turn.pauseMs / 1000).toFixed(0)}s → {freeze.target}
-            </Chip>
+            <button type="button" data-speaks onClick={() => onSay(freeze.audioUrl)} aria-label={`Hear ${freeze.target}`}>
+              <Chip tone="stumble">
+                <Volume2 className="size-3" strokeWidth={2.5} />
+                you froze · {(turn.pauseMs / 1000).toFixed(0)}s → {freeze.target}
+              </Chip>
+            </button>
           ) : null}
           {turn.wins.map((w, i) => (
             <Chip key={`w${i}`}>✓ {w.phrase}</Chip>
