@@ -30,3 +30,5 @@ Thumbs.db
 # local
 .impeccable/
 
+# personal docs repo, cloned in, never committed here
+local-docs/
