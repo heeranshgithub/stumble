@@ -39,7 +39,9 @@ export function GradeRow({
           className={`flex aspect-square flex-col items-center justify-center rounded-pill text-[12.5px] font-extrabold transition-transform duration-150 ease-out-expo active:scale-95 disabled:opacity-50 ${tone[g]}`}
         >
           {label[g]}
-          <span className="text-[10px] font-bold opacity-60">{intervals[g]}</span>
+          {/* Again's interval is the same "1d" as Hard's on a first review (FSRS never schedules
+              sooner than a day), so a date says nothing. What Again does is reset the card. */}
+          <span className="text-[10px] font-bold opacity-60">{g === "again" ? "forgot" : intervals[g]}</span>
         </button>
       ))}
     </div>
