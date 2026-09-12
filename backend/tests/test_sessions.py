@@ -132,3 +132,18 @@ async def test_stumble_audio_streams_the_target(client: AsyncClient) -> None:
     missing = await client.get(stumble["audioUrl"].replace("/stumbles/0/", "/stumbles/9/"))
     assert missing.status_code == 404
     assert missing.json()["error"]["code"] == "stumble_not_found"
+
+
+def test_mid_scene_replies_do_not_greet_again() -> None:
+    from app.services.sessions import _EN_GREETING, _FR_GREETING, _without_regreeting
+
+    assert _without_regreeting("Bonjour ! Un café, très bien. Et avec ça ?", _FR_GREETING) == (
+        "Un café, très bien. Et avec ça ?"
+    )
+    assert _without_regreeting("Hello! A coffee, very good. And with that?", _EN_GREETING) == (
+        "A coffee, very good. And with that?"
+    )
+    # only a greeting: keep it rather than answer with nothing
+    assert _without_regreeting("Bonjour !", _FR_GREETING) == "Bonjour !"
+    # no greeting: untouched
+    assert _without_regreeting("Un café, très bien.", _FR_GREETING) == "Un café, très bien."

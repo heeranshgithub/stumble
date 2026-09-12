@@ -1,5 +1,6 @@
 """Session lifecycle and the turn pipeline: audio → text → character reply + stumbles → audio."""
 
+import re
 import uuid
 from datetime import UTC, datetime
 from typing import Any
@@ -83,6 +84,23 @@ async def get_any(db: Database, session_id: str) -> Document:
     if doc is None:
         raise NotFound("Session not found.", code="session_not_found")
     return doc
+
+
+# The character greets once, in the opening line. The prompt says so, and the model still mirrors a
+# learner's "Bonjour !" about one turn in six, so the greeting is also dropped here.
+_FR_GREETING = re.compile(r"^(bonjour|bonsoir|salut|rebonjour)\s*[!.,]?\s*", re.IGNORECASE)
+_EN_GREETING = re.compile(
+    r"^(hello|hi|hey|good (morning|afternoon|evening))\s*[!.,]?\s*", re.IGNORECASE
+)
+
+
+def _without_regreeting(text: str, greeting: re.Pattern[str]) -> str:
+    """Strips a leading greeting from a mid-scene reply; a reply that is only a greeting is kept."""
+    text = text.strip()
+    rest = greeting.sub("", text, count=1)
+    if not rest or rest == text:
+        return text
+    return rest[0].upper() + rest[1:]
 
 
 def _messages(session: Document, scene: Scene, settings: Settings) -> list[ChatMessage]:
@@ -172,11 +190,13 @@ async def take_turn(
     learner["wins"] = _parse_wins(result.get("wins"))
     learner["goal_progress"] = progress
 
+    reply_text = _without_regreeting(str(result.get("reply", "")), _FR_GREETING)
+    reply_en = result.get("reply_en")
     reply = _turn(
         "character",
-        str(result.get("reply", "")).strip() or "Pardon, vous pouvez répéter ?",
+        reply_text or "Pardon, vous pouvez répéter ?",
         progress,
-        text_en=result.get("reply_en"),
+        text_en=_without_regreeting(reply_en, _EN_GREETING) if isinstance(reply_en, str) else None,
     )
     session["turns"].append(reply)
     session["goal_progress"] = progress

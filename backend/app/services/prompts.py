@@ -1,4 +1,5 @@
-"""The one prompt: the character's next line and the stumbles, in a single JSON response."""
+"""The one LLM prompt (the character's next line and the stumbles in one JSON response), and the
+short text that primes the transcriber for a learner who mixes French and English."""
 
 from app.scenes.data import Scene
 
@@ -14,6 +15,8 @@ _PATIENCE = {
 _RULES = """RULES
 - 1 to 2 sentences per reply. End most replies with a question or a prompt that keeps the
   learner talking. Never lecture, never explain grammar, never switch to English in "reply".
+- You already greeted the learner in your first line. Never greet again, even if they say
+  "bonjour" back: answer what they said. Don't repeat yourself; each reply moves the scene on.
 - If the learner makes an error, RECAST it naturally inside your reply (repeat the corrected
   form as a real person would) and log it as a stumble. Do not point it out.
 - If the learner used an English word, understand it, recast it in French, and log a
