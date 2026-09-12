@@ -19,10 +19,22 @@ export interface SceneDto {
   usesDueCards: string[];
 }
 
+export interface DeckWordDto {
+  target: string;
+  state: WordState;
+}
+
 export interface DeckStatsDto {
   caught: number;
   mastered: number;
   due: number;
+}
+
+export interface TodayDeckDto extends DeckStatsDto {
+  /** A glimpse of the deck: due first, then learning, then mastered. */
+  words: DeckWordDto[];
+  /** When the next not-yet-due card comes back; null when nothing is waiting. */
+  nextDue: string | null;
 }
 
 export interface TodayDto {
@@ -31,7 +43,7 @@ export interface TodayDto {
   reviewDue: number;
   sceneUnlocked: boolean;
   nextScene: SceneDto | null;
-  deck: DeckStatsDto;
+  deck: TodayDeckDto;
 }
 
 export type Grade = "again" | "hard" | "good" | "easy";

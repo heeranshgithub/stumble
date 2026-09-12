@@ -12,7 +12,7 @@ async def test_today_creates_profile_and_returns_shape(
     body = res.json()
     assert body["dayNumber"] == 1
     assert body["reviewDue"] == 0
-    assert body["deck"] == {"caught": 0, "mastered": 0, "due": 0}
+    assert body["deck"] == {"caught": 0, "mastered": 0, "due": 0, "words": [], "nextDue": None}
     assert body["nextScene"]["id"] == "cafe"
     assert body["nextScene"]["status"] == "next"
     assert body["nextScene"]["characterName"] == "Léa"

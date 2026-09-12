@@ -4,9 +4,9 @@ from fastapi import APIRouter
 
 from app.deps import DbDep, ProfileDep, SettingsDep
 from app.models.scene import SceneDto
-from app.models.today import DeckStatsDto, TodayDto
+from app.models.today import DeckWordDto, TodayDeckDto, TodayDto
 from app.scenes.data import SCENES, to_dto
-from app.services import cards
+from app.services import cards, progress
 
 router = APIRouter()
 
@@ -37,11 +37,17 @@ async def today(db: DbDep, profile: ProfileDep, settings: SettingsDep) -> TodayD
     """The home screen: what's due, what's next, how the deck is doing."""
     window = timedelta(hours=settings.due_window_hours)
     deck = await cards.stats(db, profile["_id"], window)
+    full = await progress.deck(db, profile, window)
+    upcoming = [c.due for c in full.cards if c.state == "off"]
     return TodayDto(
         day_number=_day_number(profile["created_at"]),
         onboarded=bool(profile.get("onboarded", False)),
         review_due=deck["due"],
         scene_unlocked=deck["due"] == 0,
         next_scene=await next_scene(db, profile, window),
-        deck=DeckStatsDto(**deck),
+        deck=TodayDeckDto(
+            **deck,
+            words=[DeckWordDto(target=c.target, state=c.state) for c in full.cards[:12]],
+            next_due=min(upcoming) if upcoming else None,
+        ),
     )

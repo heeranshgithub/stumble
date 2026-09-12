@@ -12,8 +12,20 @@ import { PillButton } from "@/components/stumble/PillButton";
 import { SampleLink } from "@/components/stumble/SampleLink";
 import { getErrorMessage } from "@/lib/errors";
 import { useGetTodayQuery } from "@/store/endpoints/today";
+import type { TodayDeckDto } from "@/types/api";
 
 const weekday = new Intl.DateTimeFormat("en", { weekday: "long" });
+
+/** One line under the words: what happens to them next. */
+function deckLine(deck: TodayDeckDto): string {
+  if (deck.due > 0) return deck.due === 1 ? "1 word is due now." : `${deck.due} words are due now.`;
+  const learning = deck.caught - deck.mastered;
+  if (learning === 0) return "All mastered. Play a scene to catch new ones.";
+  if (!deck.nextDue) return `${learning} still learning.`;
+  const days = Math.round((new Date(deck.nextDue).getTime() - Date.now()) / 86_400_000);
+  const when = days <= 0 ? "today" : days === 1 ? "tomorrow" : `in ${days} days`;
+  return `Nothing due. ${learning === 1 ? "1 word comes" : `${learning} words come`} back ${when}.`;
+}
 
 export function TodayScreen() {
   const { data, error, isLoading, refetch } = useGetTodayQuery();
@@ -119,12 +131,14 @@ export function TodayScreen() {
           </>
         ) : (
           <>
+            {/* Pink is due, ink is learning, light is mastered — the deck's own colours. */}
             <LyricLine
               size="sm"
               className="mt-2"
-              words={uses.map((t) => ({ text: t, state: "miss" as const }))}
+              words={data.deck.words.map((w) => ({ text: w.target, state: w.state }))}
             />
-            <Link href="/deck" className="mt-2 inline-block text-xs font-extrabold text-ink/65 underline-offset-2 hover:underline">
+            <p className="mt-2 text-xs font-bold text-ink/65">{deckLine(data.deck)}</p>
+            <Link href="/deck" className="mt-1 inline-block text-xs font-extrabold text-ink/65 underline-offset-2 hover:underline">
               open the deck
             </Link>
           </>
