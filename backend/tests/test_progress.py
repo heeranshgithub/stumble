@@ -38,7 +38,9 @@ async def test_progress_after_scenes(client: AsyncClient) -> None:
     assert body["scenesCleared"] == 1
     assert body["sessions"] == 1
     assert body["series"][-1]["caught"] == 2
-    assert body["series"][-1]["struggling"] == 2
+    # Born today, due tomorrow: caught, but not yet due. The chart agrees with the tile.
+    assert body["series"][-1]["struggling"] == 0
+    assert body["due"] == 0
     assert body["series"][0]["caught"] == 0
 
 

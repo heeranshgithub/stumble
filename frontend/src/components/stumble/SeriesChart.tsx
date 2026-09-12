@@ -21,9 +21,38 @@ type Key = (typeof SERIES)[number]["key"];
 
 const W = 320;
 const H = 150;
-const PAD = { top: 14, right: 62, bottom: 22, left: 26 };
+const PAD = { top: 18, right: 62, bottom: 22, left: 26 };
 
 const shortDate = new Intl.DateTimeFormat("en", { month: "short", day: "numeric" });
+
+/**
+ * End labels sit at each line's last value. Two lines that end at the same value (caught and still
+ * due on day one; mastered and due when the deck is clear) would print on top of each other, so
+ * labels are nudged apart to at least one line-height, keeping their vertical order.
+ */
+const LABEL_GAP = 12;
+
+function endLabels(items: { key: string; y: number }[]): { key: string; y: number }[] {
+  const sorted = [...items].sort((a, b) => a.y - b.y);
+  for (let i = 1; i < sorted.length; i++) {
+    const prev = sorted[i - 1];
+    const cur = sorted[i];
+    if (prev && cur && cur.y - prev.y < LABEL_GAP) cur.y = prev.y + LABEL_GAP;
+  }
+  // If the stack ran past the bottom of the plot, push up from the bottom, only as far as the
+  // gaps require, so a label that wasn't in the way stays on its line.
+  const bottom = H - PAD.bottom;
+  const last = sorted[sorted.length - 1];
+  if (last && last.y > bottom) {
+    last.y = bottom;
+    for (let i = sorted.length - 2; i >= 0; i--) {
+      const cur = sorted[i];
+      const next = sorted[i + 1];
+      if (cur && next && cur.y > next.y - LABEL_GAP) cur.y = next.y - LABEL_GAP;
+    }
+  }
+  return sorted;
+}
 
 export function SeriesChart({ points }: { points: SeriesPointDto[] }) {
   const [hover, setHover] = useState<number | null>(null);
@@ -59,6 +88,7 @@ export function SeriesChart({ points }: { points: SeriesPointDto[] }) {
     <figure className="m-0">
       <div className="relative">
         <svg
+          overflow="visible"
           viewBox={`0 0 ${W} ${H}`}
           className="block w-full touch-none"
           role="img"
@@ -89,11 +119,14 @@ export function SeriesChart({ points }: { points: SeriesPointDto[] }) {
             <path key={s.key} d={path(s.key)} fill="none" stroke={s.color} strokeWidth={s.key === "struggling" ? 2.5 : 2} strokeLinejoin="round" strokeLinecap="round" />
           ))}
           {last
-            ? SERIES.map((s) => (
-                <text key={s.key} x={x(n - 1) + 8} y={y(last[s.key]) + 3.5} fontSize={10} fontWeight={800} fill="currentColor">
-                  {last[s.key]} {s.label}
-                </text>
-              ))
+            ? endLabels(SERIES.map((s) => ({ key: s.key, y: y(last[s.key]) }))).map((l) => {
+                const s = SERIES.find((q) => q.key === l.key);
+                return s ? (
+                  <text key={s.key} x={x(n - 1) + 8} y={l.y + 3.5} fontSize={10} fontWeight={800} fill="currentColor">
+                    {last[s.key]} {s.label}
+                  </text>
+                ) : null;
+              })
             : null}
           {hover !== null && hp ? (
             <g>
