@@ -1,5 +1,6 @@
 "use client";
 
+import { Mic } from "lucide-react";
 import { useState } from "react";
 
 import { Blob } from "@/components/stumble/Blob";
@@ -10,7 +11,14 @@ import { getErrorMessage } from "@/lib/errors";
 import { useGetDeckQuery } from "@/store/endpoints/progress";
 import type { DeckCardDto } from "@/types/api";
 
-const stateCls = { on: "lyr-on", off: "lyr-off-sm", miss: "lyr-miss-sm" } as const;
+/**
+ * Below this many cards the sheet has no texture yet (five faded words on white), so the deck is a
+ * list: each row answers "what is this" on its own. From here up it reads as one lyric sheet.
+ */
+const SHEET_FROM = 12;
+
+// Learning words are the deck's most active words, so they stay ink; only mastered ones step back.
+const stateCls = { on: "text-ink/45", off: "lyr-on", miss: "lyr-miss-sm" } as const;
 
 export function DeckScreen() {
   const { data, error, isLoading, refetch } = useGetDeckQuery();
@@ -31,6 +39,8 @@ export function DeckScreen() {
   }
 
   const selected = data.cards.find((c) => c.id === open) ?? null;
+  const asSheet = data.cards.length >= SHEET_FROM;
+  const toggle = (id: string) => setOpen((cur) => (cur === id ? null : id));
 
   return (
     <div className="flex flex-1 flex-col" data-scene="review">
@@ -39,9 +49,7 @@ export function DeckScreen() {
           {data.caught} caught · {data.mastered} mastered · {data.due} due
         </p>
         <h1 className="mt-1 text-[30px] font-extrabold leading-none tracking-[-0.03em]">Your deck</h1>
-        <p className="mt-2 text-xs font-bold text-ink-2">
-          Filled words are yours. Faded ones are on their way. Pink ones are due.
-        </p>
+        <NextStep cards={data.cards} due={data.due} />
       </Blob>
 
       <Blob color="paper" className="flex-1">
@@ -52,37 +60,108 @@ export function DeckScreen() {
             </p>
             <SampleLink className="mt-3" />
           </>
+        ) : asSheet ? (
+          <>
+            <p className="text-[19px] font-extrabold leading-[1.5] tracking-[-0.01em]">
+              {data.cards.map((c, i) => (
+                <span key={c.id}>
+                  <button
+                    type="button"
+                    onClick={() => toggle(c.id)}
+                    className={`rounded-md px-0.5 ${stateCls[c.state]} ${open === c.id ? "bg-ink/10" : ""}`}
+                  >
+                    {c.target}
+                  </button>
+                  {i < data.cards.length - 1 ? " " : ""}
+                </span>
+              ))}
+            </p>
+            <p className="mt-3 text-[11px] font-bold text-ink/65">Pink is due. Light is mastered. Tap a word for its story.</p>
+            {selected ? <CardDetail card={selected} /> : null}
+          </>
         ) : (
-          <p className="text-[19px] font-extrabold leading-[1.5] tracking-[-0.01em]">
-            {data.cards.map((c, i) => (
-              <span key={c.id}>
+          <ul className="-mx-5 divide-y divide-ink/10">
+            {data.cards.map((c) => (
+              <li key={c.id}>
                 <button
                   type="button"
-                  onClick={() => setOpen((cur) => (cur === c.id ? null : c.id))}
-                  className={`rounded-md px-0.5 ${stateCls[c.state]} ${open === c.id ? "bg-ink/10" : ""}`}
+                  onClick={() => toggle(c.id)}
+                  aria-expanded={open === c.id}
+                  className="flex w-full items-center gap-3 px-5 py-3 text-left"
                 >
-                  {c.target}
+                  <div className="min-w-0 flex-1">
+                    <p className={`text-[17px] font-extrabold leading-tight ${c.state === "miss" ? "text-stumble" : "text-ink"}`}>
+                      {c.target}
+                    </p>
+                    <p className="truncate text-xs font-bold text-ink/65">
+                      {c.context ? `"${c.context}"` : c.sceneTitle}
+                    </p>
+                  </div>
+                  <DueChip card={c} />
                 </button>
-                {i < data.cards.length - 1 ? " " : ""}
-              </span>
+                {open === c.id ? (
+                  <div className="px-5 pb-3">
+                    <CardDetail card={c} />
+                  </div>
+                ) : null}
+              </li>
             ))}
-          </p>
+          </ul>
         )}
-        {selected ? <CardDetail card={selected} /> : null}
       </Blob>
     </div>
   );
 }
 
+/** The one line that changes with the deck: what happens to these words next, and the way there. */
+function NextStep({ cards, due }: { cards: DeckCardDto[]; due: number }) {
+  if (cards.length === 0) {
+    return <p className="mt-2 text-xs font-bold text-ink-2">Play a scene. Whatever you reach for and miss lands here.</p>;
+  }
+  if (due > 0) {
+    return (
+      <>
+        <p className="mt-2 text-xs font-bold text-ink-2">
+          {due === 1 ? "1 word is due." : `${due} words are due.`} Say each one in its own sentence; the scheduler does the rest.
+        </p>
+        <PillButton href="/review" className="mt-3">
+          <Mic className="size-5" strokeWidth={2.25} />
+          Start review
+        </PillButton>
+      </>
+    );
+  }
+  const next = cards.filter((c) => c.state !== "on").map((c) => new Date(c.due).getTime()).sort((a, b) => a - b)[0];
+  const learning = cards.filter((c) => c.state === "off").length;
+  return (
+    <p className="mt-2 text-xs font-bold text-ink-2">
+      {learning === 0
+        ? "Every word here is mastered. Play a scene to catch new ones."
+        : `Nothing due yet. ${learning === 1 ? "1 word comes" : `${learning} words come`} back ${next ? whenLabel(next) : "soon"}.`}
+    </p>
+  );
+}
+
+function DueChip({ card }: { card: DeckCardDto }) {
+  if (card.state === "on") return <Chip>mastered</Chip>;
+  if (card.state === "miss") return <Chip tone="stumble">due now</Chip>;
+  return <Chip>{whenLabel(new Date(card.due).getTime())}</Chip>;
+}
+
+function whenLabel(t: number): string {
+  const days = Math.round((t - Date.now()) / 86_400_000);
+  if (days <= 0) return "due today";
+  if (days === 1) return "tomorrow";
+  return `in ${days}d`;
+}
+
 function CardDetail({ card }: { card: DeckCardDto }) {
-  const due = new Date(card.due);
-  const days = Math.round((due.getTime() - Date.now()) / 86_400_000);
   return (
     <div className="mt-4 rounded-2xl bg-ink px-4 py-3 text-paper">
       <div className="flex items-center justify-between gap-2">
         <p className="text-[20px] font-extrabold leading-none tracking-tight">{card.target}</p>
         <Chip tone={card.state === "miss" ? "stumble" : "muted"} className={card.state === "miss" ? "" : "bg-paper/15 text-paper"}>
-          {card.state === "on" ? "mastered" : card.state === "miss" ? "due now" : days <= 0 ? "due today" : `due in ${days}d`}
+          {card.state === "on" ? "mastered" : card.state === "miss" ? "due now" : whenLabel(new Date(card.due).getTime())}
         </Chip>
       </div>
       {card.context ? <p className="mt-2 text-sm text-paper-2">&ldquo;{card.context}&rdquo;</p> : null}

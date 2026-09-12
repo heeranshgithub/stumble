@@ -116,7 +116,10 @@ async def deck(db: Database, profile: Document, due_window: timedelta) -> DeckDt
             return "miss"
         return "off"
 
-    ordered = sorted(all_cards, key=lambda c: _aware(c["created_at"]), reverse=True)
+    # A queue, not a scatter: what's due first, then what's still being learned, then what's
+    # mastered. Within a group the soonest due comes first.
+    rank = {"miss": 0, "off": 1, "on": 2}
+    ordered = sorted(all_cards, key=lambda c: (rank[state(c)], _aware(c["due"])))
     return DeckDto(
         cards=[
             DeckCardDto(
