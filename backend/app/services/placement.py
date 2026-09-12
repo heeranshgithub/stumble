@@ -19,8 +19,9 @@ twenty seconds, unprompted, to place themselves. You get the transcript.
 1. Estimate their level: A1, A2 or B1. Be generous; this decides the first scene's difficulty, not \
 a grade.
 2. Log stumbles exactly as in a scene: code_switch (an English word inside French), correction (a \
-wrong form), miss (a French word used with the wrong meaning). Each with "said", "target", and \
-"context" (their sentence with the target slot as ___). Only confident ones.
+wrong form), miss (a French word used with the wrong meaning). Each with "said", "target", \
+"context" (their sentence with the target slot as ___) and "context_en" (English of the fixed \
+sentence). Only confident ones.
 3. One warm sentence of note for the learner, in English, about what you heard.
 
 Respond with ONLY JSON:

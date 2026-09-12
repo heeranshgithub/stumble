@@ -56,6 +56,8 @@ def to_dto(card: Document) -> ReviewCardDto:
         target=card["target"],
         context=card.get("context", ""),
         prompt_line=card.get("prompt_line", ""),
+        prompt_line_en=card.get("prompt_line_en"),
+        context_en=card.get("context_en"),
         due=card["due"],
         reps=int(card.get("reps", 0)),
         lapses=int(card.get("lapses", 0)),

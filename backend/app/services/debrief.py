@@ -36,15 +36,20 @@ async def finish(
     seen: set[str] = set()
     stumbles: list[DebriefStumbleDto] = []
     added = relapsed = 0
+    last_character: Document | None = None
     for turn in session["turns"]:
         if turn["role"] != "learner":
+            last_character = turn
             continue
+        prompt_en = (last_character or {}).get("text_en")
         for s in turn.get("stumbles", []):
             key = target_key(s["target"])
             if not key or key in seen:
                 continue
             seen.add(key)
-            card, is_new = await cards.upsert_from_stumble(db, profile_id, session, s)
+            card, is_new = await cards.upsert_from_stumble(
+                db, profile_id, session, s, prompt_line_en=prompt_en
+            )
             added += int(is_new)
             relapsed += int(not is_new)
             stumbles.append(DebriefStumbleDto(**s, card_id=str(card["_id"]), is_new=is_new))

@@ -26,6 +26,8 @@ class ReviewCardDto(MongoModel):
     target: str
     context: str
     prompt_line: str
+    prompt_line_en: str | None = None
+    context_en: str | None = None
     due: datetime
     reps: int
     lapses: int

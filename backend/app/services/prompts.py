@@ -33,6 +33,7 @@ STUMBLE TYPES: freeze | code_switch | correction | miss
 - "context": the learner's sentence with the target slot replaced by ___ (for a freeze, the
   sentence they were trying to say)
 - "prompt_line": your line that the learner was answering
+- "context_en": English of the learner's sentence with the target in place (the fixed sentence)
 - "confidence": 0 to 1. Only report stumbles you are confident about.
 Also report "wins": target-vocabulary or due words the learner produced correctly.
 
@@ -52,7 +53,7 @@ Respond with ONLY a JSON object:
  "done": false,
  "stumbles": [{"type": "code_switch", "said": "coffee", "target": "café",
    "context": "Je voudrais un ___ au lait.", "prompt_line": "Qu'est-ce que je vous sers ?",
-   "confidence": 0.97}],
+   "context_en": "I'd like a café au lait.", "confidence": 0.97}],
  "wins": [{"phrase": "s'il vous plaît"}]}"""
 
 

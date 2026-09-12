@@ -25,7 +25,11 @@ def target_key(text: str) -> str:
 
 
 async def upsert_from_stumble(
-    db: Database, profile_id: ObjectId, session: Document, stumble: Document
+    db: Database,
+    profile_id: ObjectId,
+    session: Document,
+    stumble: Document,
+    prompt_line_en: str | None = None,
 ) -> tuple[Document, bool]:
     """Returns (card, is_new). A repeat stumble on a known target is a lapse, not a new card."""
     now = _now()
@@ -44,6 +48,7 @@ async def upsert_from_stumble(
                     "updated_at": now,
                     "last_context": stumble["context"],
                     "last_session_id": session["_id"],
+                    **({"context_en": stumble["context_en"]} if stumble.get("context_en") else {}),
                     "mastered": False,
                     "mastered_at": None,
                 },
@@ -64,6 +69,8 @@ async def upsert_from_stumble(
         "target_key": key,
         "context": stumble["context"],
         "prompt_line": stumble.get("prompt_line", ""),
+        "prompt_line_en": prompt_line_en or None,
+        "context_en": stumble.get("context_en") or None,
         "fsrs": state,
         "due": due,
         "reps": 1,

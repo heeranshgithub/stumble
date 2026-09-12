@@ -21,6 +21,8 @@ class StumbleDto(ApiModel):
     context: str
     prompt_line: str
     confidence: float
+    # English of the fixed sentence, from the model. Older stumbles predate it.
+    context_en: str | None = None
     # The target, spoken. Set on the wire only; a stumble in the database has no URL.
     audio_url: str | None = None
 

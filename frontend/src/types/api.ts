@@ -54,6 +54,9 @@ export interface ReviewCardDto {
   target: string;
   context: string;
   promptLine: string;
+  /** English of the line the learner answered, and of their sentence with the slot fixed. */
+  promptLineEn: string | null;
+  contextEn: string | null;
   due: string;
   reps: number;
   lapses: number;

@@ -64,6 +64,7 @@ function Card({
   onGraded: (remaining: number) => void;
 }) {
   const [revealed, setRevealed] = useState(false);
+  const [showPromptEn, setShowPromptEn] = useState(false);
   const [attempt, setAttempt] = useState<Attempt>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [attemptCard, attemptState] = useAttemptCardMutation();
@@ -125,9 +126,17 @@ function Card({
         {card.promptLine ? (
           <>
             <p className="text-xs font-bold text-ink-2">{card.characterName || "They"} asked</p>
-            <p className="text-[18px] font-extrabold leading-tight tracking-[-0.01em] text-ink/65">
-              « {card.promptLine} »
-            </p>
+            {/* Same friction as the scene: the line is French first; English is one tap away. */}
+            <button type="button" onClick={() => setShowPromptEn((v) => !v)} className="block text-left">
+              <p className="text-[18px] font-extrabold leading-tight tracking-[-0.01em] text-ink/65">
+                « {card.promptLine} »
+              </p>
+            </button>
+            {showPromptEn && card.promptLineEn ? (
+              <p className="mt-1 text-sm font-bold text-ink-2">{card.promptLineEn}</p>
+            ) : card.promptLineEn ? (
+              <p className="mt-1 text-[11px] font-extrabold text-ink-2">tap line to translate</p>
+            ) : null}
           </>
         ) : null}
         {/* The sentence is the learner's, with the slot fixed: never "You said" over the corrected form.
@@ -152,6 +161,7 @@ function Card({
           )}
           {after}
         </p>
+        {revealed && card.contextEn ? <p className="mt-1 text-sm font-bold text-ink-2">{card.contextEn}</p> : null}
         <div className="mt-3 flex flex-wrap gap-2">
           {isFreeze ? (
             <Chip tone="stumble">you froze here</Chip>
