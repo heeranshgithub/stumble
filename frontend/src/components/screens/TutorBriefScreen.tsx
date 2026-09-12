@@ -1,6 +1,7 @@
 "use client";
 
-import { Check, Copy } from "lucide-react";
+import { Check, ChevronLeft, Copy } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 import { Blob } from "@/components/stumble/Blob";
@@ -10,7 +11,9 @@ import { getErrorMessage } from "@/lib/errors";
 import { useGetTutorBriefQuery } from "@/store/endpoints/progress";
 
 export function TutorBriefScreen() {
-  const { data, error, isLoading, refetch } = useGetTutorBriefQuery();
+  // The server caches the brief per week and rewrites it when new cards land, so the client
+  // asks every time this screen opens rather than holding an in-memory copy that can go stale.
+  const { data, error, isLoading, refetch } = useGetTutorBriefQuery(undefined, { refetchOnMountOrArgChange: true });
   const [copied, setCopied] = useState(false);
 
   if (isLoading) return <Skeleton />;
@@ -41,7 +44,8 @@ export function TutorBriefScreen() {
     return (
       <div className="flex flex-1 flex-col" data-scene="review">
         <Blob color="scene" className="flex flex-1 flex-col justify-end pt-14 pb-6">
-          <p className="text-xs font-bold text-ink-2">Your week · {data.weekLabel}</p>
+          <BackToProgress />
+          <p className="mt-6 text-xs font-bold text-ink-2">Your week · {data.weekLabel}</p>
           <h1 className="mt-2 text-[30px] font-extrabold leading-[1.05] tracking-[-0.03em]">
             Nothing to report yet.
           </h1>
@@ -57,8 +61,9 @@ export function TutorBriefScreen() {
 
   return (
     <div className="flex flex-1 flex-col" data-scene="review">
-      <Blob color="scene" className="pt-14 pb-5">
-        <p className="text-xs font-bold text-ink-2">
+      <Blob color="scene" className="pt-12 pb-5">
+        <BackToProgress />
+        <p className="mt-6 text-xs font-bold text-ink-2">
           Week {data.weekLabel.split("-W")[1]} · from {data.scenesPlayed} {data.scenesPlayed === 1 ? "scene" : "scenes"} ·{" "}
           {data.cardsAnalysed} stumbles
         </p>
@@ -134,5 +139,15 @@ function Skeleton() {
         <div className="h-24 rounded-2xl bg-ink/8" />
       </div>
     </div>
+  );
+}
+
+/** This screen is off the tab bar; Progress is where it is reached from, and where back goes. */
+function BackToProgress() {
+  return (
+    <Link href="/progress" className="flex items-center gap-1 text-xs font-extrabold">
+      <ChevronLeft className="size-4" strokeWidth={2.5} />
+      Progress
+    </Link>
   );
 }
