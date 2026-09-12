@@ -157,3 +157,13 @@ async def next_review_at(db: Database, profile_id: ObjectId) -> datetime | None:
         return None
     due: datetime = doc["due"]
     return due if due.tzinfo else due.replace(tzinfo=UTC)
+
+
+async def make_due_now(db: Database, profile_id: ObjectId) -> int:
+    """Every unmastered card becomes due immediately. FSRS state is untouched; only `due` moves."""
+    now = _now()
+    result = await db.cards.update_many(
+        {"profile_id": profile_id, "mastered": False, "due": {"$gt": now}},
+        {"$set": {"due": now, "updated_at": now}},
+    )
+    return int(result.modified_count)

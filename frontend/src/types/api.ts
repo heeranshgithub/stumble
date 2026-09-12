@@ -217,6 +217,11 @@ export interface ReadyDto {
   tts: string;
 }
 
+/** POST /reviews/due-now: a testing lever that pulls every unmastered card's due date to now. */
+export interface DueNowDto {
+  cards: number;
+}
+
 export interface StartSessionRequest {
   sceneId: string;
   patience?: Patience;

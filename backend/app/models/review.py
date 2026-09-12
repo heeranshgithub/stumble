@@ -53,3 +53,9 @@ class GradeResultDto(ApiModel):
 class AttemptDto(ApiModel):
     heard: str
     matched: bool
+
+
+class DueNowDto(ApiModel):
+    """How many cards were pulled forward to now."""
+
+    cards: int

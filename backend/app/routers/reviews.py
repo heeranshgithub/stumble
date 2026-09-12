@@ -6,7 +6,7 @@ from fastapi.responses import Response
 
 from app.deps import DbDep, ProfileDep, SettingsDep
 from app.errors import BadRequest
-from app.models.review import AttemptDto, GradeRequest, GradeResultDto, ReviewListDto
+from app.models.review import AttemptDto, DueNowDto, GradeRequest, GradeResultDto, ReviewListDto
 from app.services import cards, reviews, tts
 from app.services.registry import Providers
 
@@ -19,6 +19,18 @@ async def due_reviews(db: DbDep, profile: ProfileDep, settings: SettingsDep) -> 
     window = timedelta(hours=settings.due_window_hours)
     docs, total = await reviews.due(db, profile, window)
     return ReviewListDto(cards=[reviews.to_dto(d) for d in docs], total_due=total)
+
+
+# Declared before /reviews/{card_id}: a literal segment must win over the id parameter.
+@router.post("/reviews/due-now", response_model=DueNowDto)
+async def due_now(db: DbDep, profile: ProfileDep) -> DueNowDto:
+    """A testing lever, not a learner feature: pull every unmastered card's due date to now.
+
+    A new card is due tomorrow on purpose (the next session, not the same hour), which makes the
+    review screen untestable within a day of playing. This is the explicit way around that,
+    reachable from the profile utility screen only. Nothing else about the card changes.
+    """
+    return DueNowDto(cards=await cards.make_due_now(db, profile["_id"]))
 
 
 @router.post("/reviews/{card_id}", response_model=GradeResultDto)

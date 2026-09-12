@@ -1,5 +1,5 @@
 import { api } from "@/store/api";
-import type { AttemptDto, Grade, GradeResultDto, ReviewListDto } from "@/types/api";
+import type { AttemptDto, DueNowDto, Grade, GradeResultDto, ReviewListDto } from "@/types/api";
 
 export const reviewsApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -15,7 +15,12 @@ export const reviewsApi = api.injectEndpoints({
     attemptCard: build.mutation<AttemptDto, { id: string; form: FormData }>({
       query: ({ id, form }) => ({ url: `/reviews/${id}/attempt`, method: "POST", body: form }),
     }),
+    // Testing lever (profile screen only): make everything due now so the review can be exercised today.
+    dueNow: build.mutation<DueNowDto, void>({
+      query: () => ({ url: "/reviews/due-now", method: "POST" }),
+      invalidatesTags: ["Today", "Card", "Progress"],
+    }),
   }),
 });
 
-export const { useGetDueReviewsQuery, useGradeCardMutation, useAttemptCardMutation } = reviewsApi;
+export const { useGetDueReviewsQuery, useGradeCardMutation, useAttemptCardMutation, useDueNowMutation } = reviewsApi;

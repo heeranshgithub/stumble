@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy, Plus, RefreshCw } from "lucide-react";
+import { Check, Copy, FastForward, Plus, RefreshCw } from "lucide-react";
 import { useState, useSyncExternalStore } from "react";
 
 import { Blob } from "@/components/stumble/Blob";
@@ -13,6 +13,7 @@ import {
   SAMPLE_DEVICE,
   switchDevice,
 } from "@/lib/device";
+import { useDueNowMutation } from "@/store/endpoints/reviews";
 import { useGetTodayQuery } from "@/store/endpoints/today";
 
 const noop = () => () => undefined;
@@ -28,6 +29,7 @@ export function ProfileScreen() {
   const { data } = useGetTodayQuery();
   const [draft, setDraft] = useState("");
   const [copied, setCopied] = useState(false);
+  const [dueNow, dueNowState] = useDueNowMutation();
 
   const link = typeof window === "undefined" ? "" : `${window.location.origin}/?device=${device}`;
 
@@ -117,6 +119,18 @@ export function ProfileScreen() {
             </PillButton>
           ) : null}
         </div>
+      </Blob>
+
+      <Blob color="paper" className="pt-0">
+        <p className="text-xs font-bold text-ink/65">For testing</p>
+        <PillButton variant="paper" className="mt-2 border border-ink/15" onClick={() => void dueNow()} disabled={dueNowState.isLoading}>
+          <FastForward className="size-5" strokeWidth={2.25} />
+          {dueNowState.data ? `${dueNowState.data.cards} made due · again` : "Make all my cards due now"}
+        </PillButton>
+        <p className="mt-2 text-[11px] font-bold text-ink/65">
+          A new card is due tomorrow on purpose, so the review can&apos;t be tried the same day. This
+          pulls every unmastered card forward to now; nothing else about it changes.
+        </p>
       </Blob>
 
       <Blob color="paper" className="mt-auto pt-0">

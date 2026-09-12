@@ -148,3 +148,16 @@ async def test_scenes_track_and_due_words(
     assert started.status_code == 200
     assert doc is not None
     assert doc["due_cards"] == ["café"]
+
+
+async def test_due_now_pulls_tomorrows_cards_into_todays_review(client: AsyncClient) -> None:
+    await _make_cards(client)
+    before = (await client.get("/reviews/due", headers=HEADERS)).json()
+    assert before["totalDue"] == 0  # born today, due tomorrow, by design
+    res = await client.post("/reviews/due-now", headers=HEADERS)
+    assert res.status_code == 200
+    assert res.json()["cards"] >= 1
+    after = (await client.get("/reviews/due", headers=HEADERS)).json()
+    assert after["totalDue"] == res.json()["cards"]
+    # idempotent: nothing left to pull forward
+    assert (await client.post("/reviews/due-now", headers=HEADERS)).json()["cards"] == 0
