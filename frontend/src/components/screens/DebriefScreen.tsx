@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Languages, MessageCircleQuestion, PenLine, Timer } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Blob } from "@/components/stumble/Blob";
 import { Chip } from "@/components/stumble/Chip";
@@ -36,6 +36,7 @@ function whenLabel(iso: string | null): string {
 }
 
 export function DebriefScreen({ sceneId, sessionId }: { sceneId: string; sessionId: string | null }) {
+  const [explain, setExplain] = useState(false);
   const [finish, { data, error, isLoading }] = useFinishSessionMutation();
   const firedRef = useRef(false);
 
@@ -58,7 +59,7 @@ export function DebriefScreen({ sceneId, sessionId }: { sceneId: string; session
 
   const d = data;
   const total = d.stumbles.length;
-  const win = d.wins[0];
+  const wins = d.wins.length;
   const headline = d.goalReached ? goalHeadline(d.sceneId) : `Not quite. ${d.characterName} is still waiting.`;
 
   return (
@@ -71,18 +72,18 @@ export function DebriefScreen({ sceneId, sessionId }: { sceneId: string; session
         <p className="mt-2 text-sm font-bold text-ink-2">
           {d.goalReached ? "Goal reached. " : `Goal: ${d.goal.toLowerCase().replace(/\.$/, "")}. `}
           {total === 0 ? "No stumbles caught." : total === 1 ? "1 stumble caught" : `${total} stumbles caught`}
-          {win ? `, 1 clean win.` : total === 0 ? "" : "."}
+          {wins === 0 ? (total === 0 ? "" : ".") : wins === 1 ? ", 1 clean win." : `, ${wins} clean wins.`}
         </p>
       </Blob>
 
       <div className="flex flex-1 flex-col">
-        {total > 0 ? (
+        {total > 0 || wins > 0 ? (
           <ul className="divide-y divide-ink/10 px-5">
             {d.stumbles.map((s) => (
               <StumbleRow key={s.cardId} s={s} />
             ))}
-            {win ? (
-              <li className="flex gap-3 py-3">
+            {d.wins.map((win) => (
+              <li key={win.cardId ?? win.phrase} className="flex gap-3 py-3">
                 <span className="grid size-9 flex-none place-items-center rounded-xl bg-pharmacie text-ink">
                   <Check className="size-4" strokeWidth={2.5} />
                 </span>
@@ -93,7 +94,7 @@ export function DebriefScreen({ sceneId, sessionId }: { sceneId: string; session
                   </p>
                 </div>
               </li>
-            ) : null}
+            ))}
           </ul>
         ) : (
           <div className="px-5 py-6">
@@ -104,15 +105,26 @@ export function DebriefScreen({ sceneId, sessionId }: { sceneId: string; session
         )}
 
         <div className="mt-auto px-5 pb-8 pt-4">
-          <div className="flex items-center justify-between rounded-2xl bg-ink px-4 py-3 text-paper">
-            <div>
-              <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-paper-2">Added to deck</p>
-              <p className="text-[15px] font-extrabold">
-                {d.cardsAdded === 1 ? "1 card" : `${d.cardsAdded} cards`}
-                {d.cardsRelapsed > 0 ? ` · ${d.cardsRelapsed} relapsed` : ""} · {whenLabel(d.nextReviewAt)}
-              </p>
+          <div className="rounded-2xl bg-ink px-4 py-3 text-paper">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-paper-2">Added to deck</p>
+                <p className="text-[15px] font-extrabold">
+                  {d.cardsAdded === 1 ? "1 card" : `${d.cardsAdded} cards`}
+                  {d.cardsRelapsed > 0 ? ` · ${d.cardsRelapsed} relapsed` : ""} · {whenLabel(d.nextReviewAt)}
+                </p>
+              </div>
+              {/* The name is a credibility signal to anyone who knows it; the tap is for everyone else. */}
+              <button type="button" aria-expanded={explain} aria-label="What is FSRS?" onClick={() => setExplain((v) => !v)}>
+                <Chip tone="stumble">FSRS</Chip>
+              </button>
             </div>
-            <Chip tone="stumble">FSRS</Chip>
+            {explain ? (
+              <p className="mt-2 text-xs font-bold leading-snug text-paper-2">
+                Scheduled by FSRS, the spaced-repetition algorithm Anki uses. Each card comes back just before
+                you&apos;d forget it.
+              </p>
+            ) : null}
           </div>
           <PillButton href="/" className="mt-4">
             Done for today
