@@ -128,8 +128,9 @@ function Card({
             </p>
           </>
         ) : null}
+        {/* The sentence is the learner's, with the slot fixed: never "You said" over the corrected form. */}
         <p className={`text-xs font-bold text-ink-2 ${card.promptLine ? "mt-5" : ""}`}>
-          {isFreeze ? "You were trying to say" : "You said"}
+          {isFreeze ? "You were trying to say" : revealed ? "Your sentence, fixed" : "Your sentence"}
         </p>
         <p className="mt-1 text-[28px] font-extrabold leading-[1.15] tracking-[-0.02em]">
           {before}

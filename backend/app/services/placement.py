@@ -52,6 +52,10 @@ async def place(db: Database, profile: Document, providers: Providers, heard: st
             continue
         if not s.target.strip():
             continue
+        # Twenty seconds of unprompted speech: there is no question to show above the card, and the
+        # model sometimes puts the learner's own wrong sentence here, which the review would then
+        # render as "They asked".
+        s = s.model_copy(update={"prompt_line": ""})
         stumbles.append(s)
         _, is_new = await cards.upsert_from_stumble(
             db, profile["_id"], pseudo_session, s.model_dump()
