@@ -162,19 +162,20 @@ function Card({
           {after}
         </p>
         {revealed && card.contextEn ? <p className="mt-1 text-sm font-bold text-ink-2">{card.contextEn}</p> : null}
+        {/* One chip at a time. Until you try, it's what went wrong in the scene; once you've spoken,
+            it's what just happened — two chips read as two verdicts on the same thing. */}
         <div className="mt-3 flex flex-wrap gap-2">
-          {isFreeze ? (
+          {attempt ? (
+            <Chip tone={attempt.matched ? "ink" : "muted"}>
+              heard &ldquo;{attempt.heard}&rdquo; · {attempt.matched ? "that's it" : "not quite"}
+            </Chip>
+          ) : isFreeze ? (
             <Chip tone="stumble">you froze here</Chip>
           ) : (
             <Chip tone="stumble">
               you said &ldquo;{card.said}&rdquo;
             </Chip>
           )}
-          {attempt ? (
-            <Chip tone={attempt.matched ? "ink" : "muted"}>
-              heard &ldquo;{attempt.heard}&rdquo; · {attempt.matched ? "that's it" : "not quite"}
-            </Chip>
-          ) : null}
         </div>
 
         <div className="flex-1" />
