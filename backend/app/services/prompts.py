@@ -68,6 +68,21 @@ def system_prompt(scene: Scene, patience: str, due_cards: list[str]) -> str:
     return head + _RULES
 
 
+# Whisper takes a "previous transcript" as a style prompt. Forced to French with no prompt, it
+# renders English speech *as* French ("I want a coffee" → "Je voudrais un café"), and the stumble
+# the app exists to catch vanishes. Mixed, hesitant text keeps English words as English.
+_STT_STYLE = (
+    "Bonjour ! Euh... je voudrais un coffee, s'il vous plaît. How do you say... un croissant ? "
+    "C'est combien ? Je paie par carte."
+)
+
+
+def stt_prompt(vocab: list[str] | None = None, due: list[str] | None = None) -> str:
+    """The style prompt plus the words this scene is listening for, so they are spelled right."""
+    words = [w for w in [*(vocab or []), *(due or [])] if w]
+    return f"{_STT_STYLE} {', '.join(words)}." if words else _STT_STYLE
+
+
 def learner_turn(text: str, pause_ms: int, freeze_threshold_ms: int) -> str:
     if pause_ms >= freeze_threshold_ms:
         return f"{text}\n\n[pause_ms: {pause_ms}. The learner stalled while speaking.]"

@@ -7,6 +7,7 @@ from app.deps import DbDep, ProfileDep, SettingsDep
 from app.errors import BadRequest
 from app.models.progress import DeckDto, PlacementDto, ProgressDto, TutorBriefDto
 from app.services import placement, progress, tutor
+from app.services.prompts import stt_prompt
 from app.services.registry import Providers
 
 router = APIRouter()
@@ -48,7 +49,7 @@ async def post_placement(
     if audio is not None:
         data = await audio.read()
         transcript = await providers.transcriber.transcribe(
-            data, audio.content_type or "audio/webm", language="fr"
+            data, audio.content_type or "audio/webm", language="fr", prompt=stt_prompt()
         )
         heard = transcript.text
     else:

@@ -26,7 +26,8 @@ class Settings(BaseSettings):
     openrouter_model: str = ""
 
     groq_api_key: str | None = None
-    groq_stt_model: str = "whisper-large-v3-turbo"
+    # The full model: turbo still mangles a wholly-English sentence even with the mixed prompt.
+    groq_stt_model: str = "whisper-large-v3"
 
     elevenlabs_api_key: str | None = None
     elevenlabs_voice_id: str | None = None

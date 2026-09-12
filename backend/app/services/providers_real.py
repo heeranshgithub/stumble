@@ -34,17 +34,24 @@ class GroqTranscriber:
         self._key = api_key
         self._model = model
 
-    async def transcribe(self, audio: bytes, mime: str, *, language: str) -> Transcript:
+    async def transcribe(
+        self, audio: bytes, mime: str, *, language: str, prompt: str | None = None
+    ) -> Transcript:
+        # `language` alone makes Whisper *translate* English speech into French, turning a
+        # code-switch into a clean sentence. The prompt shows it mixed speech, so English stays.
+        data = {
+            "model": self._model,
+            "language": language,
+            "response_format": "verbose_json",
+            "temperature": "0",
+        }
+        if prompt:
+            data["prompt"] = prompt
         try:
             res = await self._client.post(
                 "https://api.groq.com/openai/v1/audio/transcriptions",
                 headers={"Authorization": f"Bearer {self._key}"},
-                data={
-                    "model": self._model,
-                    "language": language,
-                    "response_format": "verbose_json",
-                    "temperature": "0",
-                },
+                data=data,
                 files={"file": (f"turn.{_ext(mime)}", audio, mime.split(";", 1)[0])},
             )
             res.raise_for_status()

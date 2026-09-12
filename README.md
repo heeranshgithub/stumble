@@ -52,7 +52,7 @@ flowchart LR
 | Frontend | Next.js (App Router), React 19, TypeScript strict, Tailwind v4, RTK Query, Lucide |
 | Backend | FastAPI, Pydantic v2, motor, `py-fsrs`, httpx, structlog |
 | Data | MongoDB |
-| Speech to text | Groq `whisper-large-v3-turbo` |
+| Speech to text | Groq `whisper-large-v3`, prompted with mixed French/English so a fall-back to English is transcribed, not translated |
 | LLM | OpenRouter (model id in env) |
 | Text to speech | ElevenLabs Flash v2.5, streamed and cached |
 | Hosting | AWS Amplify (frontend), AWS App Runner (backend) |

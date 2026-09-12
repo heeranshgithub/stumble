@@ -18,7 +18,9 @@ class ChatMessage:
 
 
 class Transcriber(Protocol):
-    async def transcribe(self, audio: bytes, mime: str, *, language: str) -> Transcript: ...
+    async def transcribe(
+        self, audio: bytes, mime: str, *, language: str, prompt: str | None = None
+    ) -> Transcript: ...
 
 
 class ChatModel(Protocol):

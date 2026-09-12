@@ -31,7 +31,9 @@ class FakeTranscriber:
     def __init__(self, text: str = "Je voudrais un coffee au lait, s'il vous plaît.") -> None:
         self.text = text
 
-    async def transcribe(self, audio: bytes, mime: str, *, language: str) -> Transcript:
+    async def transcribe(
+        self, audio: bytes, mime: str, *, language: str, prompt: str | None = None
+    ) -> Transcript:
         return Transcript(text=self.text, duration_s=max(0.5, len(audio) / 32000))
 
 

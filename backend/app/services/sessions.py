@@ -13,7 +13,7 @@ from app.errors import BadRequest, NotFound
 from app.log import get_logger
 from app.models.session import SessionDto, StumbleDto, TurnDto, WinDto
 from app.scenes.data import Scene, get_scene
-from app.services.prompts import learner_turn, system_prompt
+from app.services.prompts import learner_turn, stt_prompt, system_prompt
 from app.services.providers import ChatMessage
 from app.services.registry import Providers
 from app.settings import Settings
@@ -150,7 +150,10 @@ async def take_turn(
 
     if audio:
         transcript = await providers.transcriber.transcribe(
-            audio, mime or "audio/webm", language="fr"
+            audio,
+            mime or "audio/webm",
+            language="fr",
+            prompt=stt_prompt(scene.vocab, session["due_cards"]),
         )
         said = transcript.text
     else:
