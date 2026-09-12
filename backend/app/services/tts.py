@@ -16,17 +16,28 @@ log = get_logger(__name__)
 _HEADERS = {"Cache-Control": "private, max-age=86400"}
 
 
-async def stream_cached(request: Request, key: str, text: str) -> Response:
+# A phrase the learner is about to repeat, not a line in a conversation: slower, cleaner.
+PHRASE_SPEED = 0.8
+
+
+def phrase_url(path: str) -> str:
+    """The URL for a phrase's audio. The speed rides in the query string on purpose: audio is
+    cached by the browser for a day, so a new pace has to be a new URL or nobody hears it."""
+    return f"{path}?speed={PHRASE_SPEED:g}"
+
+
+async def stream_cached(request: Request, key: str, text: str, *, speed: float = 1.0) -> Response:
     """A failure before the first byte is a 502, never an empty 200 mistaken for audio."""
     providers: Providers = request.app.state.providers
     cache: AudioCache = request.app.state.audio_cache
     media_type = providers.synthesizer.content_type
 
+    key = f"{key}@{speed:g}"
     cached = cache.get(key)
     if cached is not None:
         return Response(content=cached, media_type=media_type, headers=_HEADERS)
 
-    chunks = providers.synthesizer.stream(text)
+    chunks = providers.synthesizer.stream(text, speed=speed)
     try:
         first = await anext(chunks)
     except StopAsyncIteration:

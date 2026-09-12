@@ -51,7 +51,7 @@ async def test_due_cards_carry_context_and_intervals(
     }
     assert set(card["intervals"]) == {"again", "hard", "good", "easy"}
     assert "___" in card["context"]
-    assert card["audioUrl"] == f"/reviews/{card['id']}/audio"
+    assert card["audioUrl"] == f"/reviews/{card['id']}/audio" + "?speed=0.8"
 
 
 async def test_grade_reschedules_and_counts_down(

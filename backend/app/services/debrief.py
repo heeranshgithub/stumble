@@ -8,7 +8,7 @@ from app.models.card import DebriefDto, DebriefStumbleDto
 from app.models.session import WinDto
 from app.models.today import DeckStatsDto
 from app.scenes.data import get_scene
-from app.services import cards
+from app.services import cards, tts
 from app.services.cards import target_key
 
 GOAL_REACHED_AT = 0.999
@@ -23,7 +23,7 @@ async def finish(
         cached = DebriefDto.model_validate(session["debrief"])
         sid = str(session["_id"])
         for w in cached.wins:
-            w.audio_url = w.audio_url or f"/sessions/{sid}/wins/{quote(w.phrase, safe='')}/audio"
+            w.audio_url = tts.phrase_url(f"/sessions/{sid}/wins/{quote(w.phrase, safe='')}/audio")
         return cached
 
     scene = get_scene(session["scene_id"])
@@ -63,7 +63,7 @@ async def finish(
                 WinDto(
                     phrase=w["phrase"],
                     card_id=str(won["_id"]) if won else None,
-                    audio_url=f"/sessions/{session['_id']}/wins/{slug}/audio",
+                    audio_url=tts.phrase_url(f"/sessions/{session['_id']}/wins/{slug}/audio"),
                 )
             )
 

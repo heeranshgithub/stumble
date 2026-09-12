@@ -144,5 +144,5 @@ _SILENCE = _silent_wav()
 class FakeSynthesizer:
     content_type = "audio/wav"
 
-    async def stream(self, text: str) -> AsyncIterator[bytes]:
+    async def stream(self, text: str, *, speed: float = 1.0) -> AsyncIterator[bytes]:
         yield _SILENCE

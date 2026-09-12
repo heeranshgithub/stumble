@@ -30,7 +30,7 @@ class ChatModel(Protocol):
 class Synthesizer(Protocol):
     content_type: str
 
-    def stream(self, text: str) -> AsyncIterator[bytes]: ...
+    def stream(self, text: str, *, speed: float = 1.0) -> AsyncIterator[bytes]: ...
 
 
 class ProviderError(Exception):

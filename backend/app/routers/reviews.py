@@ -1,7 +1,7 @@
 from datetime import timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, File, Form, Request, UploadFile
+from fastapi import APIRouter, File, Form, Query, Request, UploadFile
 from fastapi.responses import Response
 
 from app.deps import DbDep, ProfileDep, SettingsDep
@@ -76,7 +76,12 @@ async def attempt_card(
 
 
 @router.get("/reviews/{card_id}/audio")
-async def card_audio(card_id: str, db: DbDep, request: Request) -> Response:
+async def card_audio(
+    card_id: str,
+    db: DbDep,
+    request: Request,
+    speed: Annotated[float, Query(ge=0.7, le=1.2)] = tts.PHRASE_SPEED,
+) -> Response:
     """The target phrase, spoken. Fetched by an <audio> element, so no device header here."""
     card = await reviews.get_any_card(db, card_id)
-    return await tts.stream_cached(request, f"card:{card_id}", card["target"])
+    return await tts.stream_cached(request, f"card:{card_id}", card["target"], speed=speed)

@@ -95,6 +95,8 @@ function Card({
   };
 
   const [before, after] = splitContext(card.context, card.target);
+  // A sentence that is nothing but the slot gives the learner no scaffold to build from.
+  const bare = `${before}${after}`.replace(/[\s.!?,…]/g, "") === "";
   const isFreeze = card.type === "freeze";
 
   return (
@@ -128,9 +130,16 @@ function Card({
             </p>
           </>
         ) : null}
-        {/* The sentence is the learner's, with the slot fixed: never "You said" over the corrected form. */}
+        {/* The sentence is the learner's, with the slot fixed: never "You said" over the corrected form.
+            When the whole answer is the slot and no question was asked, the slip itself is the cue. */}
         <p className={`text-xs font-bold text-ink-2 ${card.promptLine ? "mt-5" : ""}`}>
-          {isFreeze ? "You were trying to say" : revealed ? "Your sentence, fixed" : "Your sentence"}
+          {isFreeze
+            ? "You were trying to say"
+            : revealed
+              ? "Your sentence, fixed"
+              : bare && !card.promptLine
+                ? `Not “${card.said}” — say it the French way`
+                : "Your sentence"}
         </p>
         <p className="mt-1 text-[28px] font-extrabold leading-[1.15] tracking-[-0.02em]">
           {before}

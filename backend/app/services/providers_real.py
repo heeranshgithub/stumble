@@ -120,7 +120,7 @@ class ElevenLabsSynthesizer:
         self._voice = voice_id
         self._model = model
 
-    async def stream(self, text: str) -> AsyncIterator[bytes]:
+    async def stream(self, text: str, *, speed: float = 1.0) -> AsyncIterator[bytes]:
         url = f"https://api.elevenlabs.io/v1/text-to-speech/{self._voice}/stream"
         try:
             async with self._client.stream(
@@ -128,7 +128,13 @@ class ElevenLabsSynthesizer:
                 url,
                 params={"output_format": "mp3_44100_64"},
                 headers={"xi-api-key": self._key, "accept": "audio/mpeg"},
-                json={"text": text, "model_id": self._model, "language_code": "fr"},
+                json={
+                    "text": text,
+                    "model_id": self._model,
+                    "language_code": "fr",
+                    # 0.7 to 1.2 on this model. A phrase to be repeated is slower than a line.
+                    "voice_settings": {"speed": max(0.7, min(1.2, speed))},
+                },
             ) as res:
                 res.raise_for_status()
                 async for chunk in res.aiter_bytes():

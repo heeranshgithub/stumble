@@ -1,7 +1,7 @@
 from datetime import timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, File, Form, Request, UploadFile
+from fastapi import APIRouter, File, Form, Query, Request, UploadFile
 from fastapi.responses import Response
 
 from app.deps import DbDep, ProfileDep, SettingsDep
@@ -101,7 +101,13 @@ async def turn_audio(session_id: str, turn_id: str, db: DbDep, request: Request)
 
 
 @router.get("/sessions/{session_id}/wins/{phrase}/audio")
-async def win_audio(session_id: str, phrase: str, db: DbDep, request: Request) -> Response:
+async def win_audio(
+    session_id: str,
+    phrase: str,
+    db: DbDep,
+    request: Request,
+    speed: Annotated[float, Query(ge=0.7, le=1.2)] = tts.PHRASE_SPEED,
+) -> Response:
     """A clean win, spoken. Only phrases the session actually recorded as wins are synthesized."""
     doc = await sessions.get_any(db, session_id)
     wanted = phrase.strip().casefold()
@@ -116,12 +122,17 @@ async def win_audio(session_id: str, phrase: str, db: DbDep, request: Request) -
     )
     if hit is None:
         raise NotFound("Win not found.", code="win_not_found")
-    return await tts.stream_cached(request, f"{session_id}:win:{wanted}", hit)
+    return await tts.stream_cached(request, f"{session_id}:win:{wanted}", hit, speed=speed)
 
 
 @router.get("/sessions/{session_id}/turns/{turn_id}/stumbles/{index}/audio")
 async def stumble_audio(
-    session_id: str, turn_id: str, index: int, db: DbDep, request: Request
+    session_id: str,
+    turn_id: str,
+    index: int,
+    db: DbDep,
+    request: Request,
+    speed: Annotated[float, Query(ge=0.7, le=1.2)] = tts.PHRASE_SPEED,
 ) -> Response:
     """One stumble's target, spoken. Fetched by an <audio> element, so no device header here."""
     doc = await sessions.get_any(db, session_id)
@@ -130,5 +141,8 @@ async def stumble_audio(
     if not 0 <= index < len(stumbles):
         raise NotFound("Stumble not found.", code="stumble_not_found")
     return await tts.stream_cached(
-        request, f"{session_id}:{turn_id}:s{index}", stumbles[index]["target"]
+        request,
+        f"{session_id}:{turn_id}:s{index}",
+        stumbles[index]["target"],
+        speed=speed,
     )

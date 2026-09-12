@@ -124,7 +124,8 @@ async def test_stumble_audio_streams_the_target(client: AsyncClient) -> None:
     learner = res.json()["turns"][1]
     stumble = learner["stumbles"][0]
     assert (
-        stumble["audioUrl"] == f"/sessions/{session['id']}/turns/{learner['id']}/stumbles/0/audio"
+        stumble["audioUrl"]
+        == f"/sessions/{session['id']}/turns/{learner['id']}/stumbles/0/audio?speed=0.8"
     )
     audio = await client.get(stumble["audioUrl"])
     assert audio.status_code == 200

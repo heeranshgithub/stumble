@@ -17,7 +17,7 @@ from tests.conftest import HEADERS
 class DeadSynthesizer:
     content_type = "audio/mpeg"
 
-    async def stream(self, text: str) -> AsyncIterator[bytes]:
+    async def stream(self, text: str, *, speed: float = 1.0) -> AsyncIterator[bytes]:
         raise ProviderError("elevenlabs", "quota exceeded")
         yield b""  # pragma: no cover - makes this an async generator
 

@@ -9,7 +9,7 @@ from app.db import Database, Document
 from app.errors import NotFound
 from app.models.review import IntervalsDto, ReviewCardDto
 from app.scenes.data import get_scene
-from app.services import cards, fsrs_engine
+from app.services import cards, fsrs_engine, tts
 from app.services.cards import target_key
 
 DUE_CAP = 12
@@ -60,7 +60,7 @@ def to_dto(card: Document) -> ReviewCardDto:
         reps=int(card.get("reps", 0)),
         lapses=int(card.get("lapses", 0)),
         intervals=IntervalsDto(**fsrs_engine.preview(card.get("fsrs"), now)),
-        audio_url=f"/reviews/{card['_id']}/audio",
+        audio_url=tts.phrase_url(f"/reviews/{card['_id']}/audio"),
     )
 
 

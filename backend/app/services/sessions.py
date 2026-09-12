@@ -15,6 +15,7 @@ from app.errors import BadRequest, NotFound
 from app.log import get_logger
 from app.models.session import SessionDto, StumbleDto, TurnDto, WinDto
 from app.scenes.data import Scene, get_scene
+from app.services import tts
 from app.services.prompts import learner_turn, stt_prompt, system_prompt
 from app.services.providers import ChatMessage
 from app.services.registry import Providers
@@ -231,7 +232,12 @@ def _stumble_dtos(sid: str, turn: Document) -> list[StumbleDto]:
     """Each target can be heard; the URL is by index, as the turn's own audio is by id."""
     return [
         StumbleDto.model_validate(
-            {**s, "audio_url": f"/sessions/{sid}/turns/{turn['id']}/stumbles/{i}/audio"}
+            {
+                **s,
+                "audio_url": tts.phrase_url(
+                    f"/sessions/{sid}/turns/{turn['id']}/stumbles/{i}/audio"
+                ),
+            }
         )
         for i, s in enumerate(turn.get("stumbles", []))
     ]
@@ -251,7 +257,12 @@ def to_dto(session: Document) -> SessionDto:
             stumbles=_stumble_dtos(sid, t),
             wins=[
                 WinDto.model_validate(
-                    {**w, "audio_url": f"/sessions/{sid}/wins/{quote(w['phrase'], safe='')}/audio"}
+                    {
+                        **w,
+                        "audio_url": tts.phrase_url(
+                            f"/sessions/{sid}/wins/{quote(w['phrase'], safe='')}/audio"
+                        ),
+                    }
                 )
                 for w in t.get("wins", [])
             ],
