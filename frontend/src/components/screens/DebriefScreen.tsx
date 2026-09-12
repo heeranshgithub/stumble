@@ -1,11 +1,12 @@
 "use client";
 
-import { Check, Languages, MessageCircleQuestion, PenLine, Timer } from "lucide-react";
+import { Check, Languages, MessageCircleQuestion, PenLine, Timer, Volume2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { Blob } from "@/components/stumble/Blob";
 import { Chip } from "@/components/stumble/Chip";
 import { PillButton } from "@/components/stumble/PillButton";
+import { useSpeaker } from "@/hooks/useSpeaker";
 import { getErrorMessage } from "@/lib/errors";
 import { useFinishSessionMutation } from "@/store/endpoints/sessions";
 import type { DebriefStumbleDto, StumbleType } from "@/types/api";
@@ -37,6 +38,10 @@ function whenLabel(iso: string | null): string {
 
 export function DebriefScreen({ sceneId, sessionId }: { sceneId: string; sessionId: string | null }) {
   const [explain, setExplain] = useState(false);
+  // Stumbles can be heard: the debrief is where the right form is first read, so it is also where
+  // it should first be heard. Wins stay quiet on purpose; the button marks where the work is.
+  const speaker = useSpeaker();
+  const hear = (url: string) => void speaker.play(url);
   const [finish, { data, error, isLoading }] = useFinishSessionMutation();
   const firedRef = useRef(false);
 
@@ -63,7 +68,7 @@ export function DebriefScreen({ sceneId, sessionId }: { sceneId: string; session
   const headline = d.goalReached ? goalHeadline(d.sceneId) : `Not quite. ${d.characterName} is still waiting.`;
 
   return (
-    <div className="flex flex-1 flex-col" data-scene={d.sceneColor}>
+    <div className="flex flex-1 flex-col" data-scene={d.sceneColor} onPointerDownCapture={() => speaker.unlock()}>
       <Blob color="scene" className="pt-14 pb-5">
         <p className="text-xs font-bold text-ink-2">
           {d.sceneTitle} · {Math.floor(d.durationS / 60)}:{String(d.durationS % 60).padStart(2, "0")}
@@ -80,14 +85,14 @@ export function DebriefScreen({ sceneId, sessionId }: { sceneId: string; session
         {total > 0 || wins > 0 ? (
           <ul className="divide-y divide-ink/10 px-5">
             {d.stumbles.map((s) => (
-              <StumbleRow key={s.cardId} s={s} />
+              <StumbleRow key={s.cardId} s={s} onHear={() => hear(s.audioUrl ?? `/reviews/${s.cardId}/audio`)} />
             ))}
             {d.wins.map((win) => (
-              <li key={win.cardId ?? win.phrase} className="flex gap-3 py-3">
+              <li key={win.cardId ?? win.phrase} className="flex items-center gap-3 py-3">
                 <span className="grid size-9 flex-none place-items-center rounded-xl bg-pharmacie text-ink">
                   <Check className="size-4" strokeWidth={2.5} />
                 </span>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="text-[15px] font-extrabold leading-tight">{win.phrase}</p>
                   <p className="text-xs font-bold text-ink/65">
                     {win.cardId ? "a card you'd stumbled on, produced clean" : "clean, first try"}
@@ -103,6 +108,8 @@ export function DebriefScreen({ sceneId, sessionId }: { sceneId: string; session
             </p>
           </div>
         )}
+
+        {speaker.error ? <p className="px-5 pt-2 text-center text-xs font-bold text-stumble">{speaker.error}</p> : null}
 
         <div className="mt-auto px-5 pb-8 pt-4">
           <div className="rounded-2xl bg-ink px-4 py-3 text-paper">
@@ -138,10 +145,23 @@ export function DebriefScreen({ sceneId, sessionId }: { sceneId: string; session
   );
 }
 
-function StumbleRow({ s }: { s: DebriefStumbleDto }) {
+function HearButton({ label, onHear }: { label: string; onHear: () => void }) {
+  return (
+    <button
+      type="button"
+      aria-label={`Hear ${label}`}
+      onClick={onHear}
+      className="grid size-9 flex-none place-items-center rounded-pill bg-ink/8 text-ink active:bg-ink/15"
+    >
+      <Volume2 className="size-4" strokeWidth={2.5} />
+    </button>
+  );
+}
+
+function StumbleRow({ s, onHear }: { s: DebriefStumbleDto; onHear: () => void }) {
   const Icon = icon[s.type];
   return (
-    <li className="flex gap-3 py-3">
+    <li className="flex items-center gap-3 py-3">
       <span
         className={`grid size-9 flex-none place-items-center rounded-xl ${
           s.type === "freeze" ? "bg-stumble/15 text-stumble" : "bg-ink/10 text-ink"
@@ -149,7 +169,7 @@ function StumbleRow({ s }: { s: DebriefStumbleDto }) {
       >
         <Icon className="size-4" strokeWidth={2.5} />
       </span>
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="text-[15px] font-extrabold leading-tight">
           {s.type === "freeze" ? s.target : (
             <>
@@ -162,6 +182,7 @@ function StumbleRow({ s }: { s: DebriefStumbleDto }) {
           {s.isNew ? "" : " · again"}
         </p>
       </div>
+      <HearButton label={s.target} onHear={onHear} />
     </li>
   );
 }
