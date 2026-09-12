@@ -83,8 +83,8 @@ export function ProgressScreen() {
       <div className="mt-auto px-5 pb-8 pt-2">
         <Link href="/tutor-brief" className="flex items-center justify-between rounded-2xl bg-ink px-4 py-3 text-paper">
           <div>
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-paper-2">For your tutor</p>
-            <p className="text-[15px] font-extrabold">This week&apos;s brief</p>
+            <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-paper-2">Your week</p>
+            <p className="text-[15px] font-extrabold">Patterns, strengths, what to do next</p>
           </div>
           <FileText className="size-5" strokeWidth={2.25} />
         </Link>

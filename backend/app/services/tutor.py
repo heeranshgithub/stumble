@@ -1,4 +1,5 @@
-"""The weekly tutor brief: every stumble is a data point; a human tutor gets the patterns."""
+"""The week in review: every stumble is a data point, so patterns fall out for free. Written to the
+learner; the same page, re-addressed, is the brief a human tutor can act on in the first minute."""
 
 import json
 from datetime import UTC, datetime
@@ -15,20 +16,21 @@ from app.services.registry import Providers
 
 log = get_logger(__name__)
 
-BRIEF_PROMPT = """TUTOR BRIEF. You are writing a one-page brief for a human French tutor about an \
-English-speaking adult learner, based on the learner's stumble history from spoken role-play scenes.
+BRIEF_PROMPT = """WEEK IN REVIEW. You are writing a one-page review FOR an English-speaking adult \
+learner of French, addressed to them directly ("you", never "the learner"), based on their stumble \
+history from spoken role-play scenes. A human tutor may read the same page, so keep it concrete.
 
 You get JSON: cards (each a word the learner failed to produce: type, target, what they said, the \
 sentence, how many times it recurred, whether they later produced it cleanly), scenes played, and \
 review grades.
 
-Find PATTERNS a tutor can act on in the first minute of a session. Group by grammar or function, \
-not by word: gender agreement, avoiding a tense, freezing on numbers or prices, English fallback \
-for a domain, politeness formulas, etc. Each pattern: a short title, one sentence of detail citing \
-the learner's own examples, and how many cards support it. 2 to 4 patterns, strongest first.
-Then STRENGTHS: 2 to 4 things the learner reliably does well (from clean productions and wins).
+Find PATTERNS worth acting on. Group by grammar or function, not by word: gender agreement, \
+avoiding a tense, freezing on numbers or prices, English fallback for a domain, politeness \
+formulas, etc. Each pattern: a short title, one sentence of detail citing your own examples \
+("you reached for 'coffee'…"), and how many cards support it. 2 to 4 patterns, strongest first.
+Then STRENGTHS: 2 to 4 things you reliably do well (from clean productions and wins).
 Then a SUGGESTED 30-MINUTE SESSION: 3 concrete activities, each one line, built on the patterns \
-and using the learner's own error list.
+and your own error list; things you can do alone or with a tutor.
 
 Be specific, warm, and brief. Never invent examples not in the data. Respond with ONLY JSON:
 {"patterns": [{"title": "...", "detail": "...", "count": 3}],
@@ -41,8 +43,12 @@ def week_label(now: datetime) -> str:
 
 
 def _as_text(brief: TutorBriefDto) -> str:
-    lines = [f"Stumble · tutor brief · {brief.week_label}", ""]
-    lines.append(f"{brief.cards_analysed} stumbles across {brief.scenes_played} scenes.")
+    # The share-with-a-tutor export: the same page, headed for a third party.
+    lines = [f"Stumble · week {brief.week_label} · for the tutor", ""]
+    lines.append(
+        f"{brief.cards_analysed} stumbles across {brief.scenes_played} scenes. "
+        "Written to the learner; 'you' is them."
+    )
     lines.append("")
     lines.append("PATTERNS")
     for p in brief.patterns:

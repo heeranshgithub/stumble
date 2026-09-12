@@ -41,7 +41,7 @@ export function TutorBriefScreen() {
     return (
       <div className="flex flex-1 flex-col" data-scene="review">
         <Blob color="scene" className="flex flex-1 flex-col justify-end pt-14 pb-6">
-          <p className="text-xs font-bold text-ink-2">For your tutor · {data.weekLabel}</p>
+          <p className="text-xs font-bold text-ink-2">Your week · {data.weekLabel}</p>
           <h1 className="mt-2 text-[30px] font-extrabold leading-[1.05] tracking-[-0.03em]">
             Nothing to report yet.
           </h1>
@@ -62,7 +62,10 @@ export function TutorBriefScreen() {
           Week {data.weekLabel.split("-W")[1]} · from {data.scenesPlayed} {data.scenesPlayed === 1 ? "scene" : "scenes"} ·{" "}
           {data.cardsAnalysed} stumbles
         </p>
-        <h1 className="mt-1 text-[30px] font-extrabold leading-none tracking-[-0.03em]">Brief for your tutor</h1>
+        <h1 className="mt-1 text-[30px] font-extrabold leading-none tracking-[-0.03em]">Your week</h1>
+        <p className="mt-2 text-xs font-bold text-ink-2">
+          What your stumbles add up to, and what to do about it. If someone teaches you, they can have the same page.
+        </p>
       </Blob>
 
       <div className="flex flex-1 flex-col gap-5 px-5 pt-5 pb-4">
@@ -92,7 +95,7 @@ export function TutorBriefScreen() {
 
         {data.suggestedSession.length > 0 ? (
           <section className="rounded-2xl bg-ink px-4 py-3 text-paper">
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-paper-2">Suggested 30-minute session</p>
+            <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-paper-2">Suggested 30 minutes</p>
             <ol className="mt-1 space-y-1.5">
               {data.suggestedSession.map((s, i) => (
                 <li key={i} className="flex gap-2 text-[14px] font-bold leading-snug">
@@ -108,9 +111,11 @@ export function TutorBriefScreen() {
       <div className="px-5 pb-8">
         <PillButton onClick={() => void copy()}>
           {copied ? <Check className="size-5" strokeWidth={2.5} /> : <Copy className="size-5" strokeWidth={2.25} />}
-          {copied ? "Copied" : "Copy as text for my tutor"}
+          {copied ? "Copied" : "Share with a tutor"}
         </PillButton>
-        <p className="mt-2 text-center text-[11px] font-bold text-ink/65">Paste it into your next Varsity Tutors session.</p>
+        <p className="mt-2 text-center text-[11px] font-bold text-ink/65">
+          Copies this page as text, so a tutor can act on it in the first minute of a session.
+        </p>
       </div>
     </div>
   );

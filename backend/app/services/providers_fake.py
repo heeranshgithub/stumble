@@ -41,17 +41,17 @@ _FAKE_BRIEF: dict[str, Any] = {
     "patterns": [
         {
             "title": "English fallback for café vocabulary",
-            "detail": "Reached for 'coffee' and 'please' mid-sentence; the French forms exist "
+            "detail": "You reached for 'coffee' and 'please' mid-sentence; the French forms exist "
             "but aren't automatic yet.",
             "count": 2,
         },
         {
             "title": "Freezes on prices",
-            "detail": "Stalled when asked to pay; 'C'est combien ?' is the missing formula.",
+            "detail": "You stalled when asked to pay; 'C'est combien ?' is the missing formula.",
             "count": 1,
         },
     ],
-    "strengths": ["Greets and opens naturally", "Keeps talking after a stumble"],
+    "strengths": ["You greet and open naturally", "You keep talking after a stumble"],
     "suggested_session": [
         "Role-play a market with prices from 2 to 50 euros.",
         "Drill the five café formulas until automatic.",
@@ -65,7 +65,7 @@ class FakeChat:
 
     async def complete_json(self, messages: list[ChatMessage]) -> dict[str, Any]:
         system = next((m.content for m in messages if m.role == "system"), "")
-        if system.startswith("TUTOR BRIEF"):
+        if system.startswith("WEEK IN REVIEW"):
             return dict(_FAKE_BRIEF)
         if system.startswith("PLACEMENT"):
             heard = next((m.content for m in reversed(messages) if m.role == "user"), "")
