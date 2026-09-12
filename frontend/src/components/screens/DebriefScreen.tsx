@@ -8,6 +8,7 @@ import { Chip } from "@/components/stumble/Chip";
 import { PillButton } from "@/components/stumble/PillButton";
 import { useSpeaker } from "@/hooks/useSpeaker";
 import { getErrorMessage } from "@/lib/errors";
+import { sceneColor } from "@/lib/scenes";
 import { useFinishSessionMutation } from "@/store/endpoints/sessions";
 import type { DebriefStumbleDto, StumbleType } from "@/types/api";
 
@@ -60,7 +61,7 @@ export function DebriefScreen({ sceneId, sessionId }: { sceneId: string; session
     const e = getErrorMessage(error);
     return <Missing title="Couldn't finish the scene." body={e.message} requestId={e.requestId} />;
   }
-  if (isLoading || !data) return <Skeleton />;
+  if (isLoading || !data) return <Skeleton sceneId={sceneId} />;
 
   const d = data;
   const total = d.stumbles.length;
@@ -219,9 +220,9 @@ function Missing({ title, body, requestId }: { title: string; body: string; requ
   );
 }
 
-function Skeleton() {
+function Skeleton({ sceneId }: { sceneId: string }) {
   return (
-    <div className="flex flex-1 flex-col" data-scene="cafe">
+    <div className="flex flex-1 flex-col" data-scene={sceneColor(sceneId)}>
       <div className="bg-scene px-5 pt-14 pb-5">
         <div className="h-3 w-20 rounded-full bg-ink/15" />
         <div className="mt-3 h-8 w-3/4 rounded-md bg-ink/15" />

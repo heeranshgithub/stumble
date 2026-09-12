@@ -13,6 +13,7 @@ import { useHoldToTalk, type Capture } from "@/hooks/useHoldToTalk";
 import { useSpeaker } from "@/hooks/useSpeaker";
 import { getErrorMessage } from "@/lib/errors";
 import { getPatience } from "@/lib/patience";
+import { sceneColor } from "@/lib/scenes";
 import { useGetReadyQuery } from "@/store/endpoints/health";
 import { useLazyGetSessionQuery, useSendTurnMutation, useStartSessionMutation } from "@/store/endpoints/sessions";
 import type { SessionDto, StumbleDto, TurnDto } from "@/types/api";
@@ -224,7 +225,7 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
     );
   }
 
-  const color = session?.sceneColor ?? "cafe";
+  const color = session?.sceneColor ?? sceneColor(sceneId);
   const name = session?.characterName ?? "…";
 
   return (
