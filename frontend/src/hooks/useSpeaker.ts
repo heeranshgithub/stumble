@@ -11,6 +11,8 @@ const SILENT_WAV =
 export interface Played {
   /** performance.now() when sound actually started, or null if it never did. */
   startedAt: number | null;
+  /** The browser refused to start sound without a user gesture. Not a failure: tap, then play again. */
+  blocked?: boolean;
 }
 
 /**
@@ -48,13 +50,16 @@ export function useSpeaker() {
       return new Promise((resolve) => {
         const a = getAudio();
         let startedAt: number | null = null;
-        const done = () => {
+        const cleanup = () => {
           if (current()) {
             a.onplaying = null;
             a.onended = null;
             a.onerror = null;
             setSpeaking(false);
           }
+        };
+        const done = () => {
+          cleanup();
           resolve({ startedAt });
         };
         const failed = (why: string) => {
@@ -75,7 +80,12 @@ export function useSpeaker() {
             done();
             return;
           }
-          failed(e instanceof DOMException && e.name === "NotAllowedError" ? "tap the screen first" : "playback blocked");
+          if (e instanceof DOMException && e.name === "NotAllowedError") {
+            cleanup();
+            resolve({ startedAt: null, blocked: true });
+            return;
+          }
+          failed("playback blocked");
         });
       });
     },

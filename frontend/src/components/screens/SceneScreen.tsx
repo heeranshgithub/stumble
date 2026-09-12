@@ -42,6 +42,15 @@ function scrollParent(el: HTMLElement | null): HTMLElement | null {
   return null;
 }
 
+/** The line the learner is answering: the last thing the character said. */
+function latestCharacterLine(session: SessionDto): TurnDto | undefined {
+  for (let i = session.turns.length - 1; i >= 0; i--) {
+    const t = session.turns[i];
+    if (t?.role === "character") return t;
+  }
+  return undefined;
+}
+
 function fmt(ms: number) {
   const s = Math.max(0, Math.floor(ms / 1000));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
@@ -95,8 +104,12 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
           if (s.sceneId !== sceneId) throw new Error("session belongs to another scene");
           setSession(s);
           setPhase(s.done ? "done" : "idle");
+          // The timer means "this sitting". Picking up a scene minutes later continues it; coming
+          // back hours later starts the clock again rather than showing 340:04.
           const first = s.turns[0]?.createdAt;
-          if (first) setElapsed(Math.max(0, Date.now() - Date.parse(first)));
+          const last = s.turns[s.turns.length - 1]?.createdAt;
+          const away = last ? Date.now() - Date.parse(last) : 0;
+          if (first && away < 10 * 60_000) setElapsed(Math.max(0, Date.now() - Date.parse(first)));
         })
         // Gone, or another device's: start over rather than show an error for a stale link.
         .catch(() => fresh());
@@ -158,17 +171,35 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
   // The first tap on the screen unlocks audio; also (re)plays the opening line once. A tap on
   // something that speaks by itself (replay, a stumble chip) is left to it, so nothing starts twice.
   const openedRef = useRef(false);
+  const [needsTap, setNeedsTap] = useState(false);
   const onFirstTap = useCallback(
     (e: PointerEvent<HTMLElement>) => {
       if (openedRef.current || !session) return;
       openedRef.current = true;
+      setNeedsTap(false);
       speaker.unlock();
       if ((e.target as HTMLElement).closest("[data-speaks]")) return;
-      const opening = session.turns[0];
-      if (opening) void speaker.play(opening.audioUrl);
+      const line = latestCharacterLine(session);
+      if (line && !session.done) void speaker.play(line.audioUrl);
     },
     [session, speaker],
   );
+
+  // Try to speak the line as soon as the session is here. Browsers allow that only after the page
+  // has been touched (Chrome: any earlier click on the site; iOS: never on a fresh load), so a
+  // refusal isn't an error: it means "wait for the first tap", and the screen says so.
+  const autoTriedRef = useRef(false);
+  useEffect(() => {
+    if (autoTriedRef.current || !session || session.done || phase !== "idle") return;
+    autoTriedRef.current = true;
+    const line = latestCharacterLine(session);
+    if (!line?.audioUrl) return;
+    void speaker.play(line.audioUrl).then((r) => {
+      if (openedRef.current) return;
+      if (r.blocked) setNeedsTap(true);
+      else openedRef.current = true;
+    });
+  }, [session, phase, speaker]);
 
   const sendTyped = () => {
     const text = draft.trim();
@@ -288,6 +319,9 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
         <footer className="sticky bottom-0 z-10 bg-scene px-5 pb-8 pt-2">
           {failure && phase === "idle" ? <p className="mb-2 text-center text-xs font-bold text-stumble">{failure}</p> : null}
           {speaker.error ? <p className="mb-2 text-center text-xs font-bold text-stumble">{speaker.error}</p> : null}
+          {needsTap && !speaker.error ? (
+            <p className="mb-2 text-center text-xs font-bold text-ink-2">tap anywhere to hear {name}</p>
+          ) : null}
           {mic.error ? <p className="mb-2 text-center text-xs font-bold text-stumble">{mic.error}</p> : null}
           {typing ? (
             <form
