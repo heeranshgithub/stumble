@@ -4,6 +4,7 @@ import re
 import uuid
 from datetime import UTC, datetime
 from typing import Any
+from urllib.parse import quote
 
 from bson import ObjectId
 from bson.errors import InvalidId
@@ -248,7 +249,12 @@ def to_dto(session: Document) -> SessionDto:
             text=t["text"],
             text_en=t.get("text_en"),
             stumbles=_stumble_dtos(sid, t),
-            wins=[WinDto.model_validate(w) for w in t.get("wins", [])],
+            wins=[
+                WinDto.model_validate(
+                    {**w, "audio_url": f"/sessions/{sid}/wins/{quote(w['phrase'], safe='')}/audio"}
+                )
+                for w in t.get("wins", [])
+            ],
             goal_progress=t["goal_progress"],
             audio_url=f"/sessions/{sid}/turns/{t['id']}/audio"
             if t["role"] == "character"

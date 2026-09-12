@@ -147,3 +147,22 @@ def test_mid_scene_replies_do_not_greet_again() -> None:
     assert _without_regreeting("Bonjour !", _FR_GREETING) == "Bonjour !"
     # no greeting: untouched
     assert _without_regreeting("Un café, très bien.", _FR_GREETING) == "Un café, très bien."
+
+
+async def test_win_audio_streams_the_phrase(client: AsyncClient) -> None:
+    session = await _start(client)
+    res = await client.post(
+        f"/sessions/{session['id']}/turns",
+        data={"text": "Je voudrais un coffee au lait, s'il vous plaît.", "clientPauseMs": "0"},
+        headers=HEADERS,
+    )
+    learner = res.json()["turns"][1]
+    win = learner["wins"][0]
+    assert win["phrase"] == "s'il vous plaît"
+    assert win["audioUrl"].startswith(f"/sessions/{session['id']}/wins/")
+    audio = await client.get(win["audioUrl"])
+    assert audio.status_code == 200
+    assert audio.headers["content-type"].startswith("audio/")
+    missing = await client.get(f"/sessions/{session['id']}/wins/nope/audio")
+    assert missing.status_code == 404
+    assert missing.json()["error"]["code"] == "win_not_found"

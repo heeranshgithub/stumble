@@ -100,6 +100,25 @@ async def turn_audio(session_id: str, turn_id: str, db: DbDep, request: Request)
     return await tts.stream_cached(request, f"{session_id}:{turn_id}", turn["text"])
 
 
+@router.get("/sessions/{session_id}/wins/{phrase}/audio")
+async def win_audio(session_id: str, phrase: str, db: DbDep, request: Request) -> Response:
+    """A clean win, spoken. Only phrases the session actually recorded as wins are synthesized."""
+    doc = await sessions.get_any(db, session_id)
+    wanted = phrase.strip().casefold()
+    hit = next(
+        (
+            w["phrase"]
+            for t in doc["turns"]
+            for w in t.get("wins", [])
+            if str(w.get("phrase", "")).strip().casefold() == wanted
+        ),
+        None,
+    )
+    if hit is None:
+        raise NotFound("Win not found.", code="win_not_found")
+    return await tts.stream_cached(request, f"{session_id}:win:{wanted}", hit)
+
+
 @router.get("/sessions/{session_id}/turns/{turn_id}/stumbles/{index}/audio")
 async def stumble_audio(
     session_id: str, turn_id: str, index: int, db: DbDep, request: Request

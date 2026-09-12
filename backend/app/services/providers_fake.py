@@ -87,7 +87,7 @@ class FakeChat:
             "goal_progress": progress,
             "done": progress >= 1.0,
             "stumbles": stumbles,
-            "wins": [],
+            "wins": [{"phrase": "s'il vous plaît"}] if "s'il vous pla" in last.lower() else [],
         }
 
 

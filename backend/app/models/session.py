@@ -28,6 +28,8 @@ class StumbleDto(ApiModel):
 class WinDto(ApiModel):
     phrase: str
     card_id: str | None = None
+    # The phrase, spoken. Set on the wire only.
+    audio_url: str | None = None
 
 
 class TurnDto(ApiModel):

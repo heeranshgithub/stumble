@@ -1,6 +1,7 @@
 """Finishing a scene: verdict, cards from stumbles, wins against known cards. Idempotent."""
 
 from datetime import UTC, datetime, timedelta
+from urllib.parse import quote
 
 from app.db import Database, Document
 from app.models.card import DebriefDto, DebriefStumbleDto
@@ -17,7 +18,13 @@ async def finish(
     db: Database, profile: Document, session: Document, due_window: timedelta
 ) -> DebriefDto:
     if session.get("debrief"):
-        return DebriefDto.model_validate(session["debrief"])
+        # The stored debrief predates per-win audio for older sessions; the URL is derivable, so
+        # fill it in rather than leave those rows silent.
+        cached = DebriefDto.model_validate(session["debrief"])
+        sid = str(session["_id"])
+        for w in cached.wins:
+            w.audio_url = w.audio_url or f"/sessions/{sid}/wins/{quote(w.phrase, safe='')}/audio"
+        return cached
 
     scene = get_scene(session["scene_id"])
     if scene is None:  # pragma: no cover - scenes are code
@@ -51,7 +58,14 @@ async def finish(
                 continue
             seen_wins.add(key)
             won = await cards.apply_win(db, profile_id, session, w["phrase"])
-            wins.append(WinDto(phrase=w["phrase"], card_id=str(won["_id"]) if won else None))
+            slug = quote(w["phrase"], safe="")
+            wins.append(
+                WinDto(
+                    phrase=w["phrase"],
+                    card_id=str(won["_id"]) if won else None,
+                    audio_url=f"/sessions/{session['_id']}/wins/{slug}/audio",
+                )
+            )
 
     turns_spoken = sum(1 for t in session["turns"] if t["role"] == "learner")
     started: datetime = session["created_at"]

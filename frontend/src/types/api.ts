@@ -177,6 +177,8 @@ export interface StumbleDto {
 export interface WinDto {
   phrase: string;
   cardId: string | null;
+  /** The phrase, spoken. */
+  audioUrl: string | null;
 }
 
 export interface TurnDto {
