@@ -101,7 +101,7 @@ The backend suite runs offline against a mock Mongo and the fake providers; ever
 ```
 frontend/   Next.js app
 backend/    FastAPI app, tests, scripts
-docs/       product brief, design directions, the build plan and its daily log
+dev.sh      backend + tunnels + frontend, one command
 ```
 
-Built in a week for the hackathon, pairing with Claude Code; the working docs in `docs/` are the actual planning artifacts, kept as they were.
+Built in a week for the hackathon, pairing with Claude Code.
