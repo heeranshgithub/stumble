@@ -11,6 +11,7 @@ import { LyricLine } from "@/components/stumble/LyricLine";
 import { PillButton } from "@/components/stumble/PillButton";
 import { SampleLink } from "@/components/stumble/SampleLink";
 import { getErrorMessage } from "@/lib/errors";
+import { whenDue } from "@/lib/when";
 import { lastTodayColor, rememberTodayColor, type TodayColor } from "@/lib/lastScene";
 import { useGetTodayQuery } from "@/store/endpoints/today";
 import type { DeckWordDto, TodayDeckDto } from "@/types/api";
@@ -30,9 +31,7 @@ function deckLine(deck: TodayDeckDto): string {
   const learning = deck.caught - deck.mastered;
   if (learning === 0) return "All mastered. Play a scene to catch new ones.";
   if (!deck.nextDue) return `${learning} still learning.`;
-  const days = Math.round((new Date(deck.nextDue).getTime() - Date.now()) / 86_400_000);
-  const when = days <= 0 ? "today" : days === 1 ? "tomorrow" : `in ${days} days`;
-  return `Nothing due. ${learning === 1 ? "1 word comes" : `${learning} words come`} back ${when}.`;
+  return `Nothing due. ${learning === 1 ? "1 word comes" : `${learning} words come`} back ${whenDue(deck.nextDue)}.`;
 }
 
 export function TodayScreen() {

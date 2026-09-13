@@ -8,6 +8,7 @@ import { Chip } from "@/components/stumble/Chip";
 import { PillButton } from "@/components/stumble/PillButton";
 import { useSpeaker } from "@/hooks/useSpeaker";
 import { getErrorMessage } from "@/lib/errors";
+import { whenDue } from "@/lib/when";
 import { sceneColor } from "@/lib/scenes";
 import { useFinishSessionMutation } from "@/store/endpoints/sessions";
 import type { DebriefStumbleDto, StumbleType } from "@/types/api";
@@ -28,13 +29,8 @@ const label: Record<StumbleType, string> = {
 
 function whenLabel(iso: string | null): string {
   if (!iso) return "no reviews yet";
-  const due = new Date(iso);
-  const now = new Date();
-  const days = Math.round((due.getTime() - now.getTime()) / 86_400_000);
-  const time = due.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-  if (days <= 0) return `due now`;
-  if (days === 1) return `due tomorrow ${time}`;
-  return `due in ${days} days`;
+  const w = whenDue(iso);
+  return w === "due now" ? w : `due ${w}`;
 }
 
 export function DebriefScreen({ sceneId, sessionId }: { sceneId: string; sessionId: string | null }) {

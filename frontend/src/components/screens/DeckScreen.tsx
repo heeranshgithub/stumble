@@ -8,6 +8,7 @@ import { Chip } from "@/components/stumble/Chip";
 import { PillButton } from "@/components/stumble/PillButton";
 import { SampleLink } from "@/components/stumble/SampleLink";
 import { getErrorMessage } from "@/lib/errors";
+import { whenDue } from "@/lib/when";
 import { useGetDeckQuery } from "@/store/endpoints/progress";
 import type { DeckCardDto, WordState } from "@/types/api";
 
@@ -147,7 +148,7 @@ function NextStep({ cards, due }: { cards: DeckCardDto[]; due: number }) {
     <p className="mt-2 text-xs font-bold text-ink-2">
       {learning === 0
         ? "Every word here is mastered. Play a scene to catch new ones."
-        : `Nothing due yet. ${learning === 1 ? "1 word comes" : `${learning} words come`} back ${next ? whenLabel(next) : "soon"}.`}
+        : `Nothing due yet. ${learning === 1 ? "1 word comes" : `${learning} words come`} back ${next ? whenDue(next) : "soon"}.`}
     </p>
   );
 }
@@ -155,14 +156,7 @@ function NextStep({ cards, due }: { cards: DeckCardDto[]; due: number }) {
 function DueChip({ card }: { card: DeckCardDto }) {
   if (card.state === "on") return <Chip>mastered</Chip>;
   if (card.state === "miss") return <Chip tone="stumble">due now</Chip>;
-  return <Chip>{whenLabel(new Date(card.due).getTime())}</Chip>;
-}
-
-function whenLabel(t: number): string {
-  const days = Math.round((t - Date.now()) / 86_400_000);
-  if (days <= 0) return "due today";
-  if (days === 1) return "tomorrow";
-  return `in ${days}d`;
+  return <Chip>{whenDue(card.due)}</Chip>;
 }
 
 function CardDetail({ card }: { card: DeckCardDto }) {
@@ -180,7 +174,7 @@ function CardDetail({ card }: { card: DeckCardDto }) {
             ? "mastered"
             : card.state === "miss"
               ? "due now"
-              : whenLabel(new Date(card.due).getTime())}
+              : whenDue(card.due)}
         </Chip>
       </div>
       {card.context ? (
