@@ -1,5 +1,6 @@
 """Progress and the deck: the deck shrinking is the progress bar."""
 
+import re
 from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
@@ -136,6 +137,12 @@ async def progress(db: Database, profile: Document, due_window: timedelta) -> Pr
     )
 
 
+def _question(prompt_line: str) -> str:
+    """The last sentence of the character's line: the question, without the small talk before it."""
+    parts = [x.strip() for x in re.split(r"(?<=[.!?])\s+", prompt_line.strip()) if x.strip()]
+    return parts[-1] if parts else ""
+
+
 async def deck(db: Database, profile: Document, due_window: timedelta) -> DeckDto:
     profile_id = profile["_id"]
     all_cards = await _all_cards(db, profile_id)
@@ -157,7 +164,8 @@ async def deck(db: Database, profile: Document, due_window: timedelta) -> DeckDt
         cards=[
             DeckCardDto(
                 id=str(c["_id"]),
-                target=c["target"],
+                target=None if state(c) == "miss" else c["target"],
+                prompt_line=_question(str(c.get("prompt_line", ""))),
                 state=state(c),
                 type=c["type"],
                 scene_id=c["scene_id"],

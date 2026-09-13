@@ -57,10 +57,22 @@ async def test_deck_states(client: AsyncClient, mock_client: AsyncMongoMockClien
     await mock_client["stumble_test"].cards.update_many(
         {}, {"$set": {"due": datetime.now(UTC) - timedelta(minutes=1)}}
     )
-    assert (await client.get("/deck", headers=HEADERS)).json()["cards"][0]["state"] == "miss"
+    due = (await client.get("/deck", headers=HEADERS)).json()["cards"][0]
+    assert due["state"] == "miss"
+    # Due: the answer is not sent. The row has the question and the sentence instead.
+    assert due["target"] is None
+    assert due["context"] == "Un ___."
 
     await mock_client["stumble_test"].cards.update_many({}, {"$set": {"mastered": True}})
     assert (await client.get("/deck", headers=HEADERS)).json()["cards"][0]["state"] == "on"
+
+
+def test_question_is_the_last_sentence_of_the_line() -> None:
+    from app.services.progress import _question
+
+    assert _question("De rien ! Ça fait 2 euros 50. Vous payez comment ?") == "Vous payez comment ?"
+    assert _question("Et avec ça ?") == "Et avec ça ?"
+    assert _question("") == ""
 
 
 async def test_tutor_brief_is_cached_per_week(

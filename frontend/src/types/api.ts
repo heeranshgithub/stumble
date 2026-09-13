@@ -124,7 +124,10 @@ export interface ProgressDto {
 
 export interface DeckCardDto {
   id: string;
-  target: string;
+  /** null while the card is due: the server doesn't send the answer before the review asks. */
+  target: string | null;
+  /** The question you were answering; what a due row is titled with. */
+  promptLine: string;
   state: WordState;
   type: StumbleType;
   sceneId: string;

@@ -35,7 +35,10 @@ class ProgressDto(ApiModel):
 
 class DeckCardDto(ApiModel):
     id: str
-    target: str
+    # None while the card is due: the deck doesn't show the answer before the review asks for it.
+    target: str | None
+    # The question you were answering, so a due row can still say what it's about.
+    prompt_line: str
     state: WordState
     type: StumbleType
     scene_id: str

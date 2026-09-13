@@ -109,11 +109,11 @@ export function DeckScreen() {
                                         : "text-ink"
                                 }`}
                               >
-                                {c.target}
+                                {c.target ?? (c.promptLine || c.sceneTitle)}
                               </p>
                               {!isOpen ? (
                                 <p className="truncate text-xs font-bold text-ink/65">
-                                  {c.context ? `"${c.context}"` : c.sceneTitle}
+                                  {c.target === null ? dueSub(c) : hasWords(c.context) ? `"${c.context}"` : c.sceneTitle}
                                 </p>
                               ) : null}
                             </div>
@@ -121,7 +121,9 @@ export function DeckScreen() {
                           </div>
                           {isOpen ? (
                             <>
-                              {c.context ? <p className="mt-2 text-sm text-paper-2">&ldquo;{c.context}&rdquo;</p> : null}
+                              {hasWords(c.context) ? (
+                                <p className="mt-2 text-sm text-paper-2">&ldquo;{c.context}&rdquo;</p>
+                              ) : null}
                               <p className="mt-1 text-xs font-bold text-paper-2">
                                 {c.sceneTitle} · {c.type.replace("_", "-")}
                                 {c.lapses > 0 ? ` · stumbled ×${c.lapses + 1}` : " · stumbled once"}
@@ -140,6 +142,21 @@ export function DeckScreen() {
       </Blob>
     </div>
   );
+}
+
+/** A gap with words around it is a cue; "___." on its own is not. */
+function hasWords(context: string): boolean {
+  return (context.replace("___", " ").match(/\p{L}+/gu) ?? []).length >= 2;
+}
+
+/**
+ * A due row never shows its word: the review is about to ask for it. It reads like the review
+ * card instead — the question it's titled with, then your sentence with the gap, or where it
+ * was caught when the gap was the whole sentence.
+ */
+function dueSub(c: DeckCardDto): string {
+  if (hasWords(c.context)) return `"${c.context}"`;
+  return `${c.sceneTitle} · ${c.type.replace("_", "-")}`;
 }
 
 /** The one line that changes with the deck: what happens to these words next, and the way there. */
