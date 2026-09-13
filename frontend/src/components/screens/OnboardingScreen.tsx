@@ -36,9 +36,10 @@ const CAUGHT_LINE: LyricWord[] = [
   { text: "Je", state: "on" },
   { text: "voudrais", state: "on" },
   { text: "un", state: "on" },
-  { text: "coffee", state: "miss" },
-  { text: "au", state: "on" },
-  { text: "lait.", state: "on" },
+  { text: "café", state: "on" },
+  { text: "avec", state: "on" },
+  { text: "du", state: "on" },
+  { text: "sugar.", state: "miss" },
 ];
 
 function LoopPreview() {
@@ -49,7 +50,7 @@ function LoopPreview() {
       <p className="mt-5 text-[11px] font-extrabold text-ink-2">You</p>
       <LyricLine className="mt-1" words={CAUGHT_LINE} animate />
       <div className="mt-5 fade-in" style={{ animationDelay: "560ms" }}>
-        <Chip tone="stumble">caught · coffee → café</Chip>
+        <Chip tone="stumble">caught · sugar → sucre</Chip>
         <p className="mt-2 text-[11px] font-extrabold text-ink-2">Due tomorrow, in your own sentence.</p>
       </div>
     </div>
