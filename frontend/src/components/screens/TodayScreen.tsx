@@ -13,9 +13,16 @@ import { SampleLink } from "@/components/stumble/SampleLink";
 import { getErrorMessage } from "@/lib/errors";
 import { lastTodayColor, rememberTodayColor, type TodayColor } from "@/lib/lastScene";
 import { useGetTodayQuery } from "@/store/endpoints/today";
-import type { TodayDeckDto } from "@/types/api";
+import type { DeckWordDto, TodayDeckDto } from "@/types/api";
 
 const weekday = new Intl.DateTimeFormat("en", { weekday: "long" });
+
+/** A glimpse, not the deck: what's due, or the first few if nothing is. The deck has the rest. */
+const GLIMPSE = 6;
+function glimpse(deck: TodayDeckDto): DeckWordDto[] {
+  const due = deck.words.filter((w) => w.state === "miss");
+  return (due.length > 0 ? due : deck.words).slice(0, GLIMPSE);
+}
 
 /** One line under the words: what happens to them next. */
 function deckLine(deck: TodayDeckDto): string {
@@ -148,7 +155,8 @@ export function TodayScreen() {
             <LyricLine
               size="sm"
               className="mt-2"
-              words={data.deck.words.map((w) => ({ text: w.target, state: w.state }))}
+              separator="·"
+              words={glimpse(data.deck).map((w) => ({ text: w.target, state: w.state }))}
             />
             <p className="mt-2 text-xs font-bold text-ink/65">{deckLine(data.deck)}</p>
             <Link href="/deck" className="mt-1 inline-block text-xs font-extrabold text-ink/65 underline-offset-2 hover:underline">

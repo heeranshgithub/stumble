@@ -21,11 +21,14 @@ export function LyricLine({
   size = "lg",
   animate = false,
   className = "",
+  separator,
 }: {
   words: LyricWord[];
   size?: "lg" | "sm";
   animate?: boolean;
   className?: string;
+  /** Put between items. A deck line is phrases, not words: "je ne comprends pas au marché" needs a seam. */
+  separator?: string;
 }) {
   const map = size === "lg" ? large : small;
   const sizeCls = size === "lg" ? "text-[25px] leading-[1.15]" : "text-[18px] leading-[1.35]";
@@ -39,7 +42,7 @@ export function LyricLine({
           >
             {w.text}
           </span>
-          {i < words.length - 1 ? " " : ""}
+          {i < words.length - 1 ? (separator ? <span className="text-ink/35"> {separator} </span> : " ") : ""}
         </span>
       ))}
     </p>
