@@ -144,9 +144,9 @@ export function DeckScreen() {
   );
 }
 
-/** A gap with words around it is a cue; "___." on its own is not. */
+/** A gap with words around it is a cue; "___." or "Non, ___." on its own is not. Numbers count. */
 function hasWords(context: string): boolean {
-  return (context.replace("___", " ").match(/\p{L}+/gu) ?? []).length >= 2;
+  return (context.replace("___", " ").match(/[\p{L}\p{N}]+/gu) ?? []).length >= 2;
 }
 
 /**
