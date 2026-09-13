@@ -109,11 +109,11 @@ export function DeckScreen() {
                                         : "text-ink"
                                 }`}
                               >
-                                {c.target ?? (c.promptLine || c.sceneTitle)}
+                                {c.target ?? dueRow(c).title}
                               </p>
                               {!isOpen ? (
                                 <p className="truncate text-xs font-bold text-ink/65">
-                                  {c.target === null ? dueSub(c) : hasWords(c.context) ? `"${c.context}"` : c.sceneTitle}
+                                  {c.target === null ? dueRow(c).sub : hasWords(c.context) ? `"${c.context}"` : c.sceneTitle}
                                 </p>
                               ) : null}
                             </div>
@@ -151,12 +151,15 @@ function hasWords(context: string): boolean {
 
 /**
  * A due row never shows its word: the review is about to ask for it. It reads like the review
- * card instead — the question it's titled with, then your sentence with the gap, or where it
- * was caught when the gap was the whole sentence.
+ * card instead — the question, then your sentence with the gap. Without a question the sentence
+ * takes the title; without either, where it was caught. The title stays French.
  */
-function dueSub(c: DeckCardDto): string {
-  if (hasWords(c.context)) return `"${c.context}"`;
-  return `${c.sceneTitle} · ${c.type.replace("_", "-")}`;
+function dueRow(c: DeckCardDto): { title: string; sub: string } {
+  const where = `${c.sceneTitle} · ${c.type.replace("_", "-")}`;
+  const sentence = hasWords(c.context) ? c.context : "";
+  if (c.promptLine) return { title: c.promptLine, sub: sentence ? `"${sentence}"` : where };
+  if (sentence) return { title: sentence, sub: where };
+  return { title: where, sub: "say it in the review" };
 }
 
 /** The one line that changes with the deck: what happens to these words next, and the way there. */
