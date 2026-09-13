@@ -98,11 +98,6 @@ async def progress(db: Database, profile: Document, due_window: timedelta) -> Pr
         {"profile_id": profile_id, "status": "finished"}
     ).to_list(length=2000)
     cleared = {s["scene_id"] for s in sessions if s.get("goal_progress", 0) >= 0.999}
-    seconds = 0
-    for s in sessions:
-        finished = s.get("finished_at")
-        if finished:
-            seconds += int((_aware(finished) - _aware(s["created_at"])).total_seconds())
 
     under: list[UnderPressureDto] = []
     for c in sorted(
@@ -134,7 +129,6 @@ async def progress(db: Database, profile: Document, due_window: timedelta) -> Pr
         due=stats["due"],
         scenes_cleared=len(cleared),
         sessions=len(sessions),
-        minutes_spoken=round(seconds / 60),
         series=series(
             all_cards, datetime.now(UTC).date(), reviews=review_log, due_window=due_window
         ),

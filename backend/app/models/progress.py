@@ -29,7 +29,6 @@ class ProgressDto(ApiModel):
     due: int
     scenes_cleared: int
     sessions: int
-    minutes_spoken: int
     series: list[SeriesPointDto] = Field(default_factory=list)
     under_pressure: list[UnderPressureDto] = Field(default_factory=list)
 

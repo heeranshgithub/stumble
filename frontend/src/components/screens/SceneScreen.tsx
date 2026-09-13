@@ -52,11 +52,6 @@ function latestCharacterLine(session: SessionDto): TurnDto | undefined {
   return undefined;
 }
 
-function fmt(ms: number) {
-  const s = Math.max(0, Math.floor(ms / 1000));
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-}
-
 /** `resumeId` is the `?session=` from the URL: an earlier session of this scene to pick back up. */
 export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: string | null }) {
   const [startSession, startState] = useStartSessionMutation();
@@ -67,7 +62,6 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
   const [failure, setFailure] = useState<string | null>(null);
   const [typing, setTyping] = useState(false);
   const [draft, setDraft] = useState("");
-  const [elapsed, setElapsed] = useState(0);
   const [latencyMs, setLatencyMs] = useState<number | null>(null);
   const [shownTranslation, setShownTranslation] = useState<string | null>(null);
 
@@ -105,12 +99,6 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
           if (s.sceneId !== sceneId) throw new Error("session belongs to another scene");
           setSession(s);
           setPhase(s.done ? "done" : "idle");
-          // The timer means "this sitting". Picking up a scene minutes later continues it; coming
-          // back hours later starts the clock again rather than showing 340:04.
-          const first = s.turns[0]?.createdAt;
-          const last = s.turns[s.turns.length - 1]?.createdAt;
-          const away = last ? Date.now() - Date.parse(last) : 0;
-          if (first && away < 10 * 60_000) setElapsed(Math.max(0, Date.now() - Date.parse(first)));
         })
         // Gone, or another device's: start over rather than show an error for a stale link.
         .catch(() => fresh());
@@ -119,11 +107,6 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
       setPhase("failed");
     });
   }, [sceneId, resumeId, startSession, getSession]);
-
-  useEffect(() => {
-    const id = window.setInterval(() => setElapsed((e) => e + 1000), 1000);
-    return () => window.clearInterval(id);
-  }, []);
 
   // The shell's `main` is the only scroller and the header and mic are pinned inside it, so a new
   // turn (or the live meter) scrolls it to the bottom: the latest line lands just above the mic.
@@ -244,9 +227,9 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
         <div className="flex items-center gap-2">
           {ready.data && ready.data.providers !== "real" ? <Chip tone="stumble">{ready.data.providers} providers</Chip> : null}
           {isDev && latencyMs !== null ? <Chip tone="stumble">{latencyMs} ms</Chip> : null}
-          <Chip>
-            {name} · {fmt(elapsed)}
-          </Chip>
+          {/* No clock: a scene has no time limit, and a counter running while you search for a word
+              is a grade in disguise. The debrief says how long it took. */}
+          <Chip>{name}</Chip>
           {session?.id && phase !== "done" ? (
             <button
               type="button"

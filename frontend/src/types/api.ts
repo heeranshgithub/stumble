@@ -125,7 +125,6 @@ export interface ProgressDto {
   due: number;
   scenesCleared: number;
   sessions: number;
-  minutesSpoken: number;
   series: SeriesPointDto[];
   underPressure: UnderPressureDto[];
 }

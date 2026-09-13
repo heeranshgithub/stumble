@@ -40,7 +40,8 @@ export function ProgressScreen() {
     <div className="flex flex-1 flex-col" data-scene="review">
       <Blob color="scene" className="pt-14 pb-5">
         <p className="text-xs font-bold text-ink-2">
-          French · {data.sessions === 1 ? "1 scene" : `${data.sessions} scenes`} · {data.minutesSpoken} min spoken
+          French · {data.sessions === 1 ? "1 scene played" : `${data.sessions} scenes played`}
+          {data.scenesCleared > 0 ? ` · ${data.scenesCleared} cleared` : ""}
         </p>
         <h1 className="mt-1 text-[30px] font-extrabold leading-none tracking-[-0.03em]">{headline}</h1>
         <div className="mt-4 grid grid-cols-3 gap-2">
