@@ -155,8 +155,9 @@ function NextStep({ cards, due }: { cards: DeckCardDto[]; due: number }) {
     return (
       <>
         <p className="mt-2 text-xs font-bold text-ink-2">
-          {due === 1 ? "1 word is due." : `${due} words are due.`} Say each one
-          in its own sentence; the scheduler does the rest.
+          {due === 1
+            ? "1 word is due. Say it in its own sentence, the scheduler does the rest."
+            : `${due} words are due. Say each one in its own sentence, the scheduler does the rest.`}
         </p>
         <PillButton href="/review" className="mt-3">
           <Mic className="size-5" strokeWidth={2.25} />
