@@ -320,12 +320,12 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
 
       {phase !== "done" ? (
         <footer className="sticky bottom-0 z-10 bg-scene px-5 pb-8 pt-2">
-          {failure && phase === "idle" ? <p className="mb-2 text-center text-xs font-bold text-stumble">{failure}</p> : null}
-          {speaker.error ? <p className="mb-2 text-center text-xs font-bold text-stumble">{speaker.error}</p> : null}
+          {failure && phase === "idle" ? <p className="mb-6 text-center text-xs font-bold text-stumble">{failure}</p> : null}
+          {speaker.error ? <p className="mb-6 text-center text-xs font-bold text-stumble">{speaker.error}</p> : null}
           {needsTap && !speaker.error ? (
-            <p className="mb-2 text-center text-xs font-bold text-ink-2">tap anywhere to hear {name}</p>
+            <p className="mb-6 text-center text-xs font-bold text-ink-2">tap anywhere to hear {name}</p>
           ) : null}
-          {mic.error ? <p className="mb-2 text-center text-xs font-bold text-stumble">{mic.error}</p> : null}
+          {mic.error ? <p className="mb-6 text-center text-xs font-bold text-stumble">{mic.error}</p> : null}
           {typing ? (
             <form
               className="flex items-center gap-2"
