@@ -74,6 +74,10 @@ function Card({
 
   const onCapture = useCallback(
     (c: Capture) => {
+      if (!c.spoke) {
+        setAttempt({ heard: "", matched: false });
+        return;
+      }
       const form = new FormData();
       form.append("audio", c.blob, `attempt.${c.mime.includes("mp4") ? "mp4" : "webm"}`);
       attemptCard({ id: cardId, form })
@@ -167,7 +171,9 @@ function Card({
         <div className="mt-3 flex flex-wrap gap-2">
           {attempt ? (
             <Chip tone={attempt.matched ? "ink" : "muted"}>
-              heard &ldquo;{attempt.heard}&rdquo; · {attempt.matched ? "that's it" : "not quite"}
+              {attempt.heard
+                ? `heard “${attempt.heard}” · ${attempt.matched ? "that's it" : "not quite"}`
+                : "didn't hear anything · hold and speak"}
             </Chip>
           ) : isFreeze ? (
             <Chip tone="stumble">you froze here</Chip>

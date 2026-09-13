@@ -159,8 +159,10 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
   const onCapture = useCallback(
     (c: Capture) => {
       const form = new FormData();
-      form.append("audio", c.blob, `turn.${c.mime.includes("mp4") ? "mp4" : "webm"}`);
-      form.append("clientPauseMs", String(c.pauseMs));
+      // Silence is never sent to the transcriber, which invents captions for it. A long silent
+      // hold is still a turn: the freeze the server logs from the pause alone.
+      if (c.spoke) form.append("audio", c.blob, `turn.${c.mime.includes("mp4") ? "mp4" : "webm"}`);
+      form.append("clientPauseMs", String(c.spoke ? c.pauseMs : c.durationMs));
       void submit(form);
     },
     [submit],

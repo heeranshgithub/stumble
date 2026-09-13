@@ -9,6 +9,8 @@ export interface Capture {
   /** Longest silence while held (mid-turn or trailing). ≥ ~3 s is a freeze. */
   pauseMs: number;
   durationMs: number;
+  /** Whether the meter ever heard speech. Silence is never uploaded: Whisper hallucinates on it. */
+  spoke: boolean;
 }
 
 interface Stats {
@@ -132,10 +134,11 @@ export function useHoldToTalk(onCapture: (c: Capture) => void, disabled = false,
         const trailing = s ? (s.lastSpeechAt !== null ? now - s.lastSpeechAt : now - s.startedAt) : 0;
         const pauseMs = Math.round(Math.max(s?.longestGapMs ?? 0, trailing));
         const durationMs = Math.round(s ? now - s.startedAt : 0);
+        const spoke = s?.spokeAt !== null && s?.spokeAt !== undefined;
         const type = recorder.mimeType || mime || "audio/webm";
         const blob = new Blob(chunksRef.current, { type });
         statsRef.current = null;
-        if (blob.size > 0) onCaptureRef.current({ blob, mime: type, pauseMs, durationMs });
+        if (blob.size > 0) onCaptureRef.current({ blob, mime: type, pauseMs, durationMs, spoke });
       };
       recorderRef.current = recorder;
       statsRef.current = {

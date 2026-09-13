@@ -28,6 +28,25 @@ def _ext(mime: str) -> str:
     return _EXT_BY_MIME.get(base, "webm")
 
 
+# What Whisper says when handed silence and told it is French: the caption credits and outros
+# that follow silence in its training data. A transcript that is only one of these is nothing.
+_SILENCE_HALLUCINATIONS = {
+    "sous-titrage société radio-canada",
+    "sous-titrage societe radio-canada",
+    "sous-titres réalisés par la communauté d'amara.org",
+    "sous-titres réalisés para la communauté d'amara.org",
+    "merci d'avoir regardé",
+    "merci d'avoir regardé cette vidéo",
+    "abonnez-vous",
+    "n'hésitez pas à vous abonner",
+}
+
+
+def _heard_nothing(text: str) -> bool:
+    t = text.strip().strip(".!… ").casefold()
+    return not t or t in _SILENCE_HALLUCINATIONS
+
+
 class GroqTranscriber:
     def __init__(self, client: httpx.AsyncClient, api_key: str, model: str) -> None:
         self._client = client
@@ -58,7 +77,11 @@ class GroqTranscriber:
         except httpx.HTTPError as exc:
             raise ProviderError("groq", str(exc)) from exc
         body = res.json()
-        return Transcript(text=str(body.get("text", "")).strip(), duration_s=body.get("duration"))
+        text = str(body.get("text", "")).strip()
+        if _heard_nothing(text):
+            log.info("stt_silence", heard=text)
+            text = ""
+        return Transcript(text=text, duration_s=body.get("duration"))
 
 
 _FENCE = re.compile(r"^```(?:json)?\s*|\s*```$", re.MULTILINE)

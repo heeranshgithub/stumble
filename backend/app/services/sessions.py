@@ -179,7 +179,7 @@ async def take_turn(
     else:
         said = (text or "").strip()
     if not said and pause_ms < settings.freeze_threshold_ms:
-        raise BadRequest("Nothing was said.", code="empty_turn")
+        raise BadRequest("Nothing was heard. Hold the mic and speak.", code="empty_turn")
 
     learner = _turn("learner", said, session["goal_progress"], pause_ms=pause_ms)
     session["turns"].append(learner)

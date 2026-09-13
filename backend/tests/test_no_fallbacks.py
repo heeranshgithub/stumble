@@ -66,3 +66,13 @@ async def test_dead_llm_is_a_502_with_the_provider_named(settings: Settings) -> 
         )
     assert res.status_code == 502
     assert res.json()["error"]["details"]["provider"] == "openrouter"
+
+
+def test_whisper_silence_credits_count_as_nothing() -> None:
+    from app.services.providers_real import _heard_nothing
+
+    assert _heard_nothing("Sous-titrage Société Radio-Canada")
+    assert _heard_nothing(" ... ")
+    assert _heard_nothing("Merci d'avoir regardé.")
+    assert not _heard_nothing("Merci.")
+    assert not _heard_nothing("Je voudrais un café.")

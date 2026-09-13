@@ -84,8 +84,8 @@ export function OnboardingScreen() {
 
   const onCapture = useCallback(
     (c: Capture) => {
-      if (c.durationMs < 1200) {
-        setFailure("That was quick. Tap again and say a few words.");
+      if (c.durationMs < 1200 || !c.spoke) {
+        setFailure(c.spoke ? "That was quick. Tap again and say a few words." : "Didn't hear anything. Tap again and say a few words.");
         return;
       }
       const form = new FormData();
