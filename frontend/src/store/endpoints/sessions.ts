@@ -15,8 +15,14 @@ export const sessionsApi = api.injectEndpoints({
     sendTurn: build.mutation<SessionDto, { id: string; form: FormData }>({
       query: ({ id, form }) => ({ url: `/sessions/${id}/turns`, method: "POST", body: form }),
       async onQueryStarted({ id }, { dispatch, queryFulfilled }) {
-        const { data } = await queryFulfilled;
-        dispatch(sessionsApi.util.upsertQueryData("getSession", id, data));
+        // A failed turn (nothing heard, provider down) rejects here too; the screen already shows
+        // it, and an uncaught rejection would surface as a bare "[object Object]" runtime error.
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(sessionsApi.util.upsertQueryData("getSession", id, data));
+        } catch {
+          // handled where the turn was sent
+        }
       },
     }),
     // Idempotent: ends the scene, turns stumbles into cards. Today and Progress change as a result.
