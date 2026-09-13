@@ -118,6 +118,8 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
   const submit = useCallback(
     async (form: FormData) => {
       if (!sessionId) return;
+      // A failed turn's message ("Nothing was heard…") belongs to that turn only.
+      setFailure(null);
       setPhase("thinking");
       t0Ref.current = performance.now();
       try {
