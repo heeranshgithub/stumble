@@ -11,7 +11,7 @@ applications:
             - pnpm install --frozen-lockfile
         build:
           commands:
-            - env | grep -e NEXT_PUBLIC_ >> .env.production
+            - env | grep -e NEXT_PUBLIC_ >> .env.production || true
             - pnpm build
       artifacts:
         baseDirectory: .next
