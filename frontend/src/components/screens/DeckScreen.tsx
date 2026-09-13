@@ -160,34 +160,14 @@ function DueChip({ card }: { card: DeckCardDto }) {
 }
 
 function CardDetail({ card }: { card: DeckCardDto }) {
+  // The row above already shows the word, the sentence and when it's due; this adds only what
+  // the row doesn't say: where it came from, what kind of slip, and how it has gone since.
   return (
-    <div className="mt-4 rounded-2xl bg-ink px-4 py-3 text-paper">
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-[20px] font-extrabold leading-none tracking-tight">
-          {card.target}
-        </p>
-        <Chip
-          tone={card.state === "miss" ? "stumble" : "muted"}
-          className={card.state === "miss" ? "" : "bg-paper/15 text-paper"}
-        >
-          {card.state === "on"
-            ? "mastered"
-            : card.state === "miss"
-              ? "due now"
-              : whenDue(card.due)}
-        </Chip>
-      </div>
-      {card.context ? (
-        <p className="mt-2 text-sm text-paper-2">
-          &ldquo;{card.context}&rdquo;
-        </p>
-      ) : null}
-      <p className="mt-1 text-xs font-bold text-paper-2">
-        {card.sceneTitle} · {card.type.replace("_", "-")}
-        {card.lapses > 0 ? ` · stumbled ×${card.lapses + 1}` : ""}
-        {card.produced > 0 ? ` · produced clean ×${card.produced}` : ""}
-      </p>
-    </div>
+    <p className="pb-1 text-xs font-bold text-ink/65">
+      {card.sceneTitle} · {card.type.replace("_", "-")}
+      {card.lapses > 0 ? ` · stumbled ×${card.lapses + 1}` : " · stumbled once"}
+      {card.produced > 0 ? ` · produced clean ×${card.produced}` : ""}
+    </p>
   );
 }
 
