@@ -1,7 +1,6 @@
 "use client";
 
 import { ChevronLeft, Keyboard, Mic, Send, Volume2, X } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PointerEvent } from "react";
@@ -220,10 +219,16 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
       onPointerDownCapture={onFirstTap}
     >
       <header className="sticky top-0 z-10 flex items-center justify-between bg-scene px-5 pt-12 pb-2">
-        <Link href="/" className="flex items-center gap-1 text-xs font-extrabold">
+        {/* Back means back: to Scenes, Today, the review's end or the debrief, whichever sent you here.
+            A deep link with no history goes to the scene list. */}
+        <button
+          type="button"
+          onClick={() => (window.history.length > 1 ? router.back() : router.push("/scenes"))}
+          className="flex items-center gap-1 text-xs font-extrabold"
+        >
           <ChevronLeft className="size-4" strokeWidth={2.5} />
           {session?.sceneTitle ?? "Scene"}
-        </Link>
+        </button>
         <div className="flex items-center gap-2">
           {ready.data && ready.data.providers !== "real" ? <Chip tone="stumble">{ready.data.providers} providers</Chip> : null}
           {isDev && latencyMs !== null ? <Chip tone="stumble">{latencyMs} ms</Chip> : null}
