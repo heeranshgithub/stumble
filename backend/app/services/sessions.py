@@ -16,6 +16,7 @@ from app.log import get_logger
 from app.models.session import SessionDto, StumbleDto, TurnDto, WinDto
 from app.scenes.data import Scene, get_scene
 from app.services import tts
+from app.services.cards import target_key
 from app.services.prompts import learner_turn, stt_prompt, system_prompt
 from app.services.providers import ChatMessage
 from app.services.registry import Providers
@@ -140,13 +141,21 @@ def _parse_stumbles(raw: Any) -> list[Document]:
     return out
 
 
-def _parse_wins(raw: Any) -> list[Document]:
+def _parse_wins(raw: Any, said: str) -> list[Document]:
+    """A win is credited only to the turn that contains it; the model sometimes carries the
+    previous turn's wins forward."""
     out: list[Document] = []
+    said_key = target_key(said)
     for item in raw if isinstance(raw, list) else []:
         try:
-            out.append(WinDto.model_validate(item).model_dump())
+            win = WinDto.model_validate(item)
         except ValidationError:
             continue
+        key = target_key(win.phrase)
+        if key and key in said_key:
+            out.append(win.model_dump())
+        else:
+            log.info("win_dropped", phrase=win.phrase, said=said[:80])
     return out
 
 
@@ -189,7 +198,7 @@ async def take_turn(
     progress = max(session["goal_progress"], min(1.0, progress))
     done = bool(result.get("done", False)) or progress >= 1.0
     learner["stumbles"] = _parse_stumbles(result.get("stumbles"))
-    learner["wins"] = _parse_wins(result.get("wins"))
+    learner["wins"] = _parse_wins(result.get("wins"), said)
     learner["goal_progress"] = progress
 
     reply_text = _without_regreeting(str(result.get("reply", "")), _FR_GREETING)

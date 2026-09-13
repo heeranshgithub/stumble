@@ -7,5 +7,5 @@ RUN uv sync --frozen --no-dev --no-install-project
 COPY app ./app
 RUN useradd -m appuser && chown -R appuser /app
 USER appuser
-EXPOSE 8080
-CMD ["uv", "run", "--no-sync", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+EXPOSE 8000
+CMD ["uv", "run", "--no-sync", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

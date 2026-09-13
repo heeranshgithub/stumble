@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.aws_secrets import load_aws_secrets
 from app.db import Client, make_client
 from app.errors import register_handlers
 from app.log import configure_logging, get_logger
@@ -22,7 +23,11 @@ def create_app(
     db_client: Client | None = None,
     providers: Providers | None = None,
 ) -> FastAPI:
-    settings = settings or Settings()
+    if settings is None:
+        # On App Runner the config lives in one Secrets Manager entry; it has to be in the
+        # environment before Settings() reads it. Off everywhere else (no AWS_SECRETS_ID).
+        load_aws_secrets()
+        settings = Settings()
     configure_logging(settings.env)
     log = get_logger(__name__)
 

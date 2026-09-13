@@ -167,3 +167,18 @@ async def test_win_audio_streams_the_phrase(client: AsyncClient) -> None:
     missing = await client.get(f"/sessions/{session['id']}/wins/nope/audio")
     assert missing.status_code == 404
     assert missing.json()["error"]["code"] == "win_not_found"
+
+
+def test_a_win_is_credited_only_to_the_turn_that_contains_it() -> None:
+    from app.services.sessions import _parse_wins
+
+    raw = [
+        {"phrase": "C'est combien"},
+        {"phrase": "s'il vous plaît"},
+        {"phrase": "Non, c'est tout"},
+    ]
+    # the model carried the previous turn's wins onto a freeze
+    assert _parse_wins(raw, "Euh... je paie...") == []
+    # accent- and punctuation-insensitive, so a real one survives
+    kept = _parse_wins(raw, "Non, c'est tout. C'est combien ?")
+    assert [w["phrase"] for w in kept] == ["C'est combien", "Non, c'est tout"]
