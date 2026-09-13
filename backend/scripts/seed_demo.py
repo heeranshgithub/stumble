@@ -154,9 +154,9 @@ CARDS: list[tuple[str, str, str, str, str, str, int, str]] = [
     (
         "bill",
         "miss",
-        "je ne sais pas",
-        "je ne comprends pas",
-        "___ cette ligne.",
+        "sais",
+        "comprends",
+        "Je ne ___ pas cette ligne.",
         "",
         1,
         "learning",
