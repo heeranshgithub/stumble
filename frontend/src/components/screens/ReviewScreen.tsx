@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronLeft, Mic, Play } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
 import { Chip } from "@/components/stumble/Chip";
@@ -70,6 +70,7 @@ function Card({
   const [attemptCard, attemptState] = useAttemptCardMutation();
   const [gradeCard, gradeState] = useGradeCardMutation();
   const speaker = useSpeaker();
+  const router = useRouter();
   const cardId = card.id ?? "";
 
   const onCapture = useCallback(
@@ -111,10 +112,15 @@ function Card({
       onPointerDownCapture={() => speaker.unlock()}
     >
       <header className="flex items-center justify-between px-5 pt-12 pb-2">
-        <Link href="/" className="flex items-center gap-1 text-xs font-extrabold">
+        {/* Back goes where you came from (Today or the deck), not always Today. */}
+        <button
+          type="button"
+          className="flex items-center gap-1 text-xs font-extrabold"
+          onClick={() => (window.history.length > 1 ? router.back() : router.push("/deck"))}
+        >
           <ChevronLeft className="size-4" strokeWidth={2.5} />
           Review · {position} of {total}
-        </Link>
+        </button>
         <Chip>
           {card.sceneTitle}
           {card.lapses > 0 ? ` · ×${card.lapses + 1}` : ""}
