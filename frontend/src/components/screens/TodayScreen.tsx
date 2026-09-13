@@ -102,7 +102,7 @@ export function TodayScreen() {
         </h1>
         <p className="mt-2 text-xs font-bold text-ink-2">
           {hasReview
-            ? `~${Math.max(1, Math.round(data.reviewDue * 13))} seconds · then ${scene?.title ?? "the next scene"} unlocks`
+            ? `Clear these and ${scene?.title ?? "the next scene"} unlocks.`
             : scene
               ? data.deck.caught === 0
                 ? "Your first stumbles will come from the scene."
