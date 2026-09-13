@@ -160,31 +160,6 @@ export function SeriesChart({ points }: { points: SeriesPointDto[] }) {
           </span>
         ))}
       </figcaption>
-      <details className="mt-2 text-xs">
-        <summary className="cursor-pointer font-bold text-ink/65">as a table</summary>
-        <table className="mt-1 w-full text-left">
-          <thead>
-            <tr className="text-ink/65">
-              <th className="font-bold">day</th>
-              {SERIES.map((s) => (
-                <th key={s.key} className="font-bold">
-                  {s.label}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {points.map((p) => (
-              <tr key={p.date}>
-                <td>{shortDate.format(new Date(p.date))}</td>
-                <td>{p.caught}</td>
-                <td>{p.mastered}</td>
-                <td>{p.struggling}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </details>
     </figure>
   );
 }
