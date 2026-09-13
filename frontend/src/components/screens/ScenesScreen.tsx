@@ -91,7 +91,7 @@ function SceneRow({ scene }: { scene: SceneDto }) {
         <p className="text-[16px] font-extrabold leading-tight">{scene.title}</p>
         <p className="truncate text-xs font-bold text-ink/65">
           {isNext && scene.usesDueCards.length > 0
-            ? `Uses your due cards: ${scene.usesDueCards.join(" · ")}`
+            ? `Built around ${scene.usesDueCards.length === 1 ? "1 word" : `${scene.usesDueCards.length} words`} you're reviewing.`
             : cleared
               ? "Cleared · replay anytime"
               : scene.goal}

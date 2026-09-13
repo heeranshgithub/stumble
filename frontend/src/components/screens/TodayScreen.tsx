@@ -195,7 +195,8 @@ function NextSceneBlob({
       </div>
       <p className="mt-1 text-xl font-bold tracking-[-0.01em]">{title}</p>
       <p className="text-xs font-bold text-ink-2">
-        {uses.length > 0 ? `Uses ${uses.length} of today's cards: ${uses.slice(0, 3).join(" · ")}` : goal}
+        {/* The fact, not the list: naming the words here would cue the review they're about to sit. */}
+        {uses.length > 0 ? `Built around ${uses.length === 1 ? "1 word" : `${uses.length} words`} you're reviewing.` : goal}
       </p>
     </Blob>
   );
