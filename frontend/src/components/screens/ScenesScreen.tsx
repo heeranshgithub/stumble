@@ -12,7 +12,7 @@ import { useGetScenesQuery } from "@/store/endpoints/scenes";
 import type { Patience, SceneDto } from "@/types/api";
 
 const patienceLabel: Record<Patience, { title: string; body: string }> = {
-  relaxed: { title: "Relaxed", body: "Slow, simple, rephrases a lot." },
+  relaxed: { title: "Relaxed", body: "Slow, simple, patient." },
   normal: { title: "Normal", body: "Natural speed, short sentences." },
   real: { title: "Real-world", body: "Fast, slang, a little impatient." },
 };
