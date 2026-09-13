@@ -80,33 +80,59 @@ export function DeckScreen() {
                   {g.title} · {g.cards.length}
                 </p>
                 <ul className="-mx-5 mt-1 divide-y divide-ink/10">
-                  {g.cards.map((c) => (
-                    <li key={c.id}>
-                      <button
-                        type="button"
-                        onClick={() => toggle(c.id)}
-                        aria-expanded={open === c.id}
-                        className="flex w-full items-center gap-3 px-5 py-3 text-left"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <p
-                            className={`text-[17px] font-extrabold leading-tight ${c.state === "miss" ? "text-stumble" : c.state === "on" ? "text-ink/45" : "text-ink"}`}
-                          >
-                            {c.target}
-                          </p>
-                          <p className="truncate text-xs font-bold text-ink/65">
-                            {c.context ? `"${c.context}"` : c.sceneTitle}
-                          </p>
-                        </div>
-                        <DueChip card={c} />
-                      </button>
-                      {open === c.id ? (
-                        <div className="px-5 pb-3">
-                          <CardDetail card={c} />
-                        </div>
-                      ) : null}
-                    </li>
-                  ))}
+                  {g.cards.map((c) => {
+                    const isOpen = open === c.id;
+                    return (
+                      <li key={c.id} className={isOpen ? "px-3 py-2" : ""}>
+                        {/* The open row *becomes* the ink card: same word, sentence and chip, plus its
+                            history. Nothing is shown twice. */}
+                        <button
+                          type="button"
+                          onClick={() => toggle(c.id)}
+                          aria-expanded={isOpen}
+                          className={
+                            isOpen
+                              ? "flex w-full flex-col rounded-2xl bg-ink px-4 py-3 text-left text-paper"
+                              : "flex w-full items-center gap-3 px-5 py-3 text-left"
+                          }
+                        >
+                          <div className={isOpen ? "flex w-full items-center gap-3" : "contents"}>
+                            <div className="min-w-0 flex-1">
+                              <p
+                                className={`text-[17px] font-extrabold leading-tight ${
+                                  isOpen
+                                    ? "text-[20px] tracking-tight text-paper"
+                                    : c.state === "miss"
+                                      ? "text-stumble"
+                                      : c.state === "on"
+                                        ? "text-ink/45"
+                                        : "text-ink"
+                                }`}
+                              >
+                                {c.target}
+                              </p>
+                              {!isOpen ? (
+                                <p className="truncate text-xs font-bold text-ink/65">
+                                  {c.context ? `"${c.context}"` : c.sceneTitle}
+                                </p>
+                              ) : null}
+                            </div>
+                            <DueChip card={c} onInk={isOpen} />
+                          </div>
+                          {isOpen ? (
+                            <>
+                              {c.context ? <p className="mt-2 text-sm text-paper-2">&ldquo;{c.context}&rdquo;</p> : null}
+                              <p className="mt-1 text-xs font-bold text-paper-2">
+                                {c.sceneTitle} · {c.type.replace("_", "-")}
+                                {c.lapses > 0 ? ` · stumbled ×${c.lapses + 1}` : " · stumbled once"}
+                                {c.produced > 0 ? ` · produced clean ×${c.produced}` : ""}
+                              </p>
+                            </>
+                          ) : null}
+                        </button>
+                      </li>
+                    );
+                  })}
                 </ul>
               </section>
             ))
@@ -153,23 +179,13 @@ function NextStep({ cards, due }: { cards: DeckCardDto[]; due: number }) {
   );
 }
 
-function DueChip({ card }: { card: DeckCardDto }) {
-  if (card.state === "on") return <Chip>mastered</Chip>;
+function DueChip({ card, onInk = false }: { card: DeckCardDto; onInk?: boolean }) {
+  const muted = onInk ? "bg-paper/15 text-paper" : "";
+  if (card.state === "on") return <Chip className={muted}>mastered</Chip>;
   if (card.state === "miss") return <Chip tone="stumble">due now</Chip>;
-  return <Chip>{whenDue(card.due)}</Chip>;
+  return <Chip className={muted}>{whenDue(card.due)}</Chip>;
 }
 
-function CardDetail({ card }: { card: DeckCardDto }) {
-  // The row above already shows the word, the sentence and when it's due; this adds only what
-  // the row doesn't say: where it came from, what kind of slip, and how it has gone since.
-  return (
-    <p className="pb-1 text-xs font-bold text-ink/65">
-      {card.sceneTitle} · {card.type.replace("_", "-")}
-      {card.lapses > 0 ? ` · stumbled ×${card.lapses + 1}` : " · stumbled once"}
-      {card.produced > 0 ? ` · produced clean ×${card.produced}` : ""}
-    </p>
-  );
-}
 
 function Skeleton() {
   return (
