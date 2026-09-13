@@ -3,7 +3,7 @@
 import { Lock, Mic } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 
 import { Blob } from "@/components/stumble/Blob";
 import { Chip } from "@/components/stumble/Chip";
@@ -11,6 +11,7 @@ import { LyricLine } from "@/components/stumble/LyricLine";
 import { PillButton } from "@/components/stumble/PillButton";
 import { SampleLink } from "@/components/stumble/SampleLink";
 import { getErrorMessage } from "@/lib/errors";
+import { lastTodayColor, rememberTodayColor, type TodayColor } from "@/lib/lastScene";
 import { useGetTodayQuery } from "@/store/endpoints/today";
 import type { TodayDeckDto } from "@/types/api";
 
@@ -37,6 +38,16 @@ export function TodayScreen() {
     if (needsOnboarding) router.replace("/onboarding");
   }, [needsOnboarding, router]);
 
+  // The colour this screen wears is the colour its skeleton will wear next time.
+  const wornColor: TodayColor | null = data
+    ? data.reviewDue > 0
+      ? "review"
+      : (data.nextScene?.color ?? "cafe")
+    : null;
+  useEffect(() => {
+    if (wornColor) rememberTodayColor(wornColor);
+  }, [wornColor]);
+
   if (isLoading || needsOnboarding) return <TodaySkeleton />;
 
   if (error || !data) {
@@ -60,8 +71,10 @@ export function TodayScreen() {
   const reviewLabel = data.reviewDue === 1 ? "1 stumble." : `${data.reviewDue} stumbles.`;
   const uses = scene?.usesDueCards ?? [];
 
+  const todayColor: TodayColor = hasReview ? "review" : sceneColor;
+
   return (
-    <div className="flex flex-1 flex-col" data-scene={hasReview ? "review" : sceneColor}>
+    <div className="flex flex-1 flex-col" data-scene={todayColor}>
       <Blob color="scene" className="flex flex-[1.3] flex-col justify-end pt-14">
         <p className="text-xs font-bold text-ink-2">
           {weekday.format(new Date())} · Day {data.dayNumber}
@@ -195,9 +208,14 @@ function NextSceneBlob({
   );
 }
 
+const noSubscribe = () => () => undefined;
+const serverColor = () => null;
+
 function TodaySkeleton() {
+  // Neutral on the server; the colour Today last wore on the client, from the first frame.
+  const color = useSyncExternalStore(noSubscribe, lastTodayColor, serverColor);
   return (
-    <div className="flex flex-1 flex-col" data-scene="cafe">
+    <div className="flex flex-1 flex-col" data-scene={color ?? undefined}>
       <div className="flex-[1.3] bg-scene px-5 pt-14">
         <div className="h-3 w-24 rounded-full bg-ink/15" />
         <div className="mt-4 h-9 w-48 rounded-md bg-ink/15" />

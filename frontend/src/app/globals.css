@@ -22,9 +22,10 @@
   --font-sans: var(--font-gabarito), system-ui, -apple-system, sans-serif;
 }
 
-/* The scene color is set once per route on a wrapper; everything inside reads --scene. */
+/* The scene color is set once per route on a wrapper; everything inside reads --scene. With no
+   wrapper the ground is paper, so a screen that doesn't know its colour yet is never café yellow. */
 :root {
-  --scene: var(--color-cafe);
+  --scene: var(--color-paper);
   color-scheme: light;
 }
 [data-scene="cafe"] { --scene: var(--color-cafe); }
