@@ -7,25 +7,17 @@ import { useEffect, useSyncExternalStore } from "react";
 
 import { Blob } from "@/components/stumble/Blob";
 import { Chip } from "@/components/stumble/Chip";
-import { LyricLine } from "@/components/stumble/LyricLine";
 import { PillButton } from "@/components/stumble/PillButton";
 import { SampleLink } from "@/components/stumble/SampleLink";
 import { getErrorMessage } from "@/lib/errors";
 import { whenDue } from "@/lib/when";
 import { lastTodayColor, rememberTodayColor, type TodayColor } from "@/lib/lastScene";
 import { useGetTodayQuery } from "@/store/endpoints/today";
-import type { DeckWordDto, TodayDeckDto } from "@/types/api";
+import type { TodayDeckDto } from "@/types/api";
 
 const weekday = new Intl.DateTimeFormat("en", { weekday: "long" });
 
-/** A glimpse, not the deck: what's due, or the first few if nothing is. The deck has the rest. */
-const GLIMPSE = 6;
-function glimpse(deck: TodayDeckDto): DeckWordDto[] {
-  const due = deck.words.filter((w) => w.state === "miss");
-  return (due.length > 0 ? due : deck.words).slice(0, GLIMPSE);
-}
-
-/** One line under the words: what happens to them next. */
+/** One line about the deck: what happens to it next. */
 function deckLine(deck: TodayDeckDto): string {
   if (deck.due > 0) return deck.due === 1 ? "1 word is due now." : `${deck.due} words are due now.`;
   const learning = deck.caught - deck.mastered;
@@ -150,14 +142,9 @@ export function TodayScreen() {
           </>
         ) : (
           <>
-            {/* Pink is due, ink is learning, light is mastered — the deck's own colours. */}
-            <LyricLine
-              size="sm"
-              className="mt-2"
-              separator="·"
-              words={glimpse(data.deck).map((w) => ({ text: w.target, state: w.state }))}
-            />
-            <p className="mt-2 text-xs font-bold text-ink/65">{deckLine(data.deck)}</p>
+            {/* The count, not the words: listing them here would hand over the answers to the
+                review one tap above. The deck itself is a tap away. */}
+            <p className="mt-2 text-[18px] font-extrabold leading-snug">{deckLine(data.deck)}</p>
             <Link href="/deck" className="mt-1 inline-block text-xs font-extrabold text-ink/65 underline-offset-2 hover:underline">
               open the deck
             </Link>

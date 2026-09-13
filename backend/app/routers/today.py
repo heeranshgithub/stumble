@@ -4,7 +4,7 @@ from fastapi import APIRouter
 
 from app.deps import DbDep, ProfileDep, SettingsDep
 from app.models.scene import SceneDto
-from app.models.today import DeckWordDto, TodayDeckDto, TodayDto
+from app.models.today import TodayDeckDto, TodayDto
 from app.scenes.data import SCENES, to_dto
 from app.services import cards, progress
 
@@ -47,7 +47,6 @@ async def today(db: DbDep, profile: ProfileDep, settings: SettingsDep) -> TodayD
         next_scene=await next_scene(db, profile, window),
         deck=TodayDeckDto(
             **deck,
-            words=[DeckWordDto(target=c.target, state=c.state) for c in full.cards[:12]],
             next_due=min(upcoming) if upcoming else None,
         ),
     )
