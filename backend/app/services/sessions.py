@@ -257,11 +257,17 @@ async def take_turn(
     result = await _complete(providers, _messages(session, scene, settings))
     progress = float(result.get("goal_progress", session["goal_progress"]) or 0.0)
     progress = max(session["goal_progress"], min(1.0, progress))
-    beat = _next_beat(session.get("beat", 0), result.get("beat"), len(scene.beats))
+    last = len(scene.beats) - 1
+    beat = _next_beat(session.get("beat", 0), result.get("beat"), last + 1)
+    if beat == last:
+        # The beats are the goal in steps, so the goodbye is the goal reached: the model's own
+        # estimate lags the scene it just finished, and a 0.6 would leave the next scene locked.
+        progress = 1.0
+    elif _learner_turns(session) >= settings.scene_max_turns:
+        # A forced goodbye. The goal is whatever it was; the debrief says "not quite", honestly.
+        beat = last
     # The last beat is the goodbye: saying it ends the scene, whatever the model reports.
-    if _learner_turns(session) >= settings.scene_max_turns:
-        beat = len(scene.beats) - 1
-    done = bool(result.get("done", False)) or progress >= 1.0 or beat == len(scene.beats) - 1
+    done = bool(result.get("done", False)) or progress >= 1.0 or beat == last
     learner["stumbles"] = _parse_stumbles(result.get("stumbles"), settings.stumble_confidence_min)
     learner["wins"] = _parse_wins(result.get("wins"), said)
     learner["goal_progress"] = progress
