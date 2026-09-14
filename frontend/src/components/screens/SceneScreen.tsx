@@ -222,11 +222,11 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
       onPointerDownCapture={onFirstTap}
     >
       <header className="sticky top-0 z-10 flex items-center justify-between bg-scene px-5 pt-12 pb-2">
-        {/* Back means back: to Scenes, Today, the review's end or the debrief, whichever sent you here.
-            A deep link with no history goes to the scene list. */}
+        {/* Back is the scene list, not history: a replay is reached from a finished session's debrief,
+            and that is a dead page to land on. */}
         <button
           type="button"
-          onClick={() => (window.history.length > 1 ? router.back() : router.push("/scenes"))}
+          onClick={() => router.push("/scenes")}
           className="flex items-center gap-1 text-xs font-extrabold"
         >
           <ChevronLeft className="size-4" strokeWidth={2.5} />
