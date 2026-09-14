@@ -167,6 +167,11 @@ def _clean_context(context: str) -> str:
     return context.split("\n\n[", 1)[0].strip()
 
 
+# A card is a word or a short phrase. A target longer than this is the model correcting the whole
+# sentence, and a five-word cloze is not a review anyone can pass.
+_MAX_TARGET_WORDS = 4
+
+
 def _parse_stumbles(raw: Any, confidence_min: float) -> list[Document]:
     out: list[Document] = []
     for item in raw if isinstance(raw, list) else []:
@@ -179,6 +184,9 @@ def _parse_stumbles(raw: Any, confidence_min: float) -> list[Document]:
             continue
         if s.confidence < confidence_min:
             log.info("stumble_below_floor", target=s.target, confidence=s.confidence)
+            continue
+        if len(s.target.split()) > _MAX_TARGET_WORDS:
+            log.info("stumble_target_too_long", target=s.target)
             continue
         out.append(s.model_copy(update={"context": _clean_context(s.context)}).model_dump())
     return out

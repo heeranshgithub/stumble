@@ -184,7 +184,7 @@ def test_a_win_is_credited_only_to_the_turn_that_contains_it() -> None:
     assert [w["phrase"] for w in kept] == ["C'est combien", "Non, c'est tout"]
 
 
-def test_a_stumble_below_the_confidence_floor_never_becomes_a_card() -> None:
+def test_a_hedged_or_whole_sentence_stumble_never_becomes_a_card() -> None:
     from app.services.sessions import _parse_stumbles
 
     def stumble(target: str, confidence: float) -> dict[str, object]:
@@ -200,6 +200,9 @@ def test_a_stumble_below_the_confidence_floor_never_becomes_a_card() -> None:
     # the model hedged a phantom "miss" on a terse but correct turn
     raw = [stumble("Oui, c'est tout", 0.5), stumble("café au lait", 0.9)]
     assert [s["target"] for s in _parse_stumbles(raw, 0.7)] == ["café au lait"]
+    # the model corrected the whole sentence; that's not a card
+    raw = [stumble("Un café au lait avec du sucre", 0.95), stumble("avec du sucre", 0.95)]
+    assert [s["target"] for s in _parse_stumbles(raw, 0.7)] == ["avec du sucre"]
 
 
 def test_the_beat_only_moves_forward_and_the_prompt_names_it() -> None:

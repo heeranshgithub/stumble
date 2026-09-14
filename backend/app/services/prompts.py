@@ -44,7 +44,9 @@ _RULES = """RULES
 
 STUMBLE TYPES: freeze | code_switch | correction | miss
 - "said": what the learner said (or "" for a freeze)
-- "target": the correct French word or phrase, short
+- "target": the correct French word or phrase, short: the one to four words that were wrong,
+  never the whole sentence. "Café, au lait, et de sucre" has one error, so one stumble:
+  said "et de sucre", target "avec du sucre". A sentence with two errors is two stumbles.
 - "context": the learner's sentence with the target slot replaced by ___ (for a freeze, the
   sentence they were trying to say)
 - "prompt_line": your line that the learner was answering
