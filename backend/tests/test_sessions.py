@@ -1,5 +1,6 @@
 from httpx import AsyncClient
 
+from app.settings import Settings
 from tests.conftest import HEADERS
 
 
@@ -229,3 +230,19 @@ def test_a_reply_that_trails_off_is_not_a_question() -> None:
     assert _trails_off("De rien ! Alors...")
     assert not _trails_off("Ça fait 4 euros 50. Vous payez comment ?")
     assert not _trails_off("Voilà votre café au lait.")
+
+
+async def test_a_scene_ends_at_the_turn_cap_whatever_the_model_says(
+    client: AsyncClient, settings: Settings
+) -> None:
+    settings.scene_max_turns = 2
+    res = await client.post("/sessions", json={"sceneId": "cafe"}, headers=HEADERS)
+    sid = res.json()["id"]
+    first = await client.post(f"/sessions/{sid}/turns", data={"text": "Bonjour."}, headers=HEADERS)
+    assert first.json()["done"] is False
+    # the fake advances the goal a third per turn, so nothing but the cap ends this one
+    second = await client.post(f"/sessions/{sid}/turns", data={"text": "Un café."}, headers=HEADERS)
+    assert second.json()["done"] is True
+    third = await client.post(f"/sessions/{sid}/turns", data={"text": "Encore ?"}, headers=HEADERS)
+    assert third.status_code == 400
+    assert third.json()["error"]["code"] == "session_finished"

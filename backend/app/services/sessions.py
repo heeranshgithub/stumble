@@ -131,11 +131,21 @@ async def _complete(providers: Providers, msgs: list[ChatMessage]) -> dict[str, 
     return second if str(second.get("reply", "")).strip() else result
 
 
+def _learner_turns(session: Document) -> int:
+    return sum(1 for t in session["turns"] if t["role"] == "learner")
+
+
 def _messages(session: Document, scene: Scene, settings: Settings) -> list[ChatMessage]:
     msgs = [
         ChatMessage(
             "system",
-            system_prompt(scene, session["patience"], session["due_cards"], session.get("beat", 0)),
+            system_prompt(
+                scene,
+                session["patience"],
+                session["due_cards"],
+                session.get("beat", 0),
+                last_turn=_learner_turns(session) >= settings.scene_max_turns,
+            ),
         )
     ]
     for t in session["turns"]:
@@ -249,6 +259,8 @@ async def take_turn(
     progress = max(session["goal_progress"], min(1.0, progress))
     beat = _next_beat(session.get("beat", 0), result.get("beat"), len(scene.beats))
     # The last beat is the goodbye: saying it ends the scene, whatever the model reports.
+    if _learner_turns(session) >= settings.scene_max_turns:
+        beat = len(scene.beats) - 1
     done = bool(result.get("done", False)) or progress >= 1.0 or beat == len(scene.beats) - 1
     learner["stumbles"] = _parse_stumbles(result.get("stumbles"), settings.stumble_confidence_min)
     learner["wins"] = _parse_wins(result.get("wins"), said)

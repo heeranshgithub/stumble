@@ -75,7 +75,15 @@ Respond with ONLY a JSON object:
  "wins": [{"phrase": "s'il vous plaît"}]}"""
 
 
-def system_prompt(scene: Scene, patience: str, due_cards: list[str], beat: int = 0) -> str:
+_LAST_TURN = (
+    "\n\nLAST TURN. Whatever the learner just said, answer it in one short sentence and say "
+    "goodbye. No question. Report the last beat."
+)
+
+
+def system_prompt(
+    scene: Scene, patience: str, due_cards: list[str], beat: int = 0, last_turn: bool = False
+) -> str:
     due = ", ".join(due_cards) if due_cards else "none"
     beats = "; ".join(f"{i}: {b}" for i, b in enumerate(scene.beats))
     head = (
@@ -92,7 +100,7 @@ def system_prompt(scene: Scene, patience: str, due_cards: list[str], beat: int =
         f"CURRENT BEAT: {beat}: {scene.beats[beat]}.\n"
         f"REGISTER: {_PATIENCE.get(patience, _PATIENCE['normal'])}\n\n"
     )
-    return head + _RULES
+    return head + _RULES + (_LAST_TURN if last_turn else "")
 
 
 # Whisper takes a "previous transcript" as a style prompt. Forced to French with no prompt, it

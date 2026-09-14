@@ -35,6 +35,9 @@ class Settings(BaseSettings):
 
     # A silence this long while the mic is held is a freeze.
     freeze_threshold_ms: int = 3000
+    # A scene ends on its goodbye beat. If the learner is still talking after this many turns, the
+    # character is told to say goodbye now and the server ends it whatever comes back.
+    scene_max_turns: int = 12
     # A stumble the model reports below this confidence never becomes a card. The model hedges
     # rather than omits: a phantom "miss" on a terse but correct turn comes in around 0.5.
     stumble_confidence_min: float = 0.7
