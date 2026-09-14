@@ -267,7 +267,6 @@ export interface DebriefDto {
   goal: string;
   goalReached: boolean;
   goalProgress: number;
-  durationS: number;
   turnsSpoken: number;
   stumbles: DebriefStumbleDto[];
   wins: WinDto[];

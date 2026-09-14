@@ -80,27 +80,3 @@ async def test_finish_requires_ownership(client: AsyncClient) -> None:
     res = await client.post(f"/sessions/{sid}/finish", headers={"X-Device-Id": "other"})
     assert res.status_code == 404
 
-
-async def test_duration_stops_at_the_last_turn_not_at_finish(
-    client: AsyncClient, mock_client: AsyncMongoMockClient
-) -> None:
-    from datetime import UTC, datetime, timedelta
-
-    from bson import ObjectId
-
-    sid = await _start(client)
-    await _say(client, sid, "Un café, s'il vous plaît.")
-    # the tab sat open for an hour before "finish" was pressed
-    sessions = mock_client["stumble_test"].sessions
-    doc = await sessions.find_one({"_id": ObjectId(sid)})
-    assert doc is not None
-    hour_ago = datetime.now(UTC) - timedelta(hours=1)
-    for i, t in enumerate(doc["turns"]):
-        t["created_at"] = hour_ago + timedelta(seconds=40 * i)
-    await sessions.update_one(
-        {"_id": doc["_id"]}, {"$set": {"created_at": hour_ago, "turns": doc["turns"]}}
-    )
-
-    res = await client.post(f"/sessions/{sid}/finish", headers=HEADERS)
-    assert res.status_code == 200, res.text
-    assert res.json()["durationS"] == 40 * (len(doc["turns"]) - 1)

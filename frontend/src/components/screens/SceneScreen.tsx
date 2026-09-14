@@ -235,8 +235,9 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
         <div className="flex items-center gap-2">
           {ready.data && ready.data.providers !== "real" ? <Chip tone="stumble">{ready.data.providers} providers</Chip> : null}
           {isDev && latencyMs !== null ? <Chip tone="stumble">{latencyMs} ms</Chip> : null}
-          {/* No clock: a scene has no time limit, and a counter running while you search for a word
-              is a grade in disguise. The debrief says how long it took. */}
+          {/* No clock, here or on the debrief: a scene has no time limit, and a counter running while
+              you search for a word is a grade in disguise. Most of a scene's minutes are the character's
+              anyway. */}
           <Chip>{name}</Chip>
           {session?.id && phase !== "done" ? (
             <button

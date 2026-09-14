@@ -67,9 +67,7 @@ export function DebriefScreen({ sceneId, sessionId }: { sceneId: string; session
   return (
     <div className="flex flex-1 flex-col" data-scene={d.sceneColor} onPointerDownCapture={() => speaker.unlock()}>
       <Blob color="scene" className="pt-14 pb-5">
-        <p className="text-xs font-bold text-ink-2">
-          {d.sceneTitle} · {Math.floor(d.durationS / 60)}:{String(d.durationS % 60).padStart(2, "0")}
-        </p>
+        <p className="text-xs font-bold text-ink-2">{d.sceneTitle}</p>
         <h1 className="mt-2 text-[30px] font-extrabold leading-[1.05] tracking-[-0.03em]">{headline}</h1>
         <p className="mt-2 text-sm font-bold text-ink-2">
           {d.goalReached ? "Goal reached. " : `Goal: ${d.goal.toLowerCase().replace(/\.$/, "")}. `}

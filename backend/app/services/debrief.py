@@ -14,10 +14,6 @@ from app.services.cards import target_key
 GOAL_REACHED_AT = 0.999
 
 
-def _utc(dt: datetime) -> datetime:
-    return dt if dt.tzinfo else dt.replace(tzinfo=UTC)
-
-
 async def finish(
     db: Database, profile: Document, session: Document, due_window: timedelta
 ) -> DebriefDto:
@@ -77,10 +73,6 @@ async def finish(
             )
 
     turns_spoken = sum(1 for t in session["turns"] if t["role"] == "learner")
-    # The scene took from its first line to its last, not until "finish" was pressed: a session
-    # left open in a tab and finished an hour later did not take an hour.
-    started = _utc(session["created_at"])
-    ended = _utc(session["turns"][-1]["created_at"]) if session["turns"] else now
     deck = await cards.stats(db, profile_id, due_window)
     debrief = DebriefDto(
         session_id=str(session["_id"]),
@@ -91,7 +83,6 @@ async def finish(
         goal=scene.goal,
         goal_reached=session["goal_progress"] >= GOAL_REACHED_AT,
         goal_progress=session["goal_progress"],
-        duration_s=int((ended - started).total_seconds()),
         turns_spoken=turns_spoken,
         stumbles=stumbles,
         wins=wins,

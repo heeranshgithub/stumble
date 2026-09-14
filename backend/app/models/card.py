@@ -36,7 +36,6 @@ class DebriefDto(ApiModel):
     goal: str
     goal_reached: bool
     goal_progress: float
-    duration_s: int
     turns_spoken: int
     stumbles: list[DebriefStumbleDto] = Field(default_factory=list)
     wins: list[WinDto] = Field(default_factory=list)
