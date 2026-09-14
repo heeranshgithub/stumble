@@ -1,5 +1,5 @@
 import { api } from "@/store/api";
-import type { DeckDto, PlacementDto, ProgressDto, TutorBriefDto } from "@/types/api";
+import type { DeckDto, ProgressDto, TutorBriefDto } from "@/types/api";
 
 export const progressApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -15,13 +15,8 @@ export const progressApi = api.injectEndpoints({
       query: () => "/tutor-brief",
       providesTags: ["Progress"],
     }),
-    // Onboarding: twenty seconds of anything. Multipart `audio` or `text`.
-    placement: build.mutation<PlacementDto, FormData>({
-      query: (form) => ({ url: "/placement", method: "POST", body: form }),
-      invalidatesTags: ["Today", "Card", "Progress"],
-    }),
   }),
 });
 
-export const { useGetProgressQuery, useGetDeckQuery, useGetTutorBriefQuery, usePlacementMutation } =
+export const { useGetProgressQuery, useGetDeckQuery, useGetTutorBriefQuery } =
   progressApi;

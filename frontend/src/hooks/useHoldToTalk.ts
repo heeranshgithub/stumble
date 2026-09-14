@@ -31,7 +31,7 @@ function pickMime(): string | undefined {
 /**
  * Hold-to-talk on a pointer (or the space bar). Records with MediaRecorder and measures silence with an
  * AnalyserNode while held, so a freeze is known on the client before the audio even uploads.
- * `maxMs` auto-releases (the twenty-second placement).
+ * `maxMs` auto-releases.
  */
 export function useHoldToTalk(onCapture: (c: Capture) => void, disabled = false, maxMs?: number) {
   const [holding, setHolding] = useState(false);

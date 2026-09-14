@@ -279,7 +279,6 @@ def main() -> None:
             "language": "fr",
             "created_at": created,
             "onboarded": True,
-            "level": "A2",
             "placement": {
                 "id": ObjectId(),
                 "heard": "Bonjour, je m'appelle Maya, j'ai twenty-eight ans.",

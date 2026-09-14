@@ -93,7 +93,6 @@ export interface ProfileDto {
   language: string;
   createdAt: string;
   onboarded: boolean;
-  level: string | null;
 }
 
 export type WordState = "on" | "off" | "miss";
@@ -160,14 +159,6 @@ export interface TutorBriefDto {
   strengths: string[];
   suggestedSession: string[];
   asText: string;
-}
-
-export interface PlacementDto {
-  level: "A1" | "A2" | "B1";
-  heard: string;
-  note: string;
-  stumbles: StumbleDto[];
-  cardsAdded: number;
 }
 
 export type StumbleType = "freeze" | "code_switch" | "correction" | "miss";

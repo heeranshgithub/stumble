@@ -15,7 +15,7 @@ def test_profile_dto_keys() -> None:
         created_at=datetime.now(UTC),
     )
     dumped = dto.model_dump(by_alias=True)
-    assert set(dumped) == {"id", "deviceId", "language", "createdAt", "onboarded", "level"}
+    assert set(dumped) == {"id", "deviceId", "language", "createdAt", "onboarded"}
     assert dumped["id"] == "507f1f77bcf86cd799439011"
 
 

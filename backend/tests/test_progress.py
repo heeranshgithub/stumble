@@ -93,33 +93,3 @@ async def test_tutor_brief_is_cached_per_week(
     second = await client.get("/tutor-brief", headers=HEADERS)
     assert second.json() == body
     assert await mock_client["stumble_test"].briefs.count_documents({}) == 1
-
-
-async def test_placement_onboards_and_catches_stumbles(
-    client: AsyncClient, mock_client: AsyncMongoMockClient
-) -> None:
-    before = (await client.get("/today", headers=HEADERS)).json()
-    assert before["onboarded"] is False
-
-    res = await client.post(
-        "/placement", data={"text": "Bonjour, je voudrais un coffee, thanks."}, headers=HEADERS
-    )
-    assert res.status_code == 200, res.text
-    body = res.json()
-    assert body["level"] == "A2"
-    assert body["cardsAdded"] == 2
-    assert {s["target"] for s in body["stumbles"]} == {"café", "merci"}
-    assert body["note"]
-
-    after = (await client.get("/today", headers=HEADERS)).json()
-    assert after["onboarded"] is True
-    assert after["deck"]["caught"] == 2
-    profile = await mock_client["stumble_test"].profiles.find_one({})
-    assert profile is not None
-    assert profile["level"] == "A2"
-
-
-async def test_placement_empty_is_400(client: AsyncClient) -> None:
-    res = await client.post("/placement", data={"text": " "}, headers=HEADERS)
-    assert res.status_code == 400
-    assert res.json()["error"]["code"] == "empty_placement"

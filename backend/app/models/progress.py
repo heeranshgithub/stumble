@@ -4,7 +4,7 @@ from typing import Literal
 from pydantic import Field
 
 from app.models.base import ApiModel
-from app.models.session import StumbleDto, StumbleType
+from app.models.session import StumbleType
 
 WordState = Literal["on", "off", "miss"]
 
@@ -71,11 +71,3 @@ class TutorBriefDto(ApiModel):
     strengths: list[str] = Field(default_factory=list)
     suggested_session: list[str] = Field(default_factory=list)
     as_text: str
-
-
-class PlacementDto(ApiModel):
-    level: Literal["A1", "A2", "B1"]
-    heard: str
-    note: str
-    stumbles: list[StumbleDto] = Field(default_factory=list)
-    cards_added: int

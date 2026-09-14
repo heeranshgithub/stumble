@@ -8,4 +8,3 @@ class ProfileDto(MongoModel):
     language: str
     created_at: datetime
     onboarded: bool = False
-    level: str | None = None

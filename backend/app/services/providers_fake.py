@@ -67,13 +67,6 @@ class FakeChat:
         system = next((m.content for m in messages if m.role == "system"), "")
         if system.startswith("WEEK IN REVIEW"):
             return dict(_FAKE_BRIEF)
-        if system.startswith("PLACEMENT"):
-            heard = next((m.content for m in reversed(messages) if m.role == "user"), "")
-            return {
-                "level": "A2",
-                "note": "You kept going, which is the whole game. Let's find the gaps.",
-                "stumbles": _code_switches(heard),
-            }
         learner_turns = [m for m in messages if m.role == "user"]
         # The pause annotation is metadata for the model, never part of the learner's sentence.
         last = learner_turns[-1].content.split("\n\n[", 1)[0] if learner_turns else ""
