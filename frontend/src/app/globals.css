@@ -100,9 +100,10 @@ body {
 }
 
 /*
- * The one authored motion. Words fill in like lyrics as a turn lands (staggered per word), and the
- * answer sheet rises from the bottom of a review card. Exponential ease-out from a visible default;
- * nothing else in the app animates on its own.
+ * The one authored motion. Words fill in like lyrics as a turn lands (staggered per word), the
+ * answer sheet rises from the bottom of a review card, and the thinking line lands the same way each
+ * time it changes. Exponential ease-out from a visible default; nothing else in the app animates on
+ * its own.
  */
 @keyframes lyr-word-in {
   from {

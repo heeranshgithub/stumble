@@ -8,6 +8,7 @@ import type { PointerEvent } from "react";
 import { Chip } from "@/components/stumble/Chip";
 import { LyricLine, type LyricWord } from "@/components/stumble/LyricLine";
 import { PillButton } from "@/components/stumble/PillButton";
+import { ThinkingLine } from "@/components/stumble/ThinkingLine";
 import { useHoldToTalk, type Capture } from "@/hooks/useHoldToTalk";
 import { useSpeaker } from "@/hooks/useSpeaker";
 import { getErrorMessage } from "@/lib/errors";
@@ -293,7 +294,7 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
             </div>
           </div>
         ) : null}
-        {phase === "thinking" ? <p className="text-xs font-bold text-ink-2">{name} is thinking…</p> : null}
+        {phase === "thinking" ? <ThinkingLine name={name} sceneId={sceneId} /> : null}
         {phase === "done" ? (
           <section className="-mx-5 mt-2 bg-ink px-5 py-5 text-paper">
             <p className="text-2xl font-extrabold tracking-tight">Scene cleared.</p>
