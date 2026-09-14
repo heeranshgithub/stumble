@@ -128,7 +128,7 @@ def _clean_context(context: str) -> str:
     return context.split("\n\n[", 1)[0].strip()
 
 
-def _parse_stumbles(raw: Any) -> list[Document]:
+def _parse_stumbles(raw: Any, confidence_min: float) -> list[Document]:
     out: list[Document] = []
     for item in raw if isinstance(raw, list) else []:
         try:
@@ -136,8 +136,12 @@ def _parse_stumbles(raw: Any) -> list[Document]:
         except ValidationError:
             log.warning("stumble_dropped", item=item)
             continue
-        if s.target.strip():
-            out.append(s.model_copy(update={"context": _clean_context(s.context)}).model_dump())
+        if not s.target.strip():
+            continue
+        if s.confidence < confidence_min:
+            log.info("stumble_below_floor", target=s.target, confidence=s.confidence)
+            continue
+        out.append(s.model_copy(update={"context": _clean_context(s.context)}).model_dump())
     return out
 
 
@@ -197,7 +201,7 @@ async def take_turn(
     progress = float(result.get("goal_progress", session["goal_progress"]) or 0.0)
     progress = max(session["goal_progress"], min(1.0, progress))
     done = bool(result.get("done", False)) or progress >= 1.0
-    learner["stumbles"] = _parse_stumbles(result.get("stumbles"))
+    learner["stumbles"] = _parse_stumbles(result.get("stumbles"), settings.stumble_confidence_min)
     learner["wins"] = _parse_wins(result.get("wins"), said)
     learner["goal_progress"] = progress
 

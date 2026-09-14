@@ -35,6 +35,9 @@ class Settings(BaseSettings):
 
     # A silence this long while the mic is held is a freeze.
     freeze_threshold_ms: int = 3000
+    # A stumble the model reports below this confidence never becomes a card. The model hedges
+    # rather than omits: a phantom "miss" on a terse but correct turn comes in around 0.5.
+    stumble_confidence_min: float = 0.7
     # A card counts as due this many hours early, so "tomorrow" means the next session, not 24h.
     due_window_hours: int = 8
 
