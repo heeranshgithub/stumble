@@ -54,20 +54,28 @@ async def finish(
             relapsed += int(not is_new)
             stumbles.append(DebriefStumbleDto(**s, card_id=str(card["_id"]), is_new=is_new))
 
+    # One row per card too: "un café" and "café" both land on the café card, and a card stumbled on
+    # in this scene isn't also a win in it. The stumble is the news.
     wins: list[WinDto] = []
     seen_wins: set[str] = set()
+    won_cards: set[str] = {s.card_id for s in stumbles}
     for turn in session["turns"]:
         for w in turn.get("wins", []):
             key = target_key(w["phrase"])
             if not key or key in seen or key in seen_wins:
                 continue
             seen_wins.add(key)
-            won = await cards.apply_win(db, profile_id, session, w["phrase"])
+            match = await cards.match_win(db, profile_id, w["phrase"])
+            if match is not None:
+                if str(match["_id"]) in won_cards:
+                    continue
+                won_cards.add(str(match["_id"]))
+                await cards.apply_win(db, session, match)
             slug = quote(w["phrase"], safe="")
             wins.append(
                 WinDto(
                     phrase=w["phrase"],
-                    card_id=str(won["_id"]) if won else None,
+                    card_id=str(match["_id"]) if match else None,
                     audio_url=tts.phrase_url(f"/sessions/{session['_id']}/wins/{slug}/audio"),
                 )
             )

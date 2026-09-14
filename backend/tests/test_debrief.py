@@ -79,3 +79,51 @@ async def test_finish_requires_ownership(client: AsyncClient) -> None:
     sid = await _start(client)
     res = await client.post(f"/sessions/{sid}/finish", headers={"X-Device-Id": "other"})
     assert res.status_code == 404
+
+
+async def test_wins_on_one_card_are_one_row_and_never_a_stumbled_card(
+    client: AsyncClient, mock_client: AsyncMongoMockClient
+) -> None:
+    # A card for "s'il vous plaît" from an earlier scene.
+    first = await _start(client)
+    await _say(client, first, "Un café, please.")
+    await client.post(f"/sessions/{first}/finish", headers=HEADERS)
+
+    # This scene: two phrasings that both land on that card by substring, plus a fresh stumble on
+    # "café" and a "clean" production of it in the same scene.
+    second = await _start(client)
+    await _say(client, second, "Un coffee.")
+    db = mock_client["stumble_test"]
+    from bson import ObjectId
+
+    await db.sessions.update_one(
+        {"_id": ObjectId(second)},
+        {
+            "$push": {
+                "turns": {
+                    "$each": [
+                        {
+                            "role": "learner",
+                            "text": "S'il vous plaît.",
+                            "stumbles": [],
+                            "wins": [{"phrase": "S'il vous plaît"}, {"phrase": "un café"}],
+                        },
+                        {
+                            "role": "learner",
+                            "text": "Merci, s'il vous plaît.",
+                            "stumbles": [],
+                            "wins": [{"phrase": "s'il vous plaît, merci"}],
+                        },
+                    ]
+                }
+            }
+        },
+    )
+    res = await client.post(f"/sessions/{second}/finish", headers=HEADERS)
+    assert res.status_code == 200, res.text
+    d = res.json()
+    assert [w["phrase"] for w in d["wins"]] == ["S'il vous plaît"]
+    stumbled = {s["cardId"] for s in d["stumbles"]}
+    assert d["wins"][0]["cardId"] not in stumbled
+    ids = [s["cardId"] for s in d["stumbles"]] + [w["cardId"] for w in d["wins"]]
+    assert len(ids) == len(set(ids))

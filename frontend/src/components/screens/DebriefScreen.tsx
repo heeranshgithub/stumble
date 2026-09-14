@@ -83,7 +83,7 @@ export function DebriefScreen({ sceneId, sessionId }: { sceneId: string; session
               <StumbleRow key={s.cardId} s={s} onHear={() => hear(s.audioUrl ?? `/reviews/${s.cardId}/audio`)} />
             ))}
             {d.wins.map((win) => (
-              <li key={win.cardId ?? win.phrase} className="flex items-center gap-3 py-3">
+              <li key={`win-${win.phrase}`} className="flex items-center gap-3 py-3">
                 <span className="grid size-9 flex-none place-items-center rounded-xl bg-pharmacie text-ink">
                   <Check className="size-4" strokeWidth={2.5} />
                 </span>

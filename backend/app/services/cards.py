@@ -87,15 +87,13 @@ async def upsert_from_stumble(
     return doc, True
 
 
-async def apply_win(
-    db: Database, profile_id: ObjectId, session: Document, phrase: str
-) -> Document | None:
-    """A clean production of a known target counts as a Good review. Returns the card, if any."""
+async def match_win(db: Database, profile_id: ObjectId, phrase: str) -> Document | None:
+    """The card a clean phrase counts for, by substring either way: "un café" lands on "café"."""
     key = target_key(phrase)
     if not key:
         return None
     cards: list[Document] = await db.cards.find({"profile_id": profile_id}).to_list(length=500)
-    match = next(
+    return next(
         (
             c
             for c in cards
@@ -103,8 +101,10 @@ async def apply_win(
         ),
         None,
     )
-    if match is None:
-        return None
+
+
+async def apply_win(db: Database, session: Document, match: Document) -> Document | None:
+    """A clean production of a known target counts as a Good review. Returns the refreshed card."""
     now = _now()
     sessions = list(match.get("produced_sessions", []))
     if session["_id"] not in sessions:
