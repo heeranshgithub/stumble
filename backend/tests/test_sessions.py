@@ -219,7 +219,7 @@ def test_the_beat_only_moves_forward_and_the_prompt_names_it() -> None:
     cafe = get_scene("cafe")
     assert cafe is not None
     prompt = system_prompt(cafe, "normal", [], beat=2)
-    assert "CURRENT BEAT: 2: serve the coffee" in prompt
+    assert "CURRENT BEAT: 2: say the total and ask how they pay" in prompt
 
 
 def test_a_reply_that_trails_off_is_not_a_question() -> None:
