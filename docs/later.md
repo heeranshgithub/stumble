@@ -1,8 +1,13 @@
 # Later
 
-Things decided against for the hackathon, on purpose, with the reasoning so they can be picked up cold.
+Things decided against for the hackathon, on purpose, in the order they should be taken on. The first one is the foundation: the others all change the prompt or the model, and without it there is no way to know a change didn't break something.
 
-## An eval harness for the turn prompt
+1. **An eval harness for the turn prompt** — every reply-quality bug so far was found by hand and fixed blind.
+2. **Faster turns** — the wait is the one thing a learner feels on every turn; swapping the model is one env var, and unsafe without 1.
+3. **Speaking time on the debrief** — the only time figure that is about the learner; the data is already returned, just not stored.
+4. **Style is not an error** — parked until it is actually seen.
+
+## 1. An eval harness for the turn prompt
 
 The 60-odd tests run against fake providers and prove the plumbing: a stumble becomes a card, FSRS reschedules, a win is credited to the turn that contains it. None of them see what the model actually says. Every reply-quality bug so far (the barista asking the learner the price, the same question asked three times in different words, a greeting on every turn) was found by playing a scene and fixed by editing the prompt, with no way to know the next edit doesn't undo it.
 
@@ -15,14 +20,14 @@ The shape:
 
 What exists today instead: a confidence floor (`stumble_confidence_min`) so a stumble the model hedges on never becomes a card, and the scene beats and facts, which remove the reason the character improvises rather than forbidding the result.
 
-## Speaking time on the debrief
+## 2. Faster turns
+
+A turn is three sequential calls (Whisper, the chat model, ElevenLabs first byte) and lands around 2.5–5 s. The thinking line makes the wait legible; it doesn't shorten it. In order of payoff: a faster chat model (one env var, and exactly where the evals earn their keep), then streaming the reply into TTS sentence by sentence, which means the reply can no longer be one JSON blob.
+
+## 3. Speaking time on the debrief
 
 The debrief used to show the scene's wall-clock length. Dropped: most of a scene's minutes are the character's (her line, the think gap, the learner reading), so the number said nothing about the learner. The number that would is how long the learner actually spoke. Whisper returns the audio duration on every turn (`Transcript.duration_s`); it isn't stored. Store it on the learner turn, sum it, and the debrief can say "you spoke for 1:12", a figure that should grow scene over scene. Typed turns count as zero, which is right.
 
-## Style is not an error
+## 4. Style is not an error
 
 "Je veux un café" is correct French. In the *real* register the model may log it as a correction to *je voudrais*. That's politeness, not grammar, and it becomes a card. Not seen yet, so no rule for it; when it shows up, the fix is one line in `_RULES` and one eval case.
-
-## Faster turns
-
-A turn is three sequential calls (Whisper, the chat model, ElevenLabs first byte) and lands around 2.5–5 s. The thinking line makes the wait legible; it doesn't shorten it. In order of payoff: a faster chat model (one env var, and exactly where the evals earn their keep), then streaming the reply into TTS sentence by sentence, which means the reply can no longer be one JSON blob.
