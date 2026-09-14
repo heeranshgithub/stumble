@@ -246,12 +246,3 @@ async def test_a_scene_ends_at_the_turn_cap_whatever_the_model_says(
     third = await client.post(f"/sessions/{sid}/turns", data={"text": "Encore ?"}, headers=HEADERS)
     assert third.status_code == 400
     assert third.json()["error"]["code"] == "session_finished"
-
-
-async def test_starting_the_first_scene_is_the_onboarding(client: AsyncClient) -> None:
-    before = (await client.get("/today", headers=HEADERS)).json()
-    assert before["onboarded"] is False
-    res = await client.post("/sessions", json={"sceneId": "cafe"}, headers=HEADERS)
-    assert res.status_code == 200, res.text
-    after = (await client.get("/today", headers=HEADERS)).json()
-    assert after["onboarded"] is True

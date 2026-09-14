@@ -37,10 +37,6 @@ async def start_session(
     window = timedelta(hours=settings.due_window_hours)
     due = [c["target"] for c in await cards.due_cards(db, profile["_id"], window, limit=5)]
     doc = await sessions.start(db, profile, scene, body.patience, due_cards=due)
-    # Starting the first scene is the onboarding. There is no placement: the café catches the first
-    # stumbles in a sentence, with the character scaffolding, which "say anything" never did.
-    if not profile.get("onboarded"):
-        await db.profiles.update_one({"_id": profile["_id"]}, {"$set": {"onboarded": True}})
     return sessions.to_dto(doc)
 
 

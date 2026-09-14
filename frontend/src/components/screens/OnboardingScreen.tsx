@@ -7,6 +7,7 @@ import { Blob } from "@/components/stumble/Blob";
 import { Chip } from "@/components/stumble/Chip";
 import { LyricLine, type LyricWord } from "@/components/stumble/LyricLine";
 import { PillButton } from "@/components/stumble/PillButton";
+import { useMarkOnboardedMutation } from "@/store/endpoints/today";
 
 /**
  * The headline's claim, shown instead of asserted: one café line, the word that got reached for in
@@ -41,6 +42,13 @@ function LoopPreview() {
 /** The first screen on a new device: the claim, shown as one caught sentence, and the café. */
 export function OnboardingScreen() {
   const router = useRouter();
+  const [markOnboarded, { isLoading }] = useMarkOnboardedMutation();
+  const begin = () => {
+    // Marked before leaving, or the Today tab would send you back here until a scene was played.
+    void markOnboarded()
+      .unwrap()
+      .finally(() => router.replace("/scenes"));
+  };
   return (
     <div className="flex flex-1 flex-col" data-scene="cafe">
       <Blob color="scene" className="flex flex-1 flex-col pt-14 pb-6">
@@ -63,13 +71,12 @@ export function OnboardingScreen() {
         </div>
       </Blob>
       <div className="px-5 pb-8 pt-4">
-        {/* One button. There is no placement step: the café catches the first stumbles in a real
-            sentence, with Léa scaffolding, which "say anything you know" never did. Starting it is
-            what marks the profile onboarded, so there is no "look around first" either: Today
-            would only send you back here. */}
-        <PillButton onClick={() => router.replace("/scene/cafe")}>
+        {/* One button, to the scene list. There is no placement step: the café catches the first
+            stumbles in a real sentence, with Léa scaffolding, which "say anything you know" never
+            did. */}
+        <PillButton onClick={begin} disabled={isLoading}>
           <Mic className="size-5" strokeWidth={2.25} />
-          Start Café
+          Pick a scene
         </PillButton>
       </div>
     </div>

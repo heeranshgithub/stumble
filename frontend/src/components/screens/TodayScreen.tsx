@@ -31,7 +31,7 @@ export function TodayScreen() {
   const router = useRouter();
   const needsOnboarding = !!data && !data.onboarded;
 
-  // First open on this device: the intro, then the café. Starting it is what marks the profile onboarded.
+  // First open on this device: the intro, then the scene list. Leaving the intro marks the profile onboarded.
   useEffect(() => {
     if (needsOnboarding) router.replace("/onboarding");
   }, [needsOnboarding, router]);

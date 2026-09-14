@@ -29,3 +29,13 @@ async def test_profile_is_idempotent(client: AsyncClient) -> None:
     assert first.json()["id"] == second.json()["id"]
     assert set(first.json()) == {"id", "deviceId", "language", "createdAt", "onboarded"}
     assert first.json()["onboarded"] is False
+
+
+async def test_leaving_the_intro_marks_the_profile_onboarded(client: AsyncClient) -> None:
+    before = (await client.get("/today", headers={"X-Device-Id": DEVICE})).json()
+    assert before["onboarded"] is False
+    res = await client.post("/profiles/onboarded", headers={"X-Device-Id": DEVICE})
+    assert res.status_code == 200, res.text
+    assert res.json()["onboarded"] is True
+    after = (await client.get("/today", headers={"X-Device-Id": DEVICE})).json()
+    assert after["onboarded"] is True
