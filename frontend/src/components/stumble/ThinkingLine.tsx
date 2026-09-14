@@ -74,13 +74,15 @@ export function ThinkingLine({ name, sceneId }: { name: string; sceneId: string 
   return (
     <p className="text-xs font-bold text-ink-2" role="status" aria-live="polite">
       {words.map((w, i) => (
-        <span key={`${tick}-${i}`} className="lyr-word-in" style={{ animationDelay: `${i * 55}ms` }}>
-          {w}
-          {i < words.length - 1 ? " " : ""}
+        <span key={`${tick}-${i}`}>
+          {/* the space sits outside the animated span: inline-block swallows it inside */}
+          <span className="lyr-word-in" style={{ animationDelay: `${i * 55}ms` }}>
+            {w}
+          </span>{" "}
         </span>
       ))}
       <span key={`${tick}-en`} className="lyr-word-in opacity-60" style={{ animationDelay: `${words.length * 55}ms` }}>
-        {" "}· {beat.en}
+        · {beat.en}
       </span>
     </p>
   );
