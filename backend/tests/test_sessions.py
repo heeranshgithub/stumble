@@ -200,3 +200,20 @@ def test_a_stumble_below_the_confidence_floor_never_becomes_a_card() -> None:
     # the model hedged a phantom "miss" on a terse but correct turn
     raw = [stumble("Oui, c'est tout", 0.5), stumble("café au lait", 0.9)]
     assert [s["target"] for s in _parse_stumbles(raw, 0.7)] == ["café au lait"]
+
+
+def test_the_beat_only_moves_forward_and_the_prompt_names_it() -> None:
+    from app.scenes.data import get_scene
+    from app.services.prompts import system_prompt
+    from app.services.sessions import _next_beat
+
+    assert _next_beat(2, 3, 5) == 3
+    # the model drifted back to the order after it was confirmed
+    assert _next_beat(2, 1, 5) == 2
+    assert _next_beat(2, 9, 5) == 4
+    assert _next_beat(2, None, 5) == 2
+
+    cafe = get_scene("cafe")
+    assert cafe is not None
+    prompt = system_prompt(cafe, "normal", [], beat=2)
+    assert "CURRENT BEAT: 2: serve the coffee" in prompt

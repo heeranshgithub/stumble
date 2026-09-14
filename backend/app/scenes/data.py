@@ -16,6 +16,9 @@ class Scene(BaseModel):
     opening_line: str
     opening_line_en: str
     vocab: list[str]
+    # The scene's stages, in order. The character is told which one it is on, so it moves the
+    # scene forward instead of re-asking a question the learner already answered.
+    beats: list[str]
     order: int
 
 
@@ -31,6 +34,13 @@ SCENES: list[Scene] = [
         opening_line="Bonjour ! Qu'est-ce que je vous sers ?",
         opening_line_en="Hello! What can I get you?",
         vocab=["café", "au lait", "combien", "s'il vous plaît", "l'addition"],
+        beats=[
+            "take the order",
+            "confirm it and ask if that's all",
+            "serve the coffee and stop, so the learner asks the price; then say it",
+            "take payment",
+            "say goodbye",
+        ],
         order=1,
     ),
     Scene(
@@ -44,6 +54,13 @@ SCENES: list[Scene] = [
         opening_line="Bonjour, je peux vous aider ?",
         opening_line_en="Hello, can I help you?",
         vocab=["mal à la tête", "ordonnance", "sirop", "comprimé", "combien de fois"],
+        beats=[
+            "hear the symptom",
+            "ask since when, and whether they have a prescription",
+            "offer a syrup or tablets",
+            "let the learner ask how often to take it; then say it",
+            "say goodbye",
+        ],
         order=2,
     ),
     Scene(
@@ -59,6 +76,13 @@ SCENES: list[Scene] = [
             "Come in, come in. So, this is the living room. Have you been looking for long?"
         ),
         vocab=["loyer", "appart", "mois", "charges", "je peux"],
+        beats=[
+            "show the flat and ask about their search",
+            "let the learner ask the rent; then give it, with the charges",
+            "let the learner ask the move-in date; then give it",
+            "ask whether they want to apply",
+            "say goodbye",
+        ],
         order=3,
     ),
     Scene(
@@ -72,6 +96,13 @@ SCENES: list[Scene] = [
         opening_line="Service client, bonjour. C'est à quel sujet ?",
         opening_line_en="Customer service, hello. What is it about?",
         vocab=["facture", "prélèvement", "rembourser", "je ne comprends pas"],
+        beats=[
+            "hear what the call is about",
+            "ask which line of the bill",
+            "explain the charge; the learner pushes back",
+            "agree to refund it",
+            "say goodbye",
+        ],
         order=4,
     ),
     Scene(
@@ -85,6 +116,13 @@ SCENES: list[Scene] = [
         opening_line="Bonjour, asseyez-vous. Qu'est-ce qui vous amène ?",
         opening_line_en="Hello, have a seat. What brings you in?",
         vocab=["depuis", "douleur", "fièvre", "ça fait mal"],
+        beats=[
+            "hear the symptom",
+            "ask since when and where it hurts",
+            "ask about fever",
+            "give advice",
+            "say goodbye",
+        ],
         order=5,
     ),
     Scene(
@@ -98,6 +136,13 @@ SCENES: list[Scene] = [
         opening_line="Merci d'être venu. Pour commencer, parlez-moi un peu de vous.",
         opening_line_en="Thanks for coming. To start, tell me a little about yourself.",
         vocab=["expérience", "j'ai travaillé", "pourquoi", "disponible"],
+        beats=[
+            "hear them talk about themselves",
+            "ask about their experience",
+            "ask why this job",
+            "ask when they are available",
+            "say goodbye",
+        ],
         order=6,
     ),
 ]

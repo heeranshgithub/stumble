@@ -23,6 +23,9 @@ _RULES = """RULES
   answer with a real price. To draw out "l'addition", let them ask for it. Only when the
   learner is stuck should you fold the word into your own line, as a statement, not a
   question ("Ça fait 4 euros 50.").
+- The scene moves through the BEATS in order. Once the learner has answered the current
+  beat's question, that beat is done, however short the answer: never re-ask it in other
+  words. Your reply starts the next beat. Report the beat your reply is on in "beat".
 - You already greeted the learner in your first line. Never greet again, even if they say
   "bonjour" back: answer what they said. Don't repeat yourself; each reply moves the scene on.
 - If the learner makes an error, RECAST it naturally inside your reply (repeat the corrected
@@ -58,15 +61,16 @@ EXAMPLES (learner turn → stumbles)
 
 Respond with ONLY a JSON object:
 {"reply": "...", "reply_en": "English translation of reply", "goal_progress": 0.0,
- "done": false,
+ "beat": 0, "done": false,
  "stumbles": [{"type": "code_switch", "said": "coffee", "target": "café",
    "context": "Je voudrais un ___ au lait.", "prompt_line": "Qu'est-ce que je vous sers ?",
    "context_en": "I'd like a café au lait.", "confidence": 0.97}],
  "wins": [{"phrase": "s'il vous plaît"}]}"""
 
 
-def system_prompt(scene: Scene, patience: str, due_cards: list[str]) -> str:
+def system_prompt(scene: Scene, patience: str, due_cards: list[str], beat: int = 0) -> str:
     due = ", ".join(due_cards) if due_cards else "none"
+    beats = "; ".join(f"{i}: {b}" for i, b in enumerate(scene.beats))
     head = (
         f"You are {scene.character_name}, a {scene.character_role} in Paris, in a role-play "
         "with an English-speaking learner of French. Stay in character. Speak only French "
@@ -75,6 +79,8 @@ def system_prompt(scene: Scene, patience: str, due_cards: list[str]) -> str:
         "Steer the conversation so the learner must produce these words: "
         f"{', '.join(scene.vocab)}.\n"
         f"Words the learner is due to review; create natural openings for them: {due}.\n"
+        f"BEATS, in order: {beats}.\n"
+        f"CURRENT BEAT: {beat}: {scene.beats[beat]}.\n"
         f"REGISTER: {_PATIENCE.get(patience, _PATIENCE['normal'])}\n\n"
     )
     return head + _RULES

@@ -56,6 +56,7 @@ async def start(
         "patience": patience,
         "status": "active",
         "goal_progress": 0.0,
+        "beat": 0,
         "due_cards": due_cards or [],
         "turns": [opening],
         "created_at": _now(),
@@ -107,7 +108,12 @@ def _without_regreeting(text: str, greeting: re.Pattern[str]) -> str:
 
 
 def _messages(session: Document, scene: Scene, settings: Settings) -> list[ChatMessage]:
-    msgs = [ChatMessage("system", system_prompt(scene, session["patience"], session["due_cards"]))]
+    msgs = [
+        ChatMessage(
+            "system",
+            system_prompt(scene, session["patience"], session["due_cards"], session.get("beat", 0)),
+        )
+    ]
     for t in session["turns"]:
         if t["role"] == "character":
             msgs.append(ChatMessage("assistant", t["text"]))
@@ -121,6 +127,15 @@ def _messages(session: Document, scene: Scene, settings: Settings) -> list[ChatM
                 )
             )
     return msgs
+
+
+def _next_beat(current: int, raw: Any, count: int) -> int:
+    """The beat only ever moves forward; the model sometimes drifts back to one already played."""
+    try:
+        wanted = int(raw)
+    except (TypeError, ValueError):
+        wanted = current
+    return max(current, min(count - 1, wanted))
 
 
 def _clean_context(context: str) -> str:
@@ -200,7 +215,9 @@ async def take_turn(
     result = await providers.chat.complete_json(_messages(session, scene, settings))
     progress = float(result.get("goal_progress", session["goal_progress"]) or 0.0)
     progress = max(session["goal_progress"], min(1.0, progress))
-    done = bool(result.get("done", False)) or progress >= 1.0
+    beat = _next_beat(session.get("beat", 0), result.get("beat"), len(scene.beats))
+    # The last beat is the goodbye: saying it ends the scene, whatever the model reports.
+    done = bool(result.get("done", False)) or progress >= 1.0 or beat == len(scene.beats) - 1
     learner["stumbles"] = _parse_stumbles(result.get("stumbles"), settings.stumble_confidence_min)
     learner["wins"] = _parse_wins(result.get("wins"), said)
     learner["goal_progress"] = progress
@@ -215,6 +232,7 @@ async def take_turn(
     )
     session["turns"].append(reply)
     session["goal_progress"] = progress
+    session["beat"] = beat
     if done:
         session["status"] = "finished"
         session["finished_at"] = _now()
@@ -225,6 +243,7 @@ async def take_turn(
             "$set": {
                 "turns": session["turns"],
                 "goal_progress": progress,
+                "beat": beat,
                 "status": session["status"],
                 "finished_at": session["finished_at"],
             }
@@ -236,6 +255,7 @@ async def take_turn(
         said=said[:80],
         stumbles=len(learner["stumbles"]),
         progress=progress,
+        beat=beat,
         done=done,
     )
     return session
