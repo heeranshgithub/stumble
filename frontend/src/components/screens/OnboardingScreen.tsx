@@ -1,6 +1,5 @@
 "use client";
 
-import { Mic } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { Blob } from "@/components/stumble/Blob";
@@ -75,7 +74,6 @@ export function OnboardingScreen() {
             stumbles in a real sentence, with Léa scaffolding, which "say anything you know" never
             did. */}
         <PillButton onClick={begin} disabled={isLoading}>
-          <Mic className="size-5" strokeWidth={2.25} />
           Pick a scene
         </PillButton>
       </div>
