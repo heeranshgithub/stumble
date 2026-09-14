@@ -1,12 +1,18 @@
 // PWA icons with no dependencies: a supersampled rasterizer for the Stumble mark.
-// The mark is the product in one glyph: on a stumble-pink ground, a filled ink word-dot beside a
-// hollow one. Filled is a word you have; hollow is the one you reached for and missed.
+// The mark is one lit sphere on near-black: stumble pink at the highlight, falling to violet in
+// shadow. Nothing to decode; it just glows. (Chosen 2026-09-14 from local-docs/.local/icons.)
 import { deflateSync } from "node:zlib";
 import { mkdirSync, writeFileSync } from "node:fs";
 
-const PINK = [0xff, 0x3d, 0x7f];
-const INK = [0x1a, 0x12, 0x33];
-const PAPER = [0xff, 0xff, 0xff];
+const GROUND = [0x12, 0x0c, 0x22];
+// Radial gradient stops, offset 0..1 from the light source.
+const STOPS = [
+  [0, [0xff, 0xd3, 0xdf]],
+  [0.28, [0xff, 0x3d, 0x7f]],
+  [0.78, [0x7a, 0x1c, 0x8f]],
+  [1, [0x2a, 0x10, 0x50]],
+];
+const WHITE = [0xff, 0xff, 0xff];
 const SS = 4; // supersampling factor per axis
 
 const crcTable = new Int32Array(256).map((_, n) => {
@@ -35,17 +41,29 @@ const roundedRect = (x, y, half, r) => {
   return Math.hypot(Math.max(dx, 0), Math.max(dy, 0)) + Math.min(Math.max(dx, dy), 0) - r;
 };
 const circle = (x, y, cx, cy, r) => Math.hypot(x - cx, y - cy) - r;
+const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+const gradient = (t) => {
+  for (let i = 1; i < STOPS.length; i++) {
+    const [t0, c0] = STOPS[i - 1];
+    const [t1, c1] = STOPS[i];
+    if (t <= t1) return mix(c0, c1, (t - t0) / (t1 - t0));
+  }
+  return STOPS[STOPS.length - 1][1];
+};
 
 /** Returns the color at a unit-space point, for a maskable icon (safe zone respected). */
 function shade(x, y) {
-  // Ground: pink rounded square (full bleed so it also works as a maskable icon).
+  // Ground: near-black rounded square (full bleed so it also works as a maskable icon).
   if (roundedRect(x, y, 0.5, 0.22) > 0) return null;
-  // Filled word-dot, left.
-  if (circle(x, y, 0.36, 0.5, 0.135) <= 0) return INK;
-  // Hollow word-dot, right: a ring in paper white with an ink core so it reads at 32px too.
-  const d = circle(x, y, 0.66, 0.5, 0.135);
-  if (d <= 0 && d > -0.05) return PAPER;
-  return PINK;
+  // The sphere, lit from upper left.
+  if (circle(x, y, 0.5, 0.52, 0.33) > 0) return GROUND;
+  let c = gradient(Math.min(1, Math.hypot(x - 0.394, y - 0.375) / 0.528));
+  // A soft specular: an ellipse tilted 30°, white at 45%.
+  const a = (-30 * Math.PI) / 180;
+  const px = x - 0.38, py = y - 0.36;
+  const ex = px * Math.cos(a) - py * Math.sin(a), ey = px * Math.sin(a) + py * Math.cos(a);
+  if ((ex / 0.1) ** 2 + (ey / 0.06) ** 2 <= 1) c = mix(c, WHITE, 0.45);
+  return c;
 }
 
 function png(size) {
@@ -87,8 +105,31 @@ function png(size) {
   ]);
 }
 
+// An .ico is a 6-byte header, one 16-byte directory entry per image, then the images; PNG-encoded
+// entries are valid since Vista and are what every browser reads.
+function ico(sizes) {
+  const pngs = sizes.map(png);
+  const header = Buffer.alloc(6);
+  header.writeUInt16LE(1, 2); // type: icon
+  header.writeUInt16LE(sizes.length, 4);
+  let offset = 6 + 16 * sizes.length;
+  const dir = sizes.map((size, i) => {
+    const e = Buffer.alloc(16);
+    e[0] = size === 256 ? 0 : size;
+    e[1] = size === 256 ? 0 : size;
+    e.writeUInt16LE(1, 4); // color planes
+    e.writeUInt16LE(32, 6); // bits per pixel
+    e.writeUInt32LE(pngs[i].length, 8);
+    e.writeUInt32LE(offset, 12);
+    offset += pngs[i].length;
+    return e;
+  });
+  return Buffer.concat([header, ...dir, ...pngs]);
+}
+
 mkdirSync("public/icons", { recursive: true });
 for (const size of [192, 512]) {
   writeFileSync(`public/icons/icon-${size}.png`, png(size));
 }
-console.log("wrote public/icons/icon-192.png and icon-512.png");
+writeFileSync("src/app/favicon.ico", ico([16, 32, 48]));
+console.log("wrote public/icons/icon-192.png, icon-512.png and src/app/favicon.ico");

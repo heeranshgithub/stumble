@@ -53,6 +53,30 @@ function latestCharacterLine(session: SessionDto): TurnDto | undefined {
 }
 
 /** `resumeId` is the `?session=` from the URL: an earlier session of this scene to pick back up. */
+/** The card under the last line. A clean scene is the win, and the copy says so instead of "0 caught". */
+function Cleared({ turns, href }: { turns: TurnDto[]; href: string }) {
+  const caught = turns.reduce((n, t) => n + t.stumbles.length, 0);
+  const wins = turns.reduce((n, t) => n + t.wins.length, 0);
+  const clean = caught === 0;
+  return (
+    <section className="-mx-5 mt-2 bg-ink px-5 py-5 text-paper">
+      <p className="text-2xl font-extrabold tracking-tight">{clean ? "Not one stumble." : "Scene cleared."}</p>
+      <p className="mt-1 text-sm text-paper-2">
+        {clean
+          ? wins > 0
+            ? `Every word landed, ${wins === 1 ? "1 clean win" : `${wins} clean wins`}. Nothing new for the deck.`
+            : "Every word landed. Nothing new for the deck."
+          : caught === 1
+            ? "1 stumble caught. See what it was and when you'll meet it again."
+            : `${caught} stumbles caught. See what they were and when you'll meet them again.`}
+      </p>
+      <PillButton href={href} variant="paper" className="mt-4">
+        {clean ? "See the debrief" : "See what got caught"}
+      </PillButton>
+    </section>
+  );
+}
+
 export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: string | null }) {
   const [startSession, startState] = useStartSessionMutation();
   const [getSession] = useLazyGetSessionQuery();
@@ -296,18 +320,7 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
           </div>
         ) : null}
         {phase === "thinking" ? <ThinkingLine name={name} sceneId={sceneId} /> : null}
-        {phase === "done" ? (
-          <section className="-mx-5 mt-2 bg-ink px-5 py-5 text-paper">
-            <p className="text-2xl font-extrabold tracking-tight">Scene cleared.</p>
-            <p className="mt-1 text-sm text-paper-2">
-              {session?.turns.reduce((n, t) => n + t.stumbles.length, 0) ?? 0} stumbles caught. See what they
-              were and when you&apos;ll meet them again.
-            </p>
-            <PillButton href={debriefHref} variant="paper" className="mt-4">
-              See what got caught
-            </PillButton>
-          </section>
-        ) : null}
+        {phase === "done" ? <Cleared turns={session?.turns ?? []} href={debriefHref} /> : null}
       </div>
 
       {phase !== "done" ? (
