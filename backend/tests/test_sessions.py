@@ -217,3 +217,12 @@ def test_the_beat_only_moves_forward_and_the_prompt_names_it() -> None:
     assert cafe is not None
     prompt = system_prompt(cafe, "normal", [], beat=2)
     assert "CURRENT BEAT: 2: serve the coffee" in prompt
+
+
+def test_a_reply_that_trails_off_is_not_a_question() -> None:
+    from app.services.sessions import _trails_off
+
+    assert _trails_off("Voilà votre café au lait. Ça vous fera…")
+    assert _trails_off("De rien ! Alors...")
+    assert not _trails_off("Ça fait 4 euros 50. Vous payez comment ?")
+    assert not _trails_off("Voilà votre café au lait.")

@@ -40,7 +40,8 @@ SCENES: list[Scene] = [
         beats=[
             "take the order",
             "confirm it and ask if that's all",
-            "serve the coffee; let the learner ask the price, and if they don't, state it",
+            "serve the coffee and hand it over",
+            "the price: say it, as the answer if they just asked",
             "take payment",
             "say goodbye",
         ],
@@ -65,7 +66,7 @@ SCENES: list[Scene] = [
             "hear the symptom",
             "ask since when, and whether they have a prescription",
             "offer a syrup or tablets",
-            "give the learner a chance to ask how often to take it, and if they don't, say it",
+            "how often to take it: say it, as the answer if they just asked",
             "say goodbye",
         ],
         facts=[
@@ -89,8 +90,8 @@ SCENES: list[Scene] = [
         vocab=["loyer", "appart", "mois", "charges", "je peux"],
         beats=[
             "show the flat and ask about their search",
-            "let the learner ask the rent, and if they don't, give it, with the charges",
-            "give the learner a chance to ask the move-in date, and if they don't, give it",
+            "the rent, with the charges: give it, as the answer if they just asked",
+            "the move-in date: give it, as the answer if they just asked",
             "ask whether they want to apply",
             "say goodbye",
         ],

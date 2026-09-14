@@ -79,4 +79,3 @@ async def test_finish_requires_ownership(client: AsyncClient) -> None:
     sid = await _start(client)
     res = await client.post(f"/sessions/{sid}/finish", headers={"X-Device-Id": "other"})
     assert res.status_code == 404
-

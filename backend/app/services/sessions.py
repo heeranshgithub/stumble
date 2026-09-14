@@ -107,6 +107,30 @@ def _without_regreeting(text: str, greeting: re.Pattern[str]) -> str:
     return rest[0].upper() + rest[1:]
 
 
+# A reply that stops mid-sentence ("Ça vous fera…") is the model leaving a blank for the learner
+# to fill. One more try, told so; this fires rarely and costs a second when it does.
+_TRAILS_OFF = re.compile(r"(\.\.\.|…)\s*$")
+_NUDGE = (
+    "[Your line stopped mid-sentence. Say the whole thing, with the number or the fact, "
+    "then your question. Same JSON.]"
+)
+
+
+def _trails_off(reply: str) -> bool:
+    return bool(_TRAILS_OFF.search(reply.strip())) and not reply.strip().endswith("?")
+
+
+async def _complete(providers: Providers, msgs: list[ChatMessage]) -> dict[str, Any]:
+    result = await providers.chat.complete_json(msgs)
+    reply = str(result.get("reply", ""))
+    if not _trails_off(reply):
+        return result
+    log.info("reply_trailed_off", reply=reply[:80])
+    retry = [*msgs, ChatMessage("assistant", reply), ChatMessage("user", _NUDGE)]
+    second = await providers.chat.complete_json(retry)
+    return second if str(second.get("reply", "")).strip() else result
+
+
 def _messages(session: Document, scene: Scene, settings: Settings) -> list[ChatMessage]:
     msgs = [
         ChatMessage(
@@ -212,7 +236,7 @@ async def take_turn(
     learner = _turn("learner", said, session["goal_progress"], pause_ms=pause_ms)
     session["turns"].append(learner)
 
-    result = await providers.chat.complete_json(_messages(session, scene, settings))
+    result = await _complete(providers, _messages(session, scene, settings))
     progress = float(result.get("goal_progress", session["goal_progress"]) or 0.0)
     progress = max(session["goal_progress"], min(1.0, progress))
     beat = _next_beat(session.get("beat", 0), result.get("beat"), len(scene.beats))

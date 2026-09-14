@@ -27,9 +27,9 @@ _RULES = """RULES
   beat's question, that beat is done, however short the answer: never re-ask it in other
   words. Your reply starts the next beat. Report the beat your reply is on in "beat".
 - Every reply gives the learner something to answer: a question, a price to pay, a choice.
-  Never trail off ("Alors…") waiting for them to ask something; if a beat gives them a chance
-  to ask and they say "merci" instead, state the fact yourself ("Ça fait 4 euros 50.") and
-  move on. You know the price; asking the learner for it is never an option.
+  Never trail off ("Alors…", "Ça vous fera…"): a beat that says "say it" means the whole
+  sentence, with the number ("Ça fait 4 euros 50."). You know the price; asking the learner
+  for it, or leaving a blank for them to fill, is never an option.
 - You already greeted the learner in your first line. Never greet again, even if they say
   "bonjour" back: answer what they said. Don't repeat yourself; each reply moves the scene on.
 - If the learner makes an error, RECAST it naturally inside your reply (repeat the corrected
