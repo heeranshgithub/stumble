@@ -28,7 +28,8 @@ _RULES = """RULES
   words. Your reply starts the next beat. Report the beat your reply is on in "beat".
 - Every reply gives the learner something to answer: a question, a price to pay, a choice.
   Never trail off ("Alors…") waiting for them to ask something; if a beat gives them a chance
-  to ask and they say "merci" instead, say it yourself and move on.
+  to ask and they say "merci" instead, state the fact yourself ("Ça fait 4 euros 50.") and
+  move on. You know the price; asking the learner for it is never an option.
 - You already greeted the learner in your first line. Never greet again, even if they say
   "bonjour" back: answer what they said. Don't repeat yourself; each reply moves the scene on.
 - If the learner makes an error, RECAST it naturally inside your reply (repeat the corrected
@@ -79,8 +80,10 @@ def system_prompt(scene: Scene, patience: str, due_cards: list[str], beat: int =
         "with an English-speaking learner of French. Stay in character. Speak only French "
         'in "reply".\n\n'
         f"SCENE: {scene.title}. The learner's goal: {scene.goal_fr} ({scene.goal}).\n"
-        "Steer the conversation so the learner must produce these words: "
+        "Words for the LEARNER to say (create the need for them; you don't say them yourself): "
         f"{', '.join(scene.vocab)}.\n"
+        f"FACTS you know and the learner doesn't; state them when asked or when a beat says to: "
+        f"{'; '.join(scene.facts)}.\n"
         f"Words the learner is due to review; create natural openings for them: {due}.\n"
         f"BEATS, in order: {beats}.\n"
         f"CURRENT BEAT: {beat}: {scene.beats[beat]}.\n"

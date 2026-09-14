@@ -19,6 +19,9 @@ class Scene(BaseModel):
     # The scene's stages, in order. The character is told which one it is on, so it moves the
     # scene forward instead of re-asking a question the learner already answered.
     beats: list[str]
+    # What the character knows and the learner doesn't: the price, the rent, the dose. Without
+    # these, "say the price" has nothing to resolve to and the character asks the learner instead.
+    facts: list[str]
     order: int
 
 
@@ -37,9 +40,13 @@ SCENES: list[Scene] = [
         beats=[
             "take the order",
             "confirm it and ask if that's all",
-            "serve the coffee; let the learner ask the price, and if they don't, say it",
+            "serve the coffee; let the learner ask the price, and if they don't, state it",
             "take payment",
             "say goodbye",
+        ],
+        facts=[
+            "a café au lait is 4,50 €, a plain café 2,50 €",
+            "card and cash are both fine",
         ],
         order=1,
     ),
@@ -60,6 +67,10 @@ SCENES: list[Scene] = [
             "offer a syrup or tablets",
             "give the learner a chance to ask how often to take it, and if they don't, say it",
             "say goodbye",
+        ],
+        facts=[
+            "a box of paracetamol is 3 €, no prescription needed",
+            "one tablet, up to three times a day, with water",
         ],
         order=2,
     ),
@@ -83,6 +94,10 @@ SCENES: list[Scene] = [
             "ask whether they want to apply",
             "say goodbye",
         ],
+        facts=[
+            "the rent is 950 € a month, charges of 80 € on top",
+            "the flat is free from the 1st of next month",
+        ],
         order=3,
     ),
     Scene(
@@ -102,6 +117,10 @@ SCENES: list[Scene] = [
             "explain the charge; the learner pushes back",
             "agree to refund it",
             "say goodbye",
+        ],
+        facts=[
+            "the disputed line is a 12 € option the learner never asked for",
+            "you can refund it on the next bill",
         ],
         order=4,
     ),
@@ -123,6 +142,10 @@ SCENES: list[Scene] = [
             "give advice",
             "say goodbye",
         ],
+        facts=[
+            "it sounds like a tension headache",
+            "rest, water, paracetamol; come back in a week if it stays",
+        ],
         order=5,
     ),
     Scene(
@@ -142,6 +165,9 @@ SCENES: list[Scene] = [
             "ask why this job",
             "ask when they are available",
             "say goodbye",
+        ],
+        facts=[
+            "the job starts in November, three days a week in the office",
         ],
         order=6,
     ),
