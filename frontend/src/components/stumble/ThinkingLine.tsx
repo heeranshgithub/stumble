@@ -7,12 +7,13 @@ interface Beat {
   en: string;
 }
 
-/** What the character is doing while the reply is on its way. Short French, glossed, so the wait teaches too. */
+/** What the character is doing while the reply is on its way. Short French, glossed, so the wait teaches too.
+ * Never hesitating or searching for words: that's the learner's part, and the one the app catches. */
 const SHARED: Beat[] = [
   { fr: "réfléchit", en: "is thinking" },
-  { fr: "hésite", en: "hesitates" },
-  { fr: "cherche ses mots", en: "is looking for the words" },
-  { fr: "prend son temps", en: "is taking their time" },
+  { fr: "sourit", en: "smiles" },
+  { fr: "hoche la tête", en: "nods" },
+  { fr: "vous regarde", en: "looks at you" },
 ];
 
 const BY_SCENE: Record<string, Beat[]> = {
