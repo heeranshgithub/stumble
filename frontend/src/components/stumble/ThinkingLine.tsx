@@ -55,13 +55,7 @@ function pick(beats: Beat[], avoid: Beat | null): Beat {
  * The wait for a reply: "Léa essuie le comptoir… · wipes the counter". A new beat every second or so,
  * never the same one twice in a row, each landing word by word like a turn.
  */
-export function ThinkingLine({
-  name,
-  sceneId,
-}: {
-  name: string;
-  sceneId: string;
-}) {
+export function ThinkingLine({ name, sceneId }: { name: string; sceneId: string }) {
   const beats = [...SHARED, ...(BY_SCENE[sceneId] ?? [])];
   const [beat, setBeat] = useState<Beat>(() => pick(beats, null));
   const [tick, setTick] = useState(0);
@@ -77,28 +71,15 @@ export function ThinkingLine({
 
   const words = `${name} ${beat.fr}…`.split(" ");
   return (
-    <p
-      className="text-xs font-bold text-ink-2"
-      role="status"
-      aria-live="polite"
-    >
+    <p className="text-xs font-bold text-ink-2" role="status" aria-live="polite">
       {words.map((w, i) => (
-        <span
-          key={`${tick}-${i}`}
-          className="lyr-word-in"
-          style={{ animationDelay: `${i * 55}ms` }}
-        >
+        <span key={`${tick}-${i}`} className="lyr-word-in" style={{ animationDelay: `${i * 55}ms` }}>
           {w}
           {i < words.length - 1 ? " " : ""}
         </span>
       ))}
-      <span
-        key={`${tick}-en`}
-        className="lyr-word-in opacity-60"
-        style={{ animationDelay: `${words.length * 55}ms` }}
-      >
-        {" "}
-        · {beat.en}
+      <span key={`${tick}-en`} className="lyr-word-in opacity-60" style={{ animationDelay: `${words.length * 55}ms` }}>
+        {" "}· {beat.en}
       </span>
     </p>
   );

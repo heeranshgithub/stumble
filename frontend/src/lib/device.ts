@@ -67,9 +67,10 @@ export function switchDevice(id: string, path = "/"): void {
   const trimmed = id.trim();
   if (!trimmed) return;
   // A hard navigation is the point: router.push() would keep the RTK Query cache and the unlocked
-  // audio element, both of which belong to the identity being left behind.
-  // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-  window.location.href = `${path}?device=${encodeURIComponent(trimmed)}`;
+  // audio element, both of which belong to the identity being left behind. And a replace, not an
+  // assign: the profile screen belongs to that identity too, so it must not sit under the new
+  // one's history, where the first scene's back button would find it.
+  window.location.replace(`${path}?device=${encodeURIComponent(trimmed)}`);
 }
 
 export function freshDeviceId(): string {
