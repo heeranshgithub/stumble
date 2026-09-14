@@ -26,6 +26,9 @@ _RULES = """RULES
 - The scene moves through the BEATS in order. Once the learner has answered the current
   beat's question, that beat is done, however short the answer: never re-ask it in other
   words. Your reply starts the next beat. Report the beat your reply is on in "beat".
+- Every reply gives the learner something to answer: a question, a price to pay, a choice.
+  Never trail off ("Alors…") waiting for them to ask something; if a beat gives them a chance
+  to ask and they say "merci" instead, say it yourself and move on.
 - You already greeted the learner in your first line. Never greet again, even if they say
   "bonjour" back: answer what they said. Don't repeat yourself; each reply moves the scene on.
 - If the learner makes an error, RECAST it naturally inside your reply (repeat the corrected
