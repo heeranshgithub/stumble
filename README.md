@@ -103,5 +103,3 @@ frontend/   Next.js app
 backend/    FastAPI app, tests, scripts
 dev.sh      backend + tunnels + frontend, one command
 ```
-
-Built in a week for the hackathon, pairing with Claude Code.
