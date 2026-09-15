@@ -300,7 +300,7 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
               onToggleTranslation={() => setShownTranslation((cur) => (cur === t.id ? null : t.id))}
               onReplay={() => void speaker.play(t.audioUrl)}
               onSay={(audioUrl) => void speaker.play(audioUrl)}
-              speaking={phase === "speaking"}
+              speaking={phase === "speaking" || speaker.speaking}
             />
           ))
         ) : (
@@ -409,7 +409,7 @@ function TurnView({
   onReplay: () => void;
   /** Speak a target phrase: tapping a stumble chip is how the learner hears what they should have said. */
   onSay: (audioUrl: string | null) => void;
-  /** The character is mid-line: everything that speaks is off, like the mic, so nothing talks over her. */
+  /** Audio is playing (her line, a replay, a chip): everything that speaks is off, so nothing talks over it. */
   speaking: boolean;
 }) {
   if (turn.role === "character") {
