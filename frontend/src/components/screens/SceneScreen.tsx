@@ -300,6 +300,7 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
               onToggleTranslation={() => setShownTranslation((cur) => (cur === t.id ? null : t.id))}
               onReplay={() => void speaker.play(t.audioUrl)}
               onSay={(audioUrl) => void speaker.play(audioUrl)}
+              speaking={phase === "speaking"}
             />
           ))
         ) : (
@@ -396,6 +397,7 @@ function TurnView({
   onToggleTranslation,
   onReplay,
   onSay,
+  speaking,
 }: {
   turn: TurnDto;
   name: string;
@@ -407,6 +409,8 @@ function TurnView({
   onReplay: () => void;
   /** Speak a target phrase: tapping a stumble chip is how the learner hears what they should have said. */
   onSay: (audioUrl: string | null) => void;
+  /** The character is mid-line: everything that speaks is off, like the mic, so nothing talks over her. */
+  speaking: boolean;
 }) {
   if (turn.role === "character") {
     return (
@@ -420,7 +424,8 @@ function TurnView({
           type="button"
           data-speaks
           onClick={onReplay}
-          className="mt-1 text-[11px] font-extrabold text-ink-2 underline-offset-2 hover:underline"
+          disabled={speaking}
+          className="mt-1 text-[11px] font-extrabold text-ink-2 underline-offset-2 hover:underline disabled:opacity-50"
         >
           replay{turn.textEn ? " · tap line to translate" : ""}
         </button>
@@ -438,7 +443,15 @@ function TurnView({
       {turn.stumbles.length > 0 || turn.wins.length > 0 ? (
         <div className="mt-2 flex flex-wrap gap-2">
           {others.map((s, i) => (
-            <button key={i} type="button" data-speaks onClick={() => onSay(s.audioUrl)} aria-label={`Hear ${s.target}`}>
+            <button
+              key={i}
+              type="button"
+              data-speaks
+              onClick={() => onSay(s.audioUrl)}
+              disabled={speaking}
+              className="disabled:opacity-50"
+              aria-label={`Hear ${s.target}`}
+            >
               <Chip tone="ink">
                 <Volume2 className="size-3" strokeWidth={2.5} />
                 caught · {s.said} → {s.target}
@@ -446,7 +459,14 @@ function TurnView({
             </button>
           ))}
           {freeze ? (
-            <button type="button" data-speaks onClick={() => onSay(freeze.audioUrl)} aria-label={`Hear ${freeze.target}`}>
+            <button
+              type="button"
+              data-speaks
+              onClick={() => onSay(freeze.audioUrl)}
+              disabled={speaking}
+              className="disabled:opacity-50"
+              aria-label={`Hear ${freeze.target}`}
+            >
               <Chip tone="stumble">
                 <Volume2 className="size-3" strokeWidth={2.5} />
                 you froze · {(turn.pauseMs / 1000).toFixed(0)}s → {freeze.target}
