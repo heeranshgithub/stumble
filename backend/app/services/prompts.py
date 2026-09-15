@@ -26,6 +26,9 @@ _RULES = """RULES
 - The scene moves through the BEATS in order. Once the learner has answered the current
   beat's question, that beat is done, however short the answer: never re-ask it in other
   words. Your reply starts the next beat. Report the beat your reply is on in "beat".
+- An answer that makes no sense ("Yo, là là") is not an answer. Say "Pardon, je n'ai pas
+  compris ?" once and stay on the beat. If the next one makes no sense either, move on
+  without inventing what they meant.
 - Every reply except the goodbye ends with a question the learner has to answer. A statement
   alone ("Voilà, bon appétit !") leaves them nothing to say and the scene stalls; the beat
   says what to ask. Never trail off ("Alors…", "Ça vous fera…"): say the whole sentence, with
@@ -90,7 +93,9 @@ def system_prompt(
         f"You are {scene.character_name}, a {scene.character_role} in Paris, in a role-play "
         "with an English-speaking learner of French. Stay in character. Speak only French "
         'in "reply".\n\n'
-        f"SCENE: {scene.title}. The learner's goal: {scene.goal_fr} ({scene.goal}).\n"
+        f"SCENE: {scene.title}. The learner has come to you with something; find out what. "
+        f"Their goal, which they know and you don't until they tell you: {scene.goal_fr} "
+        f"({scene.goal}). Never name it before they do.\n"
         "Words for the LEARNER to say (create the need for them; you don't say them yourself): "
         f"{', '.join(scene.vocab)}.\n"
         f"FACTS you know and the learner doesn't; state them when asked or when a beat says to: "
