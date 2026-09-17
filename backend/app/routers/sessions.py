@@ -81,6 +81,10 @@ async def take_turn(
         text=text,
         pause_ms=max(0, client_pause_ms),
     )
+    # The voice starts synthesizing as the words go out, so the two land on the phone together.
+    reply = updated["turns"][-1]
+    if reply["role"] == "character":
+        tts.prewarm(request.app, f"{session_id}:{reply['id']}", reply["text"])
     return sessions.to_dto(updated)
 
 

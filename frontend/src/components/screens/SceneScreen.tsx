@@ -22,6 +22,9 @@ type Phase = "starting" | "idle" | "recording" | "thinking" | "speaking" | "done
 
 const isDev = process.env.NODE_ENV !== "production";
 
+/** How long the words wait for the voice before showing anyway. */
+const REVEAL_CAP_MS = 1500;
+
 function strip(w: string) {
   return w.toLowerCase().replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, "");
 }
@@ -149,12 +152,24 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
       t0Ref.current = performance.now();
       try {
         const updated = await sendTurn({ id: sessionId, form }).unwrap();
-        setSession(updated);
         const reply = updated.turns[updated.turns.length - 1];
         if (reply && reply.role === "character") {
-          setPhase("speaking");
-          const { startedAt } = await speaker.play(reply.audioUrl);
+          // The words land when the voice does, not a second before: the thinking line stays up
+          // until sound starts. Capped, so a slow or blocked stream never holds the text hostage.
+          let shown = false;
+          const show = () => {
+            if (shown) return;
+            shown = true;
+            setSession(updated);
+            setPhase("speaking");
+          };
+          const cap = window.setTimeout(show, REVEAL_CAP_MS);
+          const { startedAt } = await speaker.play(reply.audioUrl, show);
+          window.clearTimeout(cap);
+          show();
           if (startedAt !== null) setLatencyMs(Math.round(startedAt - t0Ref.current));
+        } else {
+          setSession(updated);
         }
         setPhase(updated.done ? "done" : "idle");
       } catch (e) {

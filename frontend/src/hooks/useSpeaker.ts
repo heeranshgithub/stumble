@@ -16,32 +16,53 @@ export interface Played {
 }
 
 /**
- * One audio element for the character's voice. There is no fallback voice on purpose: when the
- * stream fails the line is still on screen, `error` says so, and nothing pretends otherwise.
+ * One audio element for the whole app, not one per screen. iOS lets an element play without a
+ * gesture only after a gesture has played it once, and Next navigates without reloading, so the
+ * tap that opens a scene (a row on the Scenes list, a tab, any tap) can be that gesture: the
+ * scene then speaks on its own. Only a hard load straight into a scene still needs "tap to hear".
+ */
+let shared: HTMLAudioElement | null = null;
+let unlocked = false;
+
+function getAudio(): HTMLAudioElement {
+  if (shared) return shared;
+  const a = new Audio();
+  a.preload = "auto";
+  a.setAttribute("playsinline", "true");
+  shared = a;
+  return a;
+}
+
+/** Call from inside a user gesture. Idempotent; never interrupts a line that is already playing. */
+export function unlockAudio(): void {
+  if (unlocked) return;
+  const a = getAudio();
+  if (!a.paused) {
+    unlocked = true;
+    return;
+  }
+  a.src = SILENT_WAV;
+  void a
+    .play()
+    .then(() => {
+      unlocked = true;
+    })
+    .catch(() => undefined);
+}
+
+/**
+ * The character's voice. There is no fallback voice on purpose: when the stream fails the line is
+ * still on screen, `error` says so, and nothing pretends otherwise.
  */
 export function useSpeaker() {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const playSeqRef = useRef(0);
   const [speaking, setSpeaking] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getAudio = useCallback(() => {
-    if (audioRef.current) return audioRef.current;
-    const a = new Audio();
-    a.preload = "auto";
-    a.setAttribute("playsinline", "true");
-    audioRef.current = a;
-    return a;
-  }, []);
-
-  const unlock = useCallback(() => {
-    const a = getAudio();
-    a.src = SILENT_WAV;
-    void a.play().catch(() => undefined);
-  }, [getAudio]);
+  const unlock = useCallback(() => unlockAudio(), []);
 
   const play = useCallback(
-    (audioUrl: string | null): Promise<Played> => {
+    (audioUrl: string | null, onStart?: () => void): Promise<Played> => {
       if (!audioUrl) return Promise.resolve({ startedAt: null });
       // A newer play() (or stop()) supersedes this one: the element's pending play() promise then
       // rejects with AbortError. That is not the stream failing and is not an error.
@@ -70,6 +91,7 @@ export function useSpeaker() {
           startedAt = performance.now();
           setError(null);
           setSpeaking(true);
+          onStart?.();
         };
         a.onended = done;
         // A 503 from the API, or a cut stream, both land here.
@@ -89,12 +111,13 @@ export function useSpeaker() {
         });
       });
     },
-    [getAudio],
+    [],
   );
 
   const stop = useCallback(() => {
-    const a = audioRef.current;
+    const a = shared;
     if (a) {
+      ++playSeqRef.current;
       a.pause();
       a.currentTime = 0;
     }

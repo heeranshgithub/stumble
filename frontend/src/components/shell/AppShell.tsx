@@ -1,3 +1,4 @@
+import { AudioUnlock } from "@/components/shell/AudioUnlock";
 import { QrCode } from "@/components/shell/QrCode";
 import { SampleBanner } from "@/components/shell/SampleBanner";
 import { TabBar } from "@/components/stumble/TabBar";
@@ -15,6 +16,7 @@ import { TabBar } from "@/components/stumble/TabBar";
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="h-dvh bg-paper md:flex md:items-center md:justify-center md:gap-20 md:bg-ink md:px-10 md:py-8">
+      <AudioUnlock />
       <aside className="hidden text-paper md:block md:w-[320px]">
         <p className="text-[44px] font-black leading-none tracking-[-0.03em]">
           Stumble<span className="text-stumble">.</span>

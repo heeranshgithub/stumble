@@ -246,3 +246,21 @@ async def test_a_scene_ends_at_the_turn_cap_whatever_the_model_says(
     third = await client.post(f"/sessions/{sid}/turns", data={"text": "Encore ?"}, headers=HEADERS)
     assert third.status_code == 400
     assert third.json()["error"]["code"] == "session_finished"
+
+
+async def test_the_reply_voice_is_synthesized_before_it_is_fetched(client: AsyncClient) -> None:
+    import asyncio
+
+    res = await client.post("/sessions", json={"sceneId": "cafe"}, headers=HEADERS)
+    sid = res.json()["id"]
+    turn = await client.post(f"/sessions/{sid}/turns", data={"text": "Un café."}, headers=HEADERS)
+    reply = turn.json()["turns"][-1]
+    app = client._transport.app  # type: ignore[attr-defined]
+    key = f"{sid}:{reply['id']}@1"
+    pending = app.state.audio_inflight.get(key)
+    if pending is not None:
+        await pending
+    await asyncio.sleep(0)
+    assert app.state.audio_cache.get(key) is not None
+    audio = await client.get(reply["audioUrl"])
+    assert audio.status_code == 200 and audio.headers["content-type"].startswith("audio/")
