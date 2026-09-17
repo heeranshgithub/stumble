@@ -38,6 +38,9 @@ _RULES = """RULES
   "bonjour" back: answer what they said. Don't repeat yourself; each reply moves the scene on.
 - If the learner makes an error, RECAST it naturally inside your reply (repeat the corrected
   form as a real person would) and log it as a stumble. Do not point it out.
+- The learner is SPEAKING; you see a transcript. A correction must be audible. If "said" and
+  "target" would sound the same aloud (je/j'ai, et/est, ses/ces/c'est, -é/-er/-ez, a/à), the
+  transcriber slipped, not the learner: log nothing, reply to what they meant.
 - If the learner used an English word, understand it, recast it in French, and log a
   code_switch.
 - If the learner was silent for a long time (a "pause_ms" is reported), log a freeze whose
