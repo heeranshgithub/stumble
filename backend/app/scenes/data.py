@@ -1,5 +1,7 @@
 """The six scenes. Code, not data: they change with a commit, not a migration."""
 
+from datetime import datetime
+
 from pydantic import BaseModel
 
 from app.models.scene import SceneDto, SceneStatus
@@ -179,7 +181,13 @@ def get_scene(scene_id: str) -> Scene | None:
     return _BY_ID.get(scene_id)
 
 
-def to_dto(scene: Scene, status: SceneStatus, uses_due_cards: list[str] | None = None) -> SceneDto:
+def to_dto(
+    scene: Scene,
+    status: SceneStatus,
+    uses_due_cards: list[str] | None = None,
+    unlocked: bool = True,
+    unlocks_at: datetime | None = None,
+) -> SceneDto:
     return SceneDto(
         id=scene.id,
         title=scene.title,
@@ -190,4 +198,6 @@ def to_dto(scene: Scene, status: SceneStatus, uses_due_cards: list[str] | None =
         order=scene.order,
         status=status,
         uses_due_cards=uses_due_cards or [],
+        unlocked=unlocked,
+        unlocks_at=unlocks_at,
     )

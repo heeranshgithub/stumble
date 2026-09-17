@@ -125,11 +125,12 @@ export function ProfileScreen() {
         <p className="text-xs font-bold text-ink/65">For testing</p>
         <PillButton variant="paper" className="mt-2 border border-ink/15" onClick={() => void dueNow()} disabled={dueNowState.isLoading}>
           <FastForward className="size-5" strokeWidth={2.25} />
-          {dueNowState.data ? `${dueNowState.data.cards} made due · again` : "Make all my cards due now"}
+          {dueNowState.data ? `${dueNowState.data.cards} made due · again` : "Skip to tomorrow"}
         </PillButton>
         <p className="mt-2 text-[11px] font-bold text-ink/65">
-          A new card is due tomorrow on purpose, so the review can&apos;t be tried the same day. This
-          pulls every unmastered card forward to now; nothing else about it changes.
+          A new card is due tomorrow on purpose, and the next scene opens a sitting after the last, so
+          neither can be tried the same day. This pulls every unmastered card forward to now and counts
+          the last scene as a sitting ago; nothing else changes.
         </p>
       </Blob>
 

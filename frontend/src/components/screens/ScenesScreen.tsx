@@ -8,6 +8,7 @@ import { Chip } from "@/components/stumble/Chip";
 import { PillButton } from "@/components/stumble/PillButton";
 import { getErrorMessage } from "@/lib/errors";
 import { setPatience, usePatience } from "@/lib/patience";
+import { whenOpens } from "@/lib/when";
 import { useGetScenesQuery } from "@/store/endpoints/scenes";
 import type { Patience, SceneDto } from "@/types/api";
 
@@ -78,6 +79,9 @@ export function ScenesScreen() {
 function SceneRow({ scene }: { scene: SceneDto }) {
   const isNext = scene.status === "next";
   const cleared = scene.status === "cleared";
+  // Next but shut: a review is due, or the last scene was cleared under a session ago.
+  const shut = isNext && !scene.unlocked;
+  const shutLabel = scene.unlocksAt ? `opens ${whenOpens(scene.unlocksAt)}` : "after review";
   const inner = (
     <div className={`flex items-center gap-3 px-5 py-4 ${isNext ? "" : "border-b border-ink/10"} ${scene.status === "locked" ? "opacity-45" : ""}`}>
       <span
@@ -97,10 +101,15 @@ function SceneRow({ scene }: { scene: SceneDto }) {
               : scene.goal}
         </p>
       </div>
-      {isNext ? <Chip tone="stumble">next</Chip> : null}
+      {isNext ? (
+        <Chip tone={shut ? "ink" : "stumble"}>
+          {shut ? <Lock className="size-3" strokeWidth={2.5} /> : null}
+          {shut ? shutLabel : "next"}
+        </Chip>
+      ) : null}
     </div>
   );
-  if (scene.status === "locked") return <li>{inner}</li>;
+  if (scene.status === "locked" || shut) return <li>{inner}</li>;
   return (
     <li>
       <Link href={`/scene/${scene.id}`} data-scene={scene.color} className={isNext ? "block bg-scene" : "block"}>

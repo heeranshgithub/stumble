@@ -40,6 +40,8 @@ def test_scene_dto_keys() -> None:
         "order",
         "status",
         "usesDueCards",
+        "unlocked",
+        "unlocksAt",
     }
 
 
@@ -57,6 +59,7 @@ def test_today_dto_keys() -> None:
         "onboarded",
         "reviewDue",
         "sceneUnlocked",
+        "sceneUnlocksAt",
         "nextScene",
         "deck",
     }

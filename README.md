@@ -12,7 +12,7 @@ Built for the [Nerdy AI Hackathon](https://hackathon.nerdy.com/), Prompt 02 (lan
 2. **Scene** (3–4 min): a voice conversation with a goal. The character has been told your due words.
 3. **Stumble capture**: freezes, code-switches, corrections and misses are detected on every turn and never interrupt you. The character just recasts.
 4. **Debrief** (60 s): goal reached or not, what got caught, one win, cards added.
-5. **Escalate**: the next scene unlocks. Clean production of a due word in a scene counts as a review; mastery is clean production in two scenes.
+5. **Escalate**: the next scene unlocks in your next sitting (at least eight hours on), and only once nothing is due. One new scene a sitting; the scenes climb on purpose, and clearing all six in an hour would defeat that. Cleared scenes replay anytime. Clean production of a due word in a scene counts as a review; mastery is clean production in two scenes.
 
 Once a week the app writes a one-page **brief for a human tutor**: the patterns in your stumbles, your strengths, and a suggested 30-minute session built from your own error list.
 

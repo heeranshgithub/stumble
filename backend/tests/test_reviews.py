@@ -1,5 +1,6 @@
 from datetime import UTC, datetime, timedelta
 
+from bson import ObjectId
 from httpx import AsyncClient
 from mongomock_motor import AsyncMongoMockClient
 
@@ -141,13 +142,58 @@ async def test_scenes_track_and_due_words(
     assert scenes[0]["status"] == "cleared"
     assert scenes[1]["status"] == "next"
     assert scenes[1]["usesDueCards"] == ["café"]
+    # A review is due, so the next scene is next but shut, on the list and at the door.
+    assert scenes[1]["unlocked"] is False
+    locked = await client.post("/sessions", json={"sceneId": "pharmacie"}, headers=HEADERS)
+    assert locked.status_code == 400
+    assert locked.json()["error"]["code"] == "scene_locked"
 
-    # The next session is told about the due card.
-    started = await client.post("/sessions", json={"sceneId": "pharmacie"}, headers=HEADERS)
-    doc = await mock_client["stumble_test"].sessions.find_one({"scene_id": "pharmacie"})
+    # A cleared scene replays anytime, and the character is told about the due card.
+    started = await client.post("/sessions", json={"sceneId": "cafe"}, headers=HEADERS)
     assert started.status_code == 200
+    doc = await mock_client["stumble_test"].sessions.find_one(
+        {"_id": ObjectId(started.json()["id"])}
+    )
     assert doc is not None
     assert doc["due_cards"] == ["café"]
+
+
+async def _clear_cafe(client: AsyncClient) -> None:
+    sid = (await client.post("/sessions", json={"sceneId": "cafe"}, headers=HEADERS)).json()["id"]
+    for text in ("Un café.", "Oui.", "Merci."):
+        await client.post(f"/sessions/{sid}/turns", data={"text": text}, headers=HEADERS)
+    await client.post(f"/sessions/{sid}/finish", headers=HEADERS)
+
+
+async def test_one_new_scene_per_session(
+    client: AsyncClient, mock_client: AsyncMongoMockClient
+) -> None:
+    await _clear_cafe(client)
+    # Nothing caught, nothing due: the only thing shut is the session gate.
+    today = (await client.get("/today", headers=HEADERS)).json()
+    assert today["reviewDue"] == 0
+    assert today["sceneUnlocked"] is False
+    assert today["sceneUnlocksAt"] is not None
+    assert today["nextScene"]["id"] == "pharmacie"
+    locked = await client.post("/sessions", json={"sceneId": "pharmacie"}, headers=HEADERS)
+    assert locked.json()["error"]["code"] == "scene_locked"
+
+    # A session later, it opens.
+    await mock_client["stumble_test"].sessions.update_many(
+        {}, {"$set": {"finished_at": datetime.now(UTC) - timedelta(hours=9)}}
+    )
+    today = (await client.get("/today", headers=HEADERS)).json()
+    assert today["sceneUnlocked"] is True
+    assert today["sceneUnlocksAt"] is None
+    started = await client.post("/sessions", json={"sceneId": "pharmacie"}, headers=HEADERS)
+    assert started.status_code == 200
+
+
+async def test_due_now_skips_to_tomorrow(client: AsyncClient) -> None:
+    await _clear_cafe(client)
+    assert (await client.get("/today", headers=HEADERS)).json()["sceneUnlocked"] is False
+    await client.post("/reviews/due-now", headers=HEADERS)
+    assert (await client.get("/today", headers=HEADERS)).json()["sceneUnlocked"] is True
 
 
 async def test_due_now_pulls_tomorrows_cards_into_todays_review(client: AsyncClient) -> None:

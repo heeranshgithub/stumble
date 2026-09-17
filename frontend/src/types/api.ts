@@ -17,6 +17,9 @@ export interface SceneDto {
   order: number;
   status: SceneStatus;
   usesDueCards: string[];
+  /** The next scene can be next and still shut: a review is due, or the last scene is under a session old. */
+  unlocked: boolean;
+  unlocksAt: string | null;
 }
 
 export interface DeckStatsDto {
@@ -35,6 +38,8 @@ export interface TodayDto {
   onboarded: boolean;
   reviewDue: number;
   sceneUnlocked: boolean;
+  /** When the one-scene-per-session gate opens, if that is what's shut. */
+  sceneUnlocksAt: string | null;
   nextScene: SceneDto | null;
   deck: TodayDeckDto;
 }

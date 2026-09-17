@@ -7,7 +7,7 @@ from fastapi.responses import Response
 from app.deps import DbDep, ProfileDep, SettingsDep
 from app.errors import BadRequest
 from app.models.review import AttemptDto, DueNowDto, GradeRequest, GradeResultDto, ReviewListDto
-from app.services import cards, reviews, tts
+from app.services import cards, reviews, track, tts
 from app.services.registry import Providers
 
 router = APIRouter()
@@ -23,13 +23,15 @@ async def due_reviews(db: DbDep, profile: ProfileDep, settings: SettingsDep) -> 
 
 # Declared before /reviews/{card_id}: a literal segment must win over the id parameter.
 @router.post("/reviews/due-now", response_model=DueNowDto)
-async def due_now(db: DbDep, profile: ProfileDep) -> DueNowDto:
+async def due_now(db: DbDep, profile: ProfileDep, settings: SettingsDep) -> DueNowDto:
     """A testing lever, not a learner feature: pull every unmastered card's due date to now.
 
     A new card is due tomorrow on purpose (the next session, not the same hour), which makes the
     review screen untestable within a day of playing. This is the explicit way around that,
     reachable from the profile utility screen only. Nothing else about the card changes.
     """
+    # "Skip to tomorrow": every card due, and the last scene a session old, so the track opens.
+    await track.skip_to_tomorrow(db, profile, timedelta(hours=settings.due_window_hours))
     return DueNowDto(cards=await cards.make_due_now(db, profile["_id"]))
 
 

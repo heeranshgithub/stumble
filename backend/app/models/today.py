@@ -20,7 +20,10 @@ class TodayDto(ApiModel):
     day_number: int
     onboarded: bool
     review_due: int
-    # Review comes first: the scene unlocks once nothing is due, so reviewed words get produced.
+    # Review comes first, and one new scene per session: the scene unlocks once nothing is due and
+    # the last cleared scene is a session old.
     scene_unlocked: bool
+    # When the session gate opens, if that is what's shut; None otherwise.
+    scene_unlocks_at: datetime | None = None
     next_scene: SceneDto | None
     deck: TodayDeckDto

@@ -5,6 +5,16 @@
  */
 export const DUE_WINDOW_MS = 8 * 3_600_000;
 
+/** When the next scene opens: the session gate is hours, never "now", so no due-window collapse. */
+export function whenOpens(at: string | number | Date, now = Date.now()): string {
+  const d = new Date(at);
+  const today = new Date(now);
+  if (d.toDateString() === today.toDateString()) return d.getHours() >= 17 ? "tonight" : "later today";
+  const tomorrow = new Date(now + 86_400_000);
+  if (d.toDateString() === tomorrow.toDateString()) return "tomorrow";
+  return `in ${Math.round((d.getTime() - now) / 86_400_000)} days`;
+}
+
 export function whenDue(due: string | number | Date, now = Date.now()): string {
   const t = new Date(due).getTime();
   const ms = t - now;

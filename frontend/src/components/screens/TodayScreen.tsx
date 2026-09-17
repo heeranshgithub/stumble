@@ -10,7 +10,7 @@ import { Chip } from "@/components/stumble/Chip";
 import { PillButton } from "@/components/stumble/PillButton";
 import { SampleLink } from "@/components/stumble/SampleLink";
 import { getErrorMessage } from "@/lib/errors";
-import { whenDue } from "@/lib/when";
+import { whenDue, whenOpens } from "@/lib/when";
 import { lastTodayColor, rememberTodayColor, type TodayColor } from "@/lib/lastScene";
 import { useGetTodayQuery } from "@/store/endpoints/today";
 import type { TodayDeckDto } from "@/types/api";
@@ -64,6 +64,9 @@ export function TodayScreen() {
 
   const scene = data.nextScene;
   const hasReview = data.reviewDue > 0;
+  // Nothing due, a next scene, and still shut: the last scene was cleared under a session ago.
+  const waiting = !hasReview && !!scene && !data.sceneUnlocked && !!data.sceneUnlocksAt;
+  const opens = data.sceneUnlocksAt ? whenOpens(data.sceneUnlocksAt) : "tomorrow";
   const sceneColor = scene?.color ?? "cafe";
   const sceneHref = `/scene/${scene?.id ?? "cafe"}`;
   const reviewLabel = data.reviewDue === 1 ? "1 stumble." : `${data.reviewDue} stumbles.`;
@@ -84,6 +87,12 @@ export function TodayScreen() {
               <br />
               {reviewLabel}
             </>
+          ) : waiting ? (
+            <>
+              Done for
+              <br />
+              this sitting.
+            </>
           ) : scene ? (
             <>
               Nothing to review.
@@ -101,16 +110,24 @@ export function TodayScreen() {
         <p className="mt-2 text-xs font-bold text-ink-2">
           {hasReview
             ? `Clear these and ${scene?.title ?? "the next scene"} unlocks.`
-            : scene
-              ? data.deck.caught === 0
-                ? "Your first stumbles will come from the scene."
-                : "Nothing due. The next scene is open."
-              : "Replay any scene from the Scenes tab."}
+            : waiting
+              ? `One new scene a sitting; ${scene?.title ?? "the next"} opens ${opens}. Replay any scene until then.`
+              : scene
+                ? data.deck.caught === 0
+                  ? "Your first stumbles will come from the scene."
+                  : "Nothing due. The next scene is open."
+                : "Replay any scene from the Scenes tab."}
         </p>
-        <PillButton href={hasReview ? "/review" : sceneHref} className="mt-4">
+        <PillButton href={hasReview ? "/review" : waiting ? "/scenes" : sceneHref} className="mt-4">
           <Mic className="size-5" strokeWidth={2.25} />
-          {hasReview ? "Start review" : `Start ${scene?.title ?? "a scene"}`}
+          {hasReview ? "Start review" : waiting ? "Replay a scene" : `Start ${scene?.title ?? "a scene"}`}
         </PillButton>
+        {waiting ? (
+          <p className="mt-3 text-xs font-bold text-ink-2">
+            {/* The judge's path: a first day never shows the review, the intervals or the payoff. */}
+            Or see the whole loop on a profile a week in. <SampleLink />
+          </p>
+        ) : null}
       </Blob>
 
       {scene ? (
@@ -121,6 +138,7 @@ export function TodayScreen() {
           color={scene.color}
           uses={uses}
           unlocked={data.sceneUnlocked}
+          lockLabel={hasReview ? "after review" : opens}
           href={sceneHref}
           label={hasReview ? "Then" : "Next"}
         />
@@ -162,6 +180,7 @@ function NextSceneBlob({
   color,
   uses,
   unlocked,
+  lockLabel,
   href,
   label,
 }: {
@@ -171,6 +190,7 @@ function NextSceneBlob({
   color: "cafe" | "pharmacie" | "apartment" | "bill" | "doctor" | "interview";
   uses: string[];
   unlocked: boolean;
+  lockLabel: string;
   href: string;
   label: string;
 }) {
@@ -183,7 +203,7 @@ function NextSceneBlob({
         {unlocked ? null : (
           <Chip tone="ink">
             <Lock className="size-3" strokeWidth={2.5} />
-            after review
+            {lockLabel}
           </Chip>
         )}
       </div>
