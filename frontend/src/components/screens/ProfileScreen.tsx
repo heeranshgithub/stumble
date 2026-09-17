@@ -31,11 +31,11 @@ export function ProfileScreen() {
   const [copied, setCopied] = useState(false);
   const [dueNow, dueNowState] = useDueNowMutation();
 
-  const link = typeof window === "undefined" ? "" : `${window.location.origin}/?device=${device}`;
-
+  // The id, not a link: a link is welded to one origin, and copying is for carrying the profile to
+  // another one (today's tunnel, the deployed site) by pasting the id into "Switch to" there.
   const copy = async () => {
     try {
-      await navigator.clipboard.writeText(link);
+      await navigator.clipboard.writeText(device);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1800);
     } catch {
@@ -69,7 +69,7 @@ export function ProfileScreen() {
         </div>
         <PillButton variant="paper" className="mt-3 border border-ink/15" onClick={() => void copy()}>
           {copied ? <Check className="size-5" strokeWidth={2.5} /> : <Copy className="size-5" strokeWidth={2.25} />}
-          {copied ? "Link copied" : "Copy link to this profile"}
+          {copied ? "Copied" : "Copy this profile's id"}
         </PillButton>
       </Blob>
 
