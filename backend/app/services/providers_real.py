@@ -1,5 +1,6 @@
 """Groq (speech to text), OpenRouter (chat), ElevenLabs (text to speech). All over httpx."""
 
+import asyncio
 import json
 import re
 from collections.abc import AsyncIterator
@@ -21,6 +22,39 @@ _EXT_BY_MIME = {
     "audio/wav": "wav",
     "audio/mpeg": "mp3",
 }
+
+
+# A rate limit this short is waited out once, unseen. Longer, and the learner is told to try again.
+_RETRY_WAIT_MAX_S = 5
+
+
+def _retry_after(res: httpx.Response) -> int:
+    try:
+        return max(1, int(float(res.headers.get("retry-after", "3"))))
+    except ValueError:
+        return 3
+
+
+def _error(provider: str, exc: httpx.HTTPError) -> ProviderError:
+    """The learner's message. The raw detail (URL, status) goes to the log, not the screen."""
+    log.warning("provider_http_error", provider=provider, error=str(exc))
+    if isinstance(exc, httpx.HTTPStatusError):
+        code = exc.response.status_code
+        if code == 429:
+            return ProviderError(
+                provider,
+                "Busy for a moment: a few people are speaking at once. Try again in a few seconds.",
+                status=503,
+                retry_after=_retry_after(exc.response),
+            )
+        if code in (401, 402, 403):
+            return ProviderError(provider, "The voice service isn't available right now.")
+        if code >= 500:
+            return ProviderError(provider, "The voice service is having trouble. Try again.")
+        return ProviderError(provider, "That didn't go through. Try again.")
+    if isinstance(exc, httpx.TimeoutException):
+        return ProviderError(provider, "That took too long. Try again.")
+    return ProviderError(provider, "Couldn't reach the voice service. Try again.")
 
 
 def _ext(mime: str) -> str:
@@ -67,21 +101,28 @@ class GroqTranscriber:
         if prompt:
             data["prompt"] = prompt
         try:
-            res = await self._client.post(
-                "https://api.groq.com/openai/v1/audio/transcriptions",
-                headers={"Authorization": f"Bearer {self._key}"},
-                data=data,
-                files={"file": (f"turn.{_ext(mime)}", audio, mime.split(";", 1)[0])},
-            )
+            res = await self._post(data, audio, mime)
+            if res.status_code == 429 and _retry_after(res) <= _RETRY_WAIT_MAX_S:
+                log.info("stt_rate_limited", wait_s=_retry_after(res))
+                await asyncio.sleep(_retry_after(res))
+                res = await self._post(data, audio, mime)
             res.raise_for_status()
         except httpx.HTTPError as exc:
-            raise ProviderError("groq", str(exc)) from exc
+            raise _error("groq", exc) from exc
         body = res.json()
         text = str(body.get("text", "")).strip()
         if _heard_nothing(text):
             log.info("stt_silence", heard=text)
             text = ""
         return Transcript(text=text, duration_s=body.get("duration"))
+
+    async def _post(self, data: dict[str, str], audio: bytes, mime: str) -> httpx.Response:
+        return await self._client.post(
+            "https://api.groq.com/openai/v1/audio/transcriptions",
+            headers={"Authorization": f"Bearer {self._key}"},
+            data=data,
+            files={"file": (f"turn.{_ext(mime)}", audio, mime.split(";", 1)[0])},
+        )
 
 
 _FENCE = re.compile(r"^```(?:json)?\s*|\s*```$", re.MULTILINE)
@@ -114,7 +155,7 @@ class OpenRouterChat:
                 )
                 res.raise_for_status()
             except httpx.HTTPError as exc:
-                raise ProviderError("openrouter", str(exc)) from exc
+                raise _error("openrouter", exc) from exc
             content = str(res.json()["choices"][0]["message"]["content"])
             try:
                 parsed = json.loads(_FENCE.sub("", content).strip())
@@ -163,4 +204,4 @@ class ElevenLabsSynthesizer:
                 async for chunk in res.aiter_bytes():
                     yield chunk
         except httpx.HTTPError as exc:
-            raise ProviderError("elevenlabs", str(exc)) from exc
+            raise _error("elevenlabs", exc) from exc

@@ -80,12 +80,14 @@ def register_handlers(app: FastAPI) -> None:
     @app.exception_handler(ProviderError)
     async def _provider(request: Request, exc: ProviderError) -> JSONResponse:
         log.warning("provider_error", provider=exc.provider, error=exc.message)
+        headers = {"Retry-After": str(exc.retry_after)} if exc.retry_after else None
         return JSONResponse(
-            status_code=502,
+            status_code=exc.status,
+            headers=headers,
             content=_envelope(
                 request,
-                code="provider_error",
-                message=f"{exc.provider} failed: {exc.message}",
+                code="rate_limited" if exc.status == 503 else "provider_error",
+                message=exc.message,
                 details={"provider": exc.provider},
             ),
         )

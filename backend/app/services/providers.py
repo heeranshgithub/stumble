@@ -34,9 +34,14 @@ class Synthesizer(Protocol):
 
 
 class ProviderError(Exception):
-    """A provider failed in a way the caller should turn into a 502."""
+    """A provider failed. `message` is for the learner's screen: no URLs, no status codes. A
+    rate limit is a 503 with `retry_after`, so the client knows it is a moment, not an outage."""
 
-    def __init__(self, provider: str, message: str) -> None:
+    def __init__(
+        self, provider: str, message: str, *, status: int = 502, retry_after: int | None = None
+    ) -> None:
         super().__init__(f"{provider}: {message}")
         self.provider = provider
         self.message = message
+        self.status = status
+        self.retry_after = retry_after

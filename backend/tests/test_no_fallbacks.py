@@ -76,3 +76,25 @@ def test_whisper_silence_credits_count_as_nothing() -> None:
     assert _heard_nothing("Merci d'avoir regardé.")
     assert not _heard_nothing("Merci.")
     assert not _heard_nothing("Je voudrais un café.")
+
+
+def test_provider_errors_are_for_the_screen_not_the_log() -> None:
+    import httpx
+
+    from app.services.providers_real import _error
+
+    def status(code: int, headers: dict[str, str] | None = None) -> httpx.HTTPStatusError:
+        req = httpx.Request("POST", "https://api.groq.com/openai/v1/audio/transcriptions")
+        res = httpx.Response(code, request=req, headers=headers or {})
+        return httpx.HTTPStatusError("boom", request=req, response=res)
+
+    limited = _error("groq", status(429, {"retry-after": "2"}))
+    assert limited.status == 503 and limited.retry_after == 2
+    assert "Try again" in limited.message and "groq" not in limited.message.lower()
+    assert "http" not in limited.message.lower()
+
+    down = _error("elevenlabs", status(500))
+    assert down.status == 502 and "http" not in down.message.lower()
+
+    timeout = _error("openrouter", httpx.ReadTimeout("slow"))
+    assert "too long" in timeout.message
