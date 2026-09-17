@@ -8,7 +8,7 @@ import { useEffect, useSyncExternalStore } from "react";
 import { Blob } from "@/components/stumble/Blob";
 import { Chip } from "@/components/stumble/Chip";
 import { PillButton } from "@/components/stumble/PillButton";
-import { SampleLink } from "@/components/stumble/SampleLink";
+import { SampleButton, SampleLink } from "@/components/stumble/SampleLink";
 import { getErrorMessage } from "@/lib/errors";
 import { whenDue, whenOpens } from "@/lib/when";
 import { lastTodayColor, rememberTodayColor, type TodayColor } from "@/lib/lastScene";
@@ -123,10 +123,13 @@ export function TodayScreen() {
           {hasReview ? "Start review" : waiting ? "Replay a scene" : `Start ${scene?.title ?? "a scene"}`}
         </PillButton>
         {waiting ? (
-          <p className="mt-3 text-xs font-bold text-ink-2">
+          <>
             {/* The judge's path: a first day never shows the review, the intervals or the payoff. */}
-            Or see the whole loop on a profile a week in. <SampleLink />
-          </p>
+            <SampleButton className="mt-2" />
+            <p className="mt-2 text-center text-[11px] font-bold text-ink-2">
+              A profile a week in: seven words due, the review, the payoff. Yours is one tap back.
+            </p>
+          </>
         ) : null}
       </Blob>
 

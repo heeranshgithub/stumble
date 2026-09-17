@@ -19,3 +19,20 @@ export function SampleLink({ className = "" }: { className?: string }) {
     </a>
   );
 }
+
+/**
+ * The same route as a full-width button, for the one place it has to be found: Today right after a
+ * first scene, when the review, the intervals and the payoff are all a day away and a first-time
+ * visitor (a judge) would otherwise leave. A plain anchor for the same reason as above.
+ */
+export function SampleButton({ className = "" }: { className?: string }) {
+  return (
+    <a
+      href={`/?device=${SAMPLE_DEVICE}`}
+      className={`inline-flex w-full items-center justify-center gap-2 rounded-pill border border-ink/15 bg-paper px-5 py-3.5 text-[15px] font-extrabold text-ink transition-transform duration-150 ease-out-expo active:scale-[0.98] ${className}`}
+    >
+      See a week in · sample profile
+      <ArrowRight className="size-4" strokeWidth={2.5} />
+    </a>
+  );
+}
