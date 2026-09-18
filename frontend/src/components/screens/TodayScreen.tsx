@@ -9,6 +9,7 @@ import { Blob } from "@/components/stumble/Blob";
 import { Chip } from "@/components/stumble/Chip";
 import { PillButton } from "@/components/stumble/PillButton";
 import { SampleButton, SampleLink } from "@/components/stumble/SampleLink";
+import { peekDeviceId, SAMPLE_DEVICE } from "@/lib/device";
 import { getErrorMessage } from "@/lib/errors";
 import { whenDue, whenOpens } from "@/lib/when";
 import { lastTodayColor, rememberTodayColor, type TodayColor } from "@/lib/lastScene";
@@ -16,6 +17,8 @@ import { useGetTodayQuery } from "@/store/endpoints/today";
 import type { TodayDeckDto } from "@/types/api";
 
 const weekday = new Intl.DateTimeFormat("en", { weekday: "long" });
+const noop = () => () => undefined;
+const server = () => "";
 
 /** One line about the deck: what happens to it next. */
 function deckLine(deck: TodayDeckDto): string {
@@ -29,6 +32,7 @@ function deckLine(deck: TodayDeckDto): string {
 export function TodayScreen() {
   const { data, error, isLoading, refetch } = useGetTodayQuery();
   const router = useRouter();
+  const onSample = useSyncExternalStore(noop, peekDeviceId, server) === SAMPLE_DEVICE;
   const needsOnboarding = !!data && !data.onboarded;
 
   // First open on this device: the intro, then the scene list. Leaving the intro marks the profile onboarded.
@@ -122,7 +126,7 @@ export function TodayScreen() {
           <Mic className="size-5" strokeWidth={2.25} />
           {hasReview ? "Start review" : waiting ? "Replay a scene" : `Start ${scene?.title ?? "a scene"}`}
         </PillButton>
-        {waiting ? (
+        {waiting && !onSample ? (
           <>
             {/* The judge's path: a first day never shows the review, the intervals or the payoff. */}
             <SampleButton className="mt-2" />
@@ -166,9 +170,13 @@ export function TodayScreen() {
             {/* The count, not the words: listing them here would hand over the answers to the
                 review one tap above. The deck itself is a tap away. */}
             <p className="mt-2 text-[18px] font-extrabold leading-snug">{deckLine(data.deck)}</p>
-            <Link href="/deck" className="mt-1 inline-block text-xs font-extrabold text-ink/65 underline-offset-2 hover:underline">
-              open the deck
-            </Link>
+            <div className="mt-1 flex items-center gap-4">
+              <Link href="/deck" className="text-xs font-extrabold text-ink/65 underline-offset-2 hover:underline">
+                open the deck
+              </Link>
+              {/* Always here, never a button: the one place the sample is findable in every state. */}
+              {!onSample ? <SampleLink /> : null}
+            </div>
           </>
         )}
       </Blob>

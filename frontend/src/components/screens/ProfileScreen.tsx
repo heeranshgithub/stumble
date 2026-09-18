@@ -121,6 +121,8 @@ export function ProfileScreen() {
         </div>
       </Blob>
 
+      {/* Not on the shared sample: fast-forwarding Maya would change her for the next visitor. */}
+      {device !== SAMPLE_DEVICE ? (
       <Blob color="paper" className="pt-0">
         <p className="text-xs font-bold text-ink/65">For testing</p>
         <PillButton variant="paper" className="mt-2 border border-ink/15" onClick={() => void dueNow()} disabled={dueNowState.isLoading}>
@@ -133,6 +135,7 @@ export function ProfileScreen() {
           the last scene as a sitting ago; nothing else changes.
         </p>
       </Blob>
+      ) : null}
 
       <Blob color="paper" className="mt-auto pt-0">
         <p className="text-[11px] font-bold text-ink/65">
