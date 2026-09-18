@@ -174,8 +174,9 @@ export function TodayScreen() {
               <Link href="/deck" className="text-xs font-extrabold text-ink/65 underline-offset-2 hover:underline">
                 open the deck
               </Link>
-              {/* Always here, never a button: the one place the sample is findable in every state. */}
-              {!onSample ? <SampleLink /> : null}
+              {/* The footnote route to the sample, in every state except the one where the big
+                  button above already is it. Never on the sample itself. */}
+              {!onSample && !waiting ? <SampleLink /> : null}
             </div>
           </>
         )}
