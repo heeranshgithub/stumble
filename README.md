@@ -20,7 +20,7 @@ Once a week the app writes a one-page **brief for a human tutor**: the patterns 
 
 A turn is one request: audio (or text) plus `clientPauseMs`, the longest silence the browser measured while the mic was held. The server transcribes, then makes a single LLM call that returns the character's next line, an English translation, goal progress, which beat of the scene it is on (each scene is a short list of stages; the beat only moves forward, so the character never re-asks a question the learner already answered), and a list of stumbles, each typed as `freeze`, `code_switch`, `correction` or `miss`, with what was said, the target, the learner's sentence with the slot blanked (`Je voudrais un ___ au lait.`), the prompt line it answered, and a confidence. The reply streams back as speech while the stumbles are logged.
 
-On finish, stumbles become cards keyed per learner by an accent-insensitive target, so stumbling on *café* twice is a lapse on one card, not two cards. A card is born FSRS-new, due in a day (two for a correction); its first real review carries the full interval spread. Cards are reviewed in sessions, not minutes: no learning steps, a daily cap of twelve, and a due window so "tomorrow" means the next session.
+On finish, stumbles become cards keyed per learner by an accent-insensitive target, so stumbling on *café* twice is a lapse on one card, not two cards. A card is born FSRS-new, due in a day; its first real review carries the full interval spread. Cards are reviewed in sessions, not minutes: no learning steps, a daily cap of twelve, and a due window so "tomorrow" means the next session.
 
 ## Architecture
 

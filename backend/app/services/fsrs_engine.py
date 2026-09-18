@@ -20,13 +20,14 @@ RATINGS: dict[str, Rating] = {
 }
 
 # The stumble is the card's birth, not a review: the card stays FSRS-new so its first real review
-# gets the full spread of intervals. The stumble type only decides how soon it comes back. A freeze
-# or a miss means the word wasn't there at all; a correction means it was nearly there.
+# gets the full spread of intervals. Every type comes back tomorrow: the app promises "tomorrow"
+# everywhere, the review has to land before the next scene, and a correction (a grammar slip that
+# felt right) is the one most likely to be repeated, not the one that can wait.
 INITIAL_DELAY: dict[str, timedelta] = {
     "freeze": timedelta(days=1),
     "miss": timedelta(days=1),
     "code_switch": timedelta(days=1),
-    "correction": timedelta(days=2),
+    "correction": timedelta(days=1),
 }
 
 State = dict[str, Any]

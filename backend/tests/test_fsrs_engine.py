@@ -8,7 +8,7 @@ def test_initial_state_by_stumble_type() -> None:
     freeze_state, freeze_due = fsrs_engine.initial_state("freeze", now)
     _, correction_due = fsrs_engine.initial_state("correction", now)
     assert freeze_due - now == timedelta(days=1)
-    assert correction_due - now == timedelta(days=2)
+    assert correction_due - now == timedelta(days=1)
     # Born new: the first real review is the first FSRS review.
     assert freeze_state["last_review"] is None
 
