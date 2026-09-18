@@ -65,6 +65,7 @@ function Card({
 }) {
   const [revealed, setRevealed] = useState(false);
   const [showPromptEn, setShowPromptEn] = useState(false);
+  const [showContextEn, setShowContextEn] = useState(false);
   const [attempt, setAttempt] = useState<Attempt>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [attemptCard, attemptState] = useAttemptCardMutation();
@@ -160,18 +161,27 @@ function Card({
                 ? `Not “${card.said}” — say it the French way`
                 : "Your sentence"}
         </p>
-        <p className="mt-1 text-[28px] font-extrabold leading-[1.15] tracking-[-0.02em]">
-          {before}
-          {revealed ? (
-            <span className="lyr-word-in text-ink underline decoration-ink decoration-[3px] underline-offset-[6px]">
-              {card.target}
-            </span>
-          ) : (
-            <span className="inline-block min-w-[96px] border-b-[3px] border-ink align-baseline">&nbsp;</span>
-          )}
-          {after}
-        </p>
-        {revealed && card.contextEn ? <p className="mt-1 text-sm font-bold text-ink-2">{card.contextEn}</p> : null}
+        {/* The meaning is one tap away before the reveal, as on the line above: "___ par jour ?" can be
+            several things, and guessing which is a test of the scene, not of French. The English
+            says what to produce, never how, and the grade is the learner's own either way. */}
+        <button type="button" onClick={() => setShowContextEn((v) => !v)} className="block text-left" disabled={revealed}>
+          <p className="mt-1 text-[28px] font-extrabold leading-[1.15] tracking-[-0.02em]">
+            {before}
+            {revealed ? (
+              <span className="lyr-word-in text-ink underline decoration-ink decoration-[3px] underline-offset-[6px]">
+                {card.target}
+              </span>
+            ) : (
+              <span className="inline-block min-w-[96px] border-b-[3px] border-ink align-baseline">&nbsp;</span>
+            )}
+            {after}
+          </p>
+        </button>
+        {card.contextEn && (revealed || showContextEn) ? (
+          <p className="mt-1 text-sm font-bold text-ink-2">{card.contextEn}</p>
+        ) : card.contextEn ? (
+          <p className="mt-1 text-[11px] font-extrabold text-ink-2">tap line to translate</p>
+        ) : null}
         {/* One chip at a time. Until you try, it's what went wrong in the scene; once you've spoken,
             it's what just happened — two chips read as two verdicts on the same thing. */}
         <div className="mt-3 flex flex-wrap gap-2">
