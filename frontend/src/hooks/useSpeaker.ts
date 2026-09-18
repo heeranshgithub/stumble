@@ -84,7 +84,9 @@ export function useSpeaker() {
           resolve({ startedAt });
         };
         const failed = (why: string) => {
-          if (current()) setError(`Voice unavailable (${why}). The line is still on screen.`);
+          // The mechanism goes to the console; the screen just says the words are still there.
+          console.warn(`voice: ${why}`, audioUrl);
+          if (current()) setError("The voice isn't available right now. The words stay on screen.");
           done();
         };
         a.onplaying = () => {
