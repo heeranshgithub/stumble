@@ -66,6 +66,10 @@ export function previousDeviceId(): string {
 export function switchDevice(id: string, path = "/"): void {
   const trimmed = id.trim();
   if (!trimmed) return;
+  // The id being left is remembered here, from the one the app is actually using, not re-read from
+  // storage on the next load: if that write had failed, "Back to mine" would have nowhere to go.
+  const leaving = getDeviceId();
+  if (leaving && leaving !== trimmed) writeLS(PREV_KEY, leaving);
   // A hard navigation is the point: router.push() would keep the RTK Query cache and the unlocked
   // audio element, both of which belong to the identity being left behind. And a replace, not an
   // assign: the profile screen belongs to that identity too, so it must not sit under the new
