@@ -9,7 +9,7 @@ Things decided against for the hackathon, on purpose, in the order they should b
 
 ## 1. An eval harness for the turn prompt
 
-The 60-odd tests run against fake providers and prove the plumbing: a stumble becomes a card, FSRS reschedules, a win is credited to the turn that contains it. None of them see what the model actually says. Every reply-quality bug so far (the barista asking the learner the price, the same question asked three times in different words, a greeting on every turn) was found by playing a scene and fixed by editing the prompt, with no way to know the next edit doesn't undo it.
+The backend tests run against fake providers and prove the plumbing: a stumble becomes a card, FSRS reschedules, a win is credited to the turn that contains it. None of them see what the model actually says. Every reply-quality bug so far (the barista asking the learner the price, the same question asked three times in different words, a greeting on every turn) was found by playing a scene and fixed by editing the prompt, with no way to know the next edit doesn't undo it.
 
 The shape:
 
@@ -18,11 +18,11 @@ The shape:
 - Two kinds of check. Deterministic, in Python: valid JSON, no leading greeting, the `coffee` case yields one `code_switch` with target `café`, a clean turn yields zero stumbles. Judged: a second model call with the scene, the role, the reply and one yes/no question ("does this reply ask the learner for something only the character would know?").
 - Two-sided from the start. Over-flagging is the silent failure: a phantom card takes one of the twelve daily review slots, steers the next scene toward a word the learner already has, and gets stickier on every repeat because a second flag is a lapse. So the seed set carries as many "nothing should be caught" cases as "this should be caught" ones.
 
-What exists today instead: a confidence floor (`stumble_confidence_min`) so a stumble the model hedges on never becomes a card, and the scene beats and facts, which remove the reason the character improvises rather than forbidding the result.
+What exists today instead, all deterministic: a confidence floor (`stumble_confidence_min`) and a target-length cap, so a hedged or whole-sentence stumble never becomes a card; one retry when a reply trails off mid-sentence; and the scene beats and facts, which remove the reason the character improvises rather than forbidding the result.
 
 ## 2. Faster turns
 
-A turn is three sequential calls (Whisper, the chat model, ElevenLabs first byte) and lands around 2.5–5 s. The thinking line makes the wait legible; it doesn't shorten it. In order of payoff: a faster chat model (one env var, and exactly where the evals earn their keep), then streaming the reply into TTS sentence by sentence, which means the reply can no longer be one JSON blob.
+A turn is three sequential calls (Whisper, the chat model, ElevenLabs first byte) and lands around 2.5–5 s. The thinking line makes the wait legible, and the voice now starts synthesizing as the reply goes out so the words and the sound land together; neither shortens the wait itself. In order of payoff: a faster chat model (one env var, and exactly where the evals earn their keep), then streaming the reply into TTS sentence by sentence, which means the reply can no longer be one JSON blob.
 
 ## 3. Speaking time on the debrief
 

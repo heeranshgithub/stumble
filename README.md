@@ -6,19 +6,21 @@ Stumble is a speaking-first language app. You talk your way through real scenes 
 
 Built for the [Nerdy AI Hackathon](https://hackathon.nerdy.com/), Prompt 02 (language learning). Mobile-first web app, installable as a PWA; on a wide screen it renders in a phone frame with a QR code to open it on yours.
 
+**Live:** https://main.d34wlr7dhri364.amplifyapp.com — best on a phone, with headphones. Every device gets its own profile; open it with `?device=demo-maya` for a profile a week in (the review, the intervals, the payoff). What's deliberately left for later, and why: [docs/later.md](docs/later.md).
+
 ## The loop
 
 1. **Review** (~90 s): only the cards that are due, each shown as a cloze in your own sentence. You say the word; FSRS reschedules it.
 2. **Scene** (3–4 min): a voice conversation with a goal. The character has been told your due words.
 3. **Stumble capture**: freezes, code-switches, corrections and misses are detected on every turn and never interrupt you. The character just recasts.
 4. **Debrief** (60 s): goal reached or not, what got caught, one win, cards added.
-5. **Escalate**: the next scene unlocks in your next sitting (at least eight hours on), and only once nothing is due. One new scene a sitting; the scenes climb on purpose, and clearing all six in an hour would defeat that. Cleared scenes replay anytime. Clean production of a due word in a scene counts as a review; mastery is clean production in two scenes.
+5. **Escalate**: the next scene unlocks in your next sitting (at least eight hours on), and only once nothing is due. One new scene a sitting; the scenes climb on purpose. Cleared scenes replay anytime. Clean production of a due word in a scene counts as a review; mastery is clean production in two scenes.
 
 Once a week the app writes a one-page **brief for a human tutor**: the patterns in your stumbles, your strengths, and a suggested 30-minute session built from your own error list.
 
 ## The stumble engine
 
-A turn is one request: audio (or text) plus `clientPauseMs`, the longest silence the browser measured while the mic was held. The server transcribes, then makes a single LLM call that returns the character's next line, an English translation, goal progress, which beat of the scene it is on (each scene is a short list of stages; the beat only moves forward, so the character never re-asks a question the learner already answered), and a list of stumbles, each typed as `freeze`, `code_switch`, `correction` or `miss`, with what was said, the target, the learner's sentence with the slot blanked (`Je voudrais un ___ au lait.`), the prompt line it answered, and a confidence. The reply streams back as speech while the stumbles are logged.
+A turn is one request: audio (or text) plus `clientPauseMs`, the longest silence the browser measured while the mic was held. The server transcribes, then makes a single LLM call that returns the character's next line, an English translation, goal progress, the beat of the scene it is on, and a list of stumbles, each typed as `freeze`, `code_switch`, `correction` or `miss`, with what was said, the target, the learner's sentence with the slot blanked (`Je voudrais un ___ au lait.`), the prompt line it answered, and a confidence. Each scene is a short list of beats; the beat only moves forward, so the character never re-asks a question the learner already answered, and the last beat is the goodbye that ends the scene. The voice starts synthesizing as the reply goes out, and the words wait for it, so the two land together.
 
 On finish, stumbles become cards keyed per learner by an accent-insensitive target, so stumbling on *café* twice is a lapse on one card, not two cards. A card is born FSRS-new, due in a day; its first real review carries the full interval spread. Cards are reviewed in sessions, not minutes: no learning steps, a daily cap of twelve, and a due window so "tomorrow" means the next session.
 
@@ -74,16 +76,16 @@ uv run uvicorn app.main:app --port 8000 --reload
 cd frontend
 cp .env.example .env.local      # NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 pnpm install
-pnpm dev -p 3001
+pnpm dev
 ```
 
-The backend refuses to start with a missing key. There are no silent fallbacks: if a provider is down mid-session the API answers 503 naming it, the scene shows it, and `GET /ready` says which providers the process is running on. `PROVIDERS=fake` is an explicit offline mode with canned replies, for tests and for working without keys on purpose; it is reported by `/ready` and flagged in the app.
+The backend refuses to start with a missing key. There are no silent fallbacks: if a provider fails mid-session the API answers 502 (503 with `Retry-After` for a rate limit), the scene shows a plain message, and `GET /ready` says which providers the process is running on. `PROVIDERS=fake` is an explicit offline mode with canned replies, for tests and for working without keys on purpose; it is reported by `/ready` and flagged in the app.
 
 Handy scripts, dev only:
 
 ```bash
 cd backend
-uv run python scripts/seed_demo.py         # a five-day profile; open the app with ?device=demo-maya
+uv run python scripts/seed_demo.py         # a profile a week in; open the app with ?device=demo-maya
 uv run python scripts/make_due.py          # pull every unmastered card into "due now"
 ```
 
