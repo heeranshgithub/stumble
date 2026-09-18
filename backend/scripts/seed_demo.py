@@ -20,6 +20,49 @@ from app.services import fsrs_engine
 from app.services.cards import target_key
 from app.settings import Settings
 
+# The English of each line the character asked, and of each fixed sentence. Seeded rather than
+# translated at runtime, so "tap line to translate" survives every reseed.
+PROMPT_EN: dict[str, str] = {
+    "Qu'est-ce que je vous sers ?": "What can I get you?",
+    "Et avec ça ?": "Anything else with that?",
+    "Vous voulez autre chose ?": "Would you like anything else?",
+    "Vous payez comment ?": "How are you paying?",
+    "Je peux vous aider ?": "Can I help you?",
+    "Vous avez une ordonnance ?": "Do you have a prescription?",
+    "Un comprimé, deux fois par jour.": "One tablet, twice a day.",
+    "Vous cherchez depuis longtemps ?": "Have you been looking for long?",
+    "Le loyer est de 900 euros.": "The rent is 900 euros.",
+    "Voilà le salon.": "This is the living room.",
+    "Vous voulez entrer quand ?": "When do you want to move in?",
+    "C'est à quel sujet ?": "What is it about?",
+    "Vous allez où après ?": "Where are you off to after?",
+}
+CONTEXT_EN: dict[str, str] = {
+    "J'ai ___ ans.": "I'm twenty-eight.",
+    "Je voudrais un ___ au lait.": "I'd like a coffee with milk.",
+    "Un café ___, s'il vous plaît.": "A coffee with milk, please.",
+    "Un café au lait, ___.": "A coffee with milk, please.",
+    "C'est ___ ?": "How much is it?",
+    "Je peux avoir ___ ?": "Can I have the bill?",
+    "Je paie ___.": "I'm paying by card.",
+    "J'ai ___.": "I have a headache.",
+    "Je n'ai pas ___.": "I don't have the prescription.",
+    "Vous avez un ___ ?": "Do you have a syrup?",
+    "Un ___ le matin ?": "One tablet in the morning?",
+    "___ par jour ?": "How many times a day?",
+    "Le ___ est de combien ?": "How much is the rent?",
+    "L'___ est libre quand ?": "When is the flat free?",
+    "Les ___ sont comprises ?": "Are the charges included?",
+    "___ visiter la chambre ?": "Can I see the bedroom?",
+    "Le premier du ___ ?": "The first of the month?",
+    "Il y a une erreur sur ma ___.": "There's a mistake on my bill.",
+    "Vous pouvez me ___ ?": "Can you refund me?",
+    "Il y a un ___ que je ne reconnais pas.": "There's a charge I don't recognise.",
+    "Je ne ___ pas cette ligne.": "I don't understand this line.",
+    "Je vais à ___.": "I'm going to the bakery.",
+    "Je suis allé ___.": "I went to the market.",
+}
+
 # (scene, type, said, target, context, prompt_line, days_ago, fate)
 # fate: "mastered" | "due" | "learning"
 CARDS: list[tuple[str, str, str, str, str, str, int, str]] = [
@@ -379,6 +422,8 @@ def main() -> None:
                 "target_key": target_key(target),
                 "context": context,
                 "prompt_line": prompt_line,
+                "prompt_line_en": PROMPT_EN.get(prompt_line),
+                "context_en": CONTEXT_EN[context],
                 "fsrs": state,
                 "due": due,
                 "reps": reps,
