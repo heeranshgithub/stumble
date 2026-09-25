@@ -18,7 +18,7 @@ The shape:
 - Two kinds of check. Deterministic, in Python: valid JSON, no leading greeting, the `coffee` case yields one `code_switch` with target `café`, a clean turn yields zero stumbles. Judged: a second model call with the scene, the role, the reply and one yes/no question ("does this reply ask the learner for something only the character would know?").
 - Two-sided from the start. Over-flagging is the silent failure: a phantom card takes one of the twelve daily review slots, steers the next scene toward a word the learner already has, and gets stickier on every repeat because a second flag is a lapse. So the seed set carries as many "nothing should be caught" cases as "this should be caught" ones.
 
-What exists today instead, all deterministic: a confidence floor (`stumble_confidence_min`) and a target-length cap, so a hedged or whole-sentence stumble never becomes a card; one retry when a reply trails off mid-sentence; and the scene beats and facts, which remove the reason the character improvises rather than forbidding the result.
+What exists today instead, all deterministic: a confidence floor (`stumble_confidence_min`) and a target-length cap, so a hedged or whole-sentence stumble never becomes a card; one retry when a reply trails off mid-sentence; a due word said cleanly counted as a win even when the model forgets to report it; and the scene beats and facts, which remove the reason the character improvises rather than forbidding the result.
 
 ## 2. Faster turns
 

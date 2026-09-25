@@ -220,6 +220,28 @@ def _parse_wins(raw: Any, said: str) -> list[Document]:
     return out
 
 
+def _due_word_wins(
+    due_cards: list[str], said: str, wins: list[Document], stumbles: list[Document]
+) -> list[Document]:
+    """A due word said cleanly is a win whether or not the model mentions it. The character is told
+    which words are due, and still skips the win about half the time on a scene's last turn: the
+    moment the loop pays off. Whole words only, and never a word the model flagged as a mistake."""
+    padded = f" {target_key(said)} "
+    have = [target_key(w["phrase"]) for w in wins]
+    wrong = [target_key(s[f]) for s in stumbles for f in ("target", "said") if s.get(f)]
+    out = list(wins)
+    for word in due_cards:
+        key = target_key(word)
+        if not key or f" {key} " not in padded:
+            continue
+        if any(h and (key in h or h in key) for h in have + wrong):
+            continue
+        out.append(WinDto(phrase=word).model_dump())
+        have.append(key)
+        log.info("win_added_for_due_word", phrase=word)
+    return out
+
+
 async def take_turn(
     db: Database,
     providers: Providers,
@@ -269,7 +291,12 @@ async def take_turn(
     # The last beat is the goodbye: saying it ends the scene, whatever the model reports.
     done = bool(result.get("done", False)) or progress >= 1.0 or beat == last
     learner["stumbles"] = _parse_stumbles(result.get("stumbles"), settings.stumble_confidence_min)
-    learner["wins"] = _parse_wins(result.get("wins"), said)
+    learner["wins"] = _due_word_wins(
+        session.get("due_cards", []),
+        said,
+        _parse_wins(result.get("wins"), said),
+        learner["stumbles"],
+    )
     learner["goal_progress"] = progress
 
     reply_text = _without_regreeting(str(result.get("reply", "")), _FR_GREETING)

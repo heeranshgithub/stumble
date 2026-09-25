@@ -71,8 +71,8 @@ export function DebriefScreen({ sceneId, sessionId }: { sceneId: string; session
         <h1 className="mt-2 text-[30px] font-extrabold leading-[1.05] tracking-[-0.03em]">{headline}</h1>
         <p className="mt-2 text-sm font-bold text-ink-2">
           {d.goalReached ? "Goal reached. " : `Goal: ${d.goal.toLowerCase().replace(/\.$/, "")}. `}
-          {total === 0 ? "No stumbles caught." : total === 1 ? "1 stumble caught" : `${total} stumbles caught`}
-          {wins === 0 ? (total === 0 ? "" : ".") : wins === 1 ? ", 1 clean win." : `, ${wins} clean wins.`}
+          {total === 0 ? "No stumbles caught" : total === 1 ? "1 stumble caught" : `${total} stumbles caught`}
+          {wins === 0 ? "." : wins === 1 ? ", 1 clean win." : `, ${wins} clean wins.`}
         </p>
       </Blob>
 

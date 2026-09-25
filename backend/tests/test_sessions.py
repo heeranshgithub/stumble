@@ -264,3 +264,22 @@ async def test_the_reply_voice_is_synthesized_before_it_is_fetched(client: Async
     assert app.state.audio_cache.get(key) is not None
     audio = await client.get(reply["audioUrl"])
     assert audio.status_code == 200 and audio.headers["content-type"].startswith("audio/")
+
+
+def test_a_due_word_said_cleanly_is_a_win_even_when_the_model_forgets_it() -> None:
+    from app.services.sessions import _due_word_wins
+
+    due = ["par carte", "café"]
+    # the model reported nothing on the goodbye turn
+    wins = _due_word_wins(due, "Je paie par carte.", [], [])
+    assert [w["phrase"] for w in wins] == ["par carte"]
+    # already reported, in any wording: not doubled
+    reported = [{"phrase": "Je paie par carte", "card_id": None, "audio_url": None}]
+    assert len(_due_word_wins(due, "Je paie par carte.", reported, [])) == 1
+    # flagged as a mistake in the same turn: not a win
+    stumble = {"target": "par carte", "said": "par card"}
+    assert _due_word_wins(due, "Je paie par carte.", [], [stumble]) == []
+    # whole words only: "car" is not "carte"
+    assert _due_word_wins(["car"], "Je paie par carte.", [], []) == []
+    # accent-insensitive
+    assert [w["phrase"] for w in _due_word_wins(due, "Un cafe, merci.", [], [])] == ["café"]
