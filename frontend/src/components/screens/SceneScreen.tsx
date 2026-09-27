@@ -91,6 +91,7 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
   const [draft, setDraft] = useState("");
   const [latencyMs, setLatencyMs] = useState<number | null>(null);
   const [shownTranslation, setShownTranslation] = useState<string | null>(null);
+  const [resumedFrom, setResumedFrom] = useState<string | null>(null);
 
   const router = useRouter();
   const startedRef = useRef(false);
@@ -100,6 +101,14 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
   // Fake providers are a deliberate offline mode; when they're on, say so where the reviewer looks.
   const ready = useGetReadyQuery();
   const debriefHref = session?.id ? `/scene/${sceneId}/debrief?session=${session.id}` : "/";
+  const endScene = () => {
+    speaker.stop();
+    router.push(debriefHref);
+  };
+  // After the support message the mic gives way to a choice, so ending is one obvious tap rather
+  // than the small ✕; the scene still waits for anyone who wants to carry on.
+  const lastTurn = session?.turns[session.turns.length - 1];
+  const paused = lastTurn?.role === "character" && lastTurn.guard === "support" && lastTurn.id !== resumedFrom;
 
   // One session per URL: a fresh visit starts one and writes its id into the query string, so a
   // refresh resumes the conversation instead of abandoning it (and its stumbles) for a new one.
@@ -282,10 +291,7 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
             <button
               type="button"
               aria-label="End scene"
-              onClick={() => {
-                speaker.stop();
-                router.push(debriefHref);
-              }}
+              onClick={endScene}
               className="grid size-7 place-items-center rounded-pill bg-ink/10 text-ink"
             >
               <X className="size-4" strokeWidth={2.5} />
@@ -347,7 +353,14 @@ export function SceneScreen({ sceneId, resumeId }: { sceneId: string; resumeId: 
             <p className="mb-6 text-center text-xs font-bold text-ink-2">tap anywhere to hear {name}</p>
           ) : null}
           {mic.error ? <p className="mb-6 text-center text-xs font-bold text-stumble">{mic.error}</p> : null}
-          {typing ? (
+          {paused ? (
+            <div className="flex flex-col gap-3">
+              <PillButton onClick={endScene}>End here</PillButton>
+              <PillButton variant="paper" onClick={() => setResumedFrom(lastTurn.id)}>
+                Continue the scene
+              </PillButton>
+            </div>
+          ) : typing ? (
             <form
               className="flex items-center gap-2"
               onSubmit={(e) => {
