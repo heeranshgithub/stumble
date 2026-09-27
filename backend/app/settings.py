@@ -33,6 +33,12 @@ class Settings(BaseSettings):
     elevenlabs_voice_id: str | None = None
     elevenlabs_model: str = "eleven_flash_v2_5"
 
+    # The guardrail: TypeSafe's Jev, a classifier that returns calibrated probabilities, not text.
+    # Pinned, not "jev-latest": the thresholds are tuned against this version's numbers, and an
+    # alias would move them under us.
+    jev_api_key: str | None = None
+    jev_model: str = "jev-1.13.0"
+
     # A silence this long while the mic is held is a freeze.
     freeze_threshold_ms: int = 3000
     # A scene ends on its goodbye beat. If the learner is still talking after this many turns, the

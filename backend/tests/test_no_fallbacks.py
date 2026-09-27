@@ -8,7 +8,7 @@ from mongomock_motor import AsyncMongoMockClient
 
 from app.main import create_app
 from app.services.providers import ChatMessage, ProviderError
-from app.services.providers_fake import FakeChat, FakeSynthesizer, FakeTranscriber
+from app.services.providers_fake import FakeChat, FakeGuard, FakeSynthesizer, FakeTranscriber
 from app.services.registry import Providers
 from app.settings import Settings
 from tests.conftest import HEADERS
@@ -41,11 +41,12 @@ async def test_ready_reports_the_provider_mode(client: AsyncClient) -> None:
         "stt": "fake",
         "llm": "fake",
         "tts": "fake",
+        "guard": "fake",
     }
 
 
 async def test_dead_tts_is_a_502_not_an_empty_200(settings: Settings) -> None:
-    providers = Providers(FakeTranscriber(), FakeChat(), DeadSynthesizer(), "real")
+    providers = Providers(FakeTranscriber(), FakeChat(), DeadSynthesizer(), "real", FakeGuard())
     async with _client(settings, providers) as client:
         session = (await client.post("/sessions", json={"sceneId": "cafe"}, headers=HEADERS)).json()
         res = await client.get(session["turns"][0]["audioUrl"])
@@ -56,7 +57,7 @@ async def test_dead_tts_is_a_502_not_an_empty_200(settings: Settings) -> None:
 
 
 async def test_dead_llm_is_a_502_with_the_provider_named(settings: Settings) -> None:
-    providers = Providers(FakeTranscriber(), DeadChat(), FakeSynthesizer(), "real")
+    providers = Providers(FakeTranscriber(), DeadChat(), FakeSynthesizer(), "real", FakeGuard())
     async with _client(settings, providers) as client:
         session = (await client.post("/sessions", json={"sceneId": "cafe"}, headers=HEADERS)).json()
         res = await client.post(

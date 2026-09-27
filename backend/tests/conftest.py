@@ -5,7 +5,7 @@ from httpx import ASGITransport, AsyncClient
 from mongomock_motor import AsyncMongoMockClient
 
 from app.main import create_app
-from app.services.providers_fake import FakeChat, FakeSynthesizer, FakeTranscriber
+from app.services.providers_fake import FakeChat, FakeGuard, FakeSynthesizer, FakeTranscriber
 from app.services.registry import Providers
 from app.settings import Settings
 
@@ -31,7 +31,7 @@ def mock_client() -> AsyncMongoMockClient:
 
 @pytest.fixture
 def providers() -> Providers:
-    return Providers(FakeTranscriber(), FakeChat(), FakeSynthesizer(), "fake")
+    return Providers(FakeTranscriber(), FakeChat(), FakeSynthesizer(), "fake", FakeGuard())
 
 
 @pytest.fixture

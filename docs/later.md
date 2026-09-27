@@ -2,7 +2,7 @@
 
 Things decided against for the hackathon, on purpose, in the order they should be taken on. The first one is the foundation: the others all change the prompt or the model, and without it there is no way to know a change didn't break something.
 
-1. **An eval harness for the turn prompt** — every reply-quality bug so far was found by hand and fixed blind.
+1. **An eval harness for the turn prompt** — every reply-quality bug so far was found by hand and fixed blind. The guardrails now have one (`backend/evals/guardrails`, see [guardrails.md](guardrails.md)); its runner and case format are the template for this.
 2. **Faster turns** — the wait is the one thing a learner feels on every turn; swapping the model is one env var, and unsafe without 1.
 3. **Speaking time on the debrief** — the only time figure that is about the learner; the data is already returned, just not stored.
 4. **Style is not an error** — parked until it is actually seen.

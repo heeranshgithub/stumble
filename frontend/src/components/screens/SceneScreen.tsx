@@ -427,6 +427,23 @@ function TurnView({
   /** The same rule as the mic: off while a turn is in flight (thinking, speaking) or any audio plays. */
   speaking: boolean;
 }) {
+  if (turn.role === "character" && turn.guard === "support") {
+    // The one moment the role-play gives way: not the character's line, not spoken, in English.
+    return (
+      <section className={`-mx-5 bg-ink px-5 py-5 text-paper ${latest ? "fade-in" : ""}`} role="status">
+        <p className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-paper-2">Paused · outside the scene</p>
+        <p className="mt-2 text-[16px] font-bold leading-snug">{turn.text}</p>
+        <a
+          href="https://findahelpline.com"
+          target="_blank"
+          rel="noreferrer"
+          className="mt-3 inline-block text-sm font-extrabold underline underline-offset-4"
+        >
+          Find a helpline near you
+        </a>
+      </section>
+    );
+  }
   if (turn.role === "character") {
     return (
       <div className={latest ? "fade-in" : undefined}>
@@ -454,6 +471,12 @@ function TurnView({
       <p className="text-xs font-bold text-ink-2">You</p>
       {turn.text ? (
         <LyricLine className="mt-0.5" animate={latest} words={learnerWords(turn.text, turn.stumbles)} />
+      ) : null}
+      {turn.guard === "block" || turn.guard === "ignore" ? (
+        <div className="mt-2">
+          {/* Nothing from this line was caught or counted: no card will come back from it. */}
+          <Chip>not counted</Chip>
+        </div>
       ) : null}
       {turn.stumbles.length > 0 || turn.wins.length > 0 ? (
         <div className="mt-2 flex flex-wrap gap-2">

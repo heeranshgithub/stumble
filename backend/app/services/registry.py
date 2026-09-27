@@ -5,9 +5,14 @@ from dataclasses import dataclass
 import httpx
 
 from app.log import get_logger
-from app.services.providers import ChatModel, Synthesizer, Transcriber
-from app.services.providers_fake import FakeChat, FakeSynthesizer, FakeTranscriber
-from app.services.providers_real import ElevenLabsSynthesizer, GroqTranscriber, OpenRouterChat
+from app.services.providers import ChatModel, Guard, Synthesizer, Transcriber
+from app.services.providers_fake import FakeChat, FakeGuard, FakeSynthesizer, FakeTranscriber
+from app.services.providers_real import (
+    ElevenLabsSynthesizer,
+    GroqTranscriber,
+    OpenRouterChat,
+    TypeSafeGuard,
+)
 from app.settings import Settings
 
 log = get_logger(__name__)
@@ -19,6 +24,8 @@ class Providers:
     chat: ChatModel
     synthesizer: Synthesizer
     mode: str  # "real" | "fake"
+    # Screens every learner line on the way in and every reply on the way out.
+    guard: Guard
     _client: httpx.AsyncClient | None = None
 
     async def aclose(self) -> None:
@@ -29,7 +36,7 @@ class Providers:
 def build_providers(settings: Settings) -> Providers:
     if settings.providers == "fake":
         log.warning("providers_fake", reason="PROVIDERS=fake: canned replies, no network")
-        return Providers(FakeTranscriber(), FakeChat(), FakeSynthesizer(), "fake")
+        return Providers(FakeTranscriber(), FakeChat(), FakeSynthesizer(), "fake", FakeGuard())
 
     required = {
         "GROQ_API_KEY": settings.groq_api_key,
@@ -37,6 +44,7 @@ def build_providers(settings: Settings) -> Providers:
         "OPENROUTER_MODEL": settings.openrouter_model,
         "ELEVENLABS_API_KEY": settings.elevenlabs_api_key,
         "ELEVENLABS_VOICE_ID": settings.elevenlabs_voice_id,
+        "JEV_API_KEY": settings.jev_api_key,
     }
     missing = [name for name, value in required.items() if not value]
     if missing:
@@ -56,5 +64,6 @@ def build_providers(settings: Settings) -> Providers:
             settings.elevenlabs_model,
         ),
         "real",
+        TypeSafeGuard(client, settings.jev_api_key or "", settings.jev_model),
         client,
     )

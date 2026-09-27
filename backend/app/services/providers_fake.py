@@ -4,7 +4,7 @@ import struct
 from collections.abc import AsyncIterator
 from typing import Any
 
-from app.services.providers import ChatMessage, Transcript
+from app.services.providers import Assessment, ChatMessage, Transcript
 
 # A tiny en → fr map so the fake catches code-switches deterministically.
 _EN_FR = {
@@ -139,3 +139,41 @@ class FakeSynthesizer:
 
     async def stream(self, text: str, *, speed: float = 1.0) -> AsyncIterator[bytes]:
         yield _SILENCE
+
+
+# A hazard scores 0.95 when the screened text contains one of its markers, else 0.02. The
+# defaults cover a few obvious words; tests pass their own to script a verdict.
+_GUARD_MARKERS: dict[str, tuple[str, ...]] = {
+    "harassment": ("idiot",),
+    "sexual": ("sexy",),
+    "violence": ("frappe", "smash"),
+    "dangerous": ("drogue", "bomb"),
+    "self_harm": ("mourir",),
+    "sensitive_topic": ("macron",),
+    "instruction_override": ("ignore",),
+    "unsafe_reply": ("pathétique",),
+    "broke_character": ("from now on i'll speak english",),
+}
+
+
+class FakeGuard:
+    """Offline stand-in for Jev. Reads the learner's line on the way in and the character's reply
+    on the way out, and records every call so a test can assert what was screened."""
+
+    def __init__(self, markers: dict[str, tuple[str, ...]] | None = None) -> None:
+        self._markers = _GUARD_MARKERS if markers is None else markers
+        self.calls: list[dict[str, Any]] = []
+
+    async def assess(
+        self, state: dict[str, Any], questions: dict[str, dict[str, Any]]
+    ) -> Assessment:
+        self.calls.append(state)
+        text = str(state.get("character_reply", state.get("learner_said", ""))).lower()
+        answers: dict[str, dict[str, Any]] = {}
+        for qid, q in questions.items():
+            if q["type"] == "noul":
+                hit = any(m in text for m in self._markers.get(qid, ()))
+                answers[qid] = {"type": "noul", "noul": 0.95 if hit else 0.02}
+            else:
+                answers[qid] = {"type": "score", "score": 0.0, "confidence": 1.0}
+        return Assessment(answers=answers, model="fake-guard", ms=1)

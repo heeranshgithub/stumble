@@ -33,6 +33,21 @@ class Synthesizer(Protocol):
     def stream(self, text: str, *, speed: float = 1.0) -> AsyncIterator[bytes]: ...
 
 
+@dataclass(frozen=True)
+class Assessment:
+    """A guard's answers, one per question id, as the API returned them."""
+
+    answers: dict[str, dict[str, Any]]
+    model: str
+    ms: int
+
+
+class Guard(Protocol):
+    async def assess(
+        self, state: dict[str, Any], questions: dict[str, dict[str, Any]]
+    ) -> Assessment: ...
+
+
 class ProviderError(Exception):
     """A provider failed. `message` is for the learner's screen: no URLs, no status codes. A
     rate limit is a 503 with `retry_after`, so the client knows it is a moment, not an outage."""

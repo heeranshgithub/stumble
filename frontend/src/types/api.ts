@@ -198,6 +198,12 @@ export interface TurnDto {
   audioUrl: string | null;
   pauseMs: number;
   createdAt: string;
+  /**
+   * What the guardrail did. Learner turn: "block" | "ignore" (nothing from it counts), "support",
+   * "deflect". Character turn: "boundary" | "redirect" | "ended" | "replaced" (a set line, not the
+   * model's), or "support" (out of character, in English, never spoken).
+   */
+  guard: string | null;
 }
 
 export interface SessionDto {
@@ -221,6 +227,7 @@ export interface ReadyDto {
   stt: string;
   llm: string;
   tts: string;
+  guard: string;
 }
 
 /** POST /reviews/due-now: a testing lever that pulls every unmastered card's due date to now. */

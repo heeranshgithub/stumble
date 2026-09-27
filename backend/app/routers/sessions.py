@@ -83,7 +83,7 @@ async def take_turn(
     )
     # The voice starts synthesizing as the words go out, so the two land on the phone together.
     reply = updated["turns"][-1]
-    if reply["role"] == "character":
+    if reply["role"] == "character" and reply.get("guard") != "support":
         tts.prewarm(request.app, f"{session_id}:{reply['id']}", reply["text"])
     return sessions.to_dto(updated)
 
@@ -102,7 +102,8 @@ async def turn_audio(session_id: str, turn_id: str, db: DbDep, request: Request)
     """Streams the character's line. Fetched by an <audio> element, so no device header here."""
     doc = await sessions.get_any(db, session_id)
     turn = next((t for t in doc["turns"] if t["id"] == turn_id and t["role"] == "character"), None)
-    if turn is None:
+    # The support message is read, not spoken: a character's voice saying it would be wrong.
+    if turn is None or turn.get("guard") == "support":
         raise NotFound("Turn not found.", code="turn_not_found")
     return await tts.stream_cached(request, f"{session_id}:{turn_id}", turn["text"])
 

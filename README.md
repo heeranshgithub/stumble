@@ -24,6 +24,10 @@ A turn is one request: audio (or text) plus `clientPauseMs`, the longest silence
 
 On finish, stumbles become cards keyed per learner by an accent-insensitive target, so stumbling on *café* twice is a lapse on one card, not two cards. A card is born FSRS-new, due in a day; its first real review carries the full interval spread. Cards are reviewed in sessions, not minutes: no learning steps, a daily cap of twelve, and a due window so "tomorrow" means the next session.
 
+## Guardrails
+
+Every learner line is screened by [Jev](https://docs.typesafe.ai), TypeSafe's classifier, alongside the character's reply being written, so it costs no time; every reply is screened again before it is shown or spoken. Harassment, sexual content, threats and dangerous requests get a set line in role and nothing from the turn is counted, so abuse can never become a flashcard. Distress breaks character, in English, with where to get help. Politics gets a dodge in role; small talk is just practice. Measured end to end on the real app: harmful lines turned into flashcards went from 3 of 20 to 0, distress given a caring answer from 0 of 4 to 4. The policy, the evals and their limits: [docs/guardrails.md](docs/guardrails.md).
+
 ## Architecture
 
 ```mermaid
@@ -57,6 +61,7 @@ flowchart LR
 | Speech to text | Groq `whisper-large-v3`, prompted with mixed French/English so a fall-back to English is transcribed, not translated |
 | LLM | OpenRouter (model id in env) |
 | Text to speech | ElevenLabs Flash v2.5, streamed and cached |
+| Guardrail | TypeSafe Jev (`jev-1.13.0`, pinned): one call screens a line for every hazard |
 | Hosting | AWS Amplify (frontend), AWS App Runner (backend) |
 
 No accounts: a device id minted in the browser is the identity.

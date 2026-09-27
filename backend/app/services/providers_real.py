@@ -3,13 +3,14 @@
 import asyncio
 import json
 import re
+import time
 from collections.abc import AsyncIterator
 from typing import Any
 
 import httpx
 
 from app.log import get_logger
-from app.services.providers import ChatMessage, ProviderError, Transcript
+from app.services.providers import Assessment, ChatMessage, ProviderError, Transcript
 
 log = get_logger(__name__)
 
@@ -205,3 +206,52 @@ class ElevenLabsSynthesizer:
                     yield chunk
         except httpx.HTTPError as exc:
             raise _error("elevenlabs", exc) from exc
+
+
+class TypeSafeGuard:
+    """Jev, TypeSafe's classifier: a state and typed questions in, calibrated answers out."""
+
+    _URL = "https://api.typesafe.ai/v1/systemone"
+
+    def __init__(self, client: httpx.AsyncClient, api_key: str, model: str) -> None:
+        self._client = client
+        self._key = api_key
+        self._model = model
+
+    async def _post(self, body: dict[str, Any]) -> httpx.Response:
+        return await self._client.post(
+            self._URL, json=body, headers={"Authorization": f"Bearer {self._key}"}, timeout=10.0
+        )
+
+    async def assess(
+        self, state: dict[str, Any], questions: dict[str, dict[str, Any]]
+    ) -> Assessment:
+        body = {"state": state, "model": self._model, "questions": questions}
+        started = time.perf_counter()
+        try:
+            res = await self._post(body)
+            # 429 is a rate limit, 529 is TypeSafe overloaded: both are "a moment", once.
+            if res.status_code in (429, 529) and _retry_after(res) <= _RETRY_WAIT_MAX_S:
+                log.info("guard_rate_limited", status=res.status_code, wait_s=_retry_after(res))
+                await asyncio.sleep(max(1, _retry_after(res)))
+                res = await self._post(body)
+            res.raise_for_status()
+        except httpx.HTTPError as exc:
+            log.warning("provider_http_error", provider="typesafe", error=str(exc))
+            if isinstance(exc, httpx.HTTPStatusError) and exc.response.status_code in (429, 529):
+                raise ProviderError(
+                    "typesafe",
+                    "Busy for a moment. Try again in a few seconds.",
+                    status=503,
+                    retry_after=_retry_after(exc.response),
+                ) from exc
+            # No turn goes out unscreened: a guard that can't answer fails the turn, visibly.
+            raise ProviderError(
+                "typesafe", "The safety check isn't available right now. Try again."
+            ) from exc
+        data = res.json()
+        return Assessment(
+            answers=data["answers"],
+            model=str(data.get("model", self._model)),
+            ms=round((time.perf_counter() - started) * 1000),
+        )

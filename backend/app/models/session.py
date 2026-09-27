@@ -45,6 +45,10 @@ class TurnDto(ApiModel):
     audio_url: str | None = None
     pause_ms: int = 0
     created_at: datetime
+    # What the guardrail did. On a learner turn: "block", "ignore" or "support" (nothing from it
+    # counts) or "deflect". On a character turn: "boundary", "redirect", "ended" or "replaced"
+    # (a set line, not the model's), or "support" (out of character, in English, never spoken).
+    guard: str | None = None
 
 
 class SessionDto(MongoModel):

@@ -1,5 +1,6 @@
 """Session lifecycle and the turn pipeline: audio → text → character reply + stumbles → audio."""
 
+import asyncio
 import re
 import uuid
 from datetime import UTC, datetime
@@ -15,7 +16,7 @@ from app.errors import BadRequest, NotFound
 from app.log import get_logger
 from app.models.session import SessionDto, StumbleDto, TurnDto, WinDto
 from app.scenes.data import Scene, get_scene
-from app.services import tts
+from app.services import guardrails, tts
 from app.services.cards import target_key
 from app.services.prompts import learner_turn, stt_prompt, system_prompt
 from app.services.providers import ChatMessage
@@ -135,6 +136,14 @@ def _learner_turns(session: Document) -> int:
     return sum(1 for t in session["turns"] if t["role"] == "learner")
 
 
+# A learner turn the guard stopped: the scene carries on as if it hadn't happened.
+_HELD = ("block", "ignore", "support")
+_HELD_PLACEHOLDER = (
+    "[The learner said something the scene doesn't use. It was handled outside the scene. "
+    "Carry on with the current beat.]"
+)
+
+
 def _messages(session: Document, scene: Scene, settings: Settings) -> list[ChatMessage]:
     msgs = [
         ChatMessage(
@@ -151,6 +160,10 @@ def _messages(session: Document, scene: Scene, settings: Settings) -> list[ChatM
     for t in session["turns"]:
         if t["role"] == "character":
             msgs.append(ChatMessage("assistant", t["text"]))
+        elif (t.get("guard") or {}).get("action") in _HELD:
+            # Never replayed to the model: an insult stays out of its context, and an attempt
+            # to rewrite the rules can't sit in the history waiting to work on a later turn.
+            msgs.append(ChatMessage("user", _HELD_PLACEHOLDER))
         else:
             msgs.append(
                 ChatMessage(
@@ -242,6 +255,50 @@ def _due_word_wins(
     return out
 
 
+async def _held_turn(
+    db: Database, session: Document, learner: Document, verdict: guardrails.Verdict
+) -> Document:
+    """A turn the guard stopped: a set line instead of the model's reply, and nothing counted.
+    No stumbles, no wins, no progress, so an insult can never become a flashcard."""
+    strikes = int(session.get("guard_strikes", 0))
+    text_en: str | None
+    if verdict.action == "support":
+        text, text_en, kind = guardrails.SUPPORT, None, "support"
+    elif verdict.action == "ignore":
+        (text, text_en), kind = guardrails.REDIRECT, "redirect"
+    else:
+        strikes += 1
+        if strikes >= guardrails.STRIKES_TO_END:
+            (text, text_en), kind = guardrails.ENDED, "ended"
+            session["status"] = "finished"
+            session["finished_at"] = _now()
+        else:
+            (text, text_en), kind = guardrails.BOUNDARY, "boundary"
+    reply = _turn("character", text, session["goal_progress"], text_en=text_en, guard=kind)
+    session["turns"].append(reply)
+    session["guard_strikes"] = strikes
+    await db.sessions.update_one(
+        {"_id": session["_id"]},
+        {
+            "$set": {
+                "turns": session["turns"],
+                "guard_strikes": strikes,
+                "status": session["status"],
+                "finished_at": session["finished_at"],
+            }
+        },
+    )
+    log.warning(
+        "guard_held_turn",
+        session_id=str(session["_id"]),
+        action=verdict.action,
+        category=verdict.category,
+        scores=verdict.scores,
+        strikes=strikes,
+    )
+    return session
+
+
 async def take_turn(
     db: Database,
     providers: Providers,
@@ -274,9 +331,26 @@ async def take_turn(
         raise BadRequest("Nothing was heard. Hold the mic and speak.", code="empty_turn")
 
     learner = _turn("learner", said, session["goal_progress"], pause_ms=pause_ms)
+    last_line = next(
+        (t["text"] for t in reversed(session["turns"]) if t["role"] == "character"), ""
+    )
     session["turns"].append(learner)
 
-    result = await _complete(providers, _messages(session, scene, settings))
+    # The screen runs alongside the reply being written, so it costs no time: Jev answers in
+    # about a third of a second, the character's model in one to two.
+    messages = _messages(session, scene, settings)
+    if said.strip():
+        verdict, result = await asyncio.gather(
+            guardrails.screen_input(providers.guard, scene, last_line, said),
+            _complete(providers, messages),
+        )
+    else:  # a silent freeze: nothing was said, nothing to screen
+        verdict, result = guardrails.PASS, await _complete(providers, messages)
+    learner["guard"] = verdict.record()
+    if verdict.action in _HELD:
+        # The model's reply is discarded, whatever it was: nothing it wrote is shown or spoken.
+        return await _held_turn(db, session, learner, verdict)
+
     progress = float(result.get("goal_progress", session["goal_progress"]) or 0.0)
     progress = max(session["goal_progress"], min(1.0, progress))
     last = len(scene.beats) - 1
@@ -300,13 +374,27 @@ async def take_turn(
     learner["goal_progress"] = progress
 
     reply_text = _without_regreeting(str(result.get("reply", "")), _FR_GREETING)
+    reply_text = reply_text or "Pardon, vous pouvez répéter ?"
     reply_en = result.get("reply_en")
-    reply = _turn(
-        "character",
-        reply_text or "Pardon, vous pouvez répéter ?",
-        progress,
-        text_en=_without_regreeting(reply_en, _EN_GREETING) if isinstance(reply_en, str) else None,
-    )
+    reply_en = _without_regreeting(reply_en, _EN_GREETING) if isinstance(reply_en, str) else None
+    reply_guard: str | None = None
+
+    # On the way out: nothing reaches the screen or the voice unscreened, even on a clean input.
+    out = await guardrails.screen_output(providers.guard, scene, said, reply_text)
+    learner["guard"]["output"] = out.record()
+    if out.action == "replace":
+        # The model misbehaved on this turn, so nothing it produced counts: no stumbles, no
+        # wins, and the scene doesn't move on.
+        reply_text, reply_en = guardrails.REPLACED
+        reply_guard = "replaced"
+        learner["stumbles"], learner["wins"] = [], []
+        progress, beat, done = session["goal_progress"], session.get("beat", 0), False
+        learner["goal_progress"] = progress
+        log.warning("guard_replaced_reply", category=out.category, scores=out.scores)
+
+    reply = _turn("character", reply_text, progress, text_en=reply_en)
+    if reply_guard:
+        reply["guard"] = reply_guard
     session["turns"].append(reply)
     session["goal_progress"] = progress
     session["beat"] = beat
@@ -353,6 +441,14 @@ def _stumble_dtos(sid: str, turn: Document) -> list[StumbleDto]:
     ]
 
 
+def _guard_label(turn: Document) -> str | None:
+    if turn["role"] == "character":
+        label: str | None = turn.get("guard")
+        return label
+    action = (turn.get("guard") or {}).get("action")
+    return action if action in ("block", "ignore", "support", "deflect") else None
+
+
 def to_dto(session: Document) -> SessionDto:
     scene = get_scene(session["scene_id"])
     if scene is None:  # pragma: no cover
@@ -378,8 +474,9 @@ def to_dto(session: Document) -> SessionDto:
             ],
             goal_progress=t["goal_progress"],
             audio_url=f"/sessions/{sid}/turns/{t['id']}/audio"
-            if t["role"] == "character"
+            if t["role"] == "character" and t.get("guard") != "support"
             else None,
+            guard=_guard_label(t),
             pause_ms=int(t.get("pause_ms", 0)),
             created_at=t["created_at"],
         )

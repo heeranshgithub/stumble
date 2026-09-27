@@ -17,6 +17,7 @@ class ReadyDto(ApiModel):
     stt: str
     llm: str
     tts: str
+    guard: str
 
 
 @router.get("/health", response_model=HealthDto)
@@ -37,4 +38,5 @@ async def ready(request: Request) -> ReadyDto:
         stt=f"groq/{settings.groq_stt_model}" if real else "fake",
         llm=f"openrouter/{settings.openrouter_model}" if real else "fake",
         tts=f"elevenlabs/{settings.elevenlabs_model}" if real else "fake",
+        guard=f"typesafe/{settings.jev_model}" if real else "fake",
     )
