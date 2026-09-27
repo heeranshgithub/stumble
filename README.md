@@ -26,7 +26,7 @@ On finish, stumbles become cards keyed per learner by an accent-insensitive targ
 
 ## Guardrails
 
-Every learner line is screened by [Jev](https://docs.typesafe.ai), TypeSafe's classifier, alongside the character's reply being written, so it costs no time; every reply is screened again before it is shown or spoken. Harassment, sexual content, threats and dangerous requests get a set line in role and nothing from the turn is counted, so abuse can never become a flashcard. Distress breaks character, in English, with where to get help. Politics gets a dodge in role; small talk is just practice. Measured end to end on the real app: harmful lines turned into flashcards went from 3 of 20 to 0, distress given a caring answer from 0 of 4 to 4. The policy, the evals and their limits: [docs/guardrails.md](docs/guardrails.md).
+Every learner line is screened by [Jev](https://docs.typesafe.ai), TypeSafe's classifier, alongside the character's reply being written, so it costs no time; every reply is screened again before it is shown or spoken. Harassment, sexual content, threats and dangerous requests get a set line in role and nothing from the turn is counted, so abuse can never become a flashcard. Distress breaks character, in English, with where to get help. Politics gets a dodge in role; small talk is just practice. Measured end to end on the real app: across 96 test lines, harmful lines turned into flashcards went from 7 of 37 to 0, and all 6 lines of distress are now pointed to help (none were before). The policy, the evals and their limits: [docs/guardrails.md](docs/guardrails.md).
 
 ## Architecture
 

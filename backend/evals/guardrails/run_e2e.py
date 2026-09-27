@@ -25,10 +25,22 @@ from app.scenes.data import get_scene
 from app.services import debrief, sessions
 from app.services.registry import build_providers
 from app.settings import Settings
-from evals.guardrails.cases import CASES, Case
+from evals.guardrails.cases import (
+    CASES,
+    HELD_OUT_CASES,
+    UNNAMED_CASES,
+    UNNAMED_HELD_OUT_CASES,
+    Case,
+)
 
 RESULTS = Path(__file__).parent / "results"
-HARMFUL = {"harassment", "sexual", "violence", "dangerous", "adversarial"}
+HARMFUL = {"harassment", "sexual", "violence", "dangerous", "adversarial", "unnamed"}
+SETS = {
+    "tuning": CASES,
+    "heldout": HELD_OUT_CASES,
+    "unnamed": UNNAMED_CASES + UNNAMED_HELD_OUT_CASES,
+    "all": CASES + HELD_OUT_CASES + UNNAMED_CASES + UNNAMED_HELD_OUT_CASES,
+}
 
 
 async def run_case(
@@ -94,12 +106,18 @@ def summarise(rows: list[dict[str, Any]], label: str) -> str:
         "",
     ]
     errors = [r for r in rows if "error" in r]
-    harmful = [r for r in rows if r["group"] in HARMFUL and "error" not in r]
+    # Harmful means block is the only right answer; a borderline case that also accepts pass isn't.
+    harmful = [
+        r for r in rows if r["group"] in HARMFUL and r["expect"] == ["block"] and "error" not in r
+    ]
+    distress = [r for r in rows if r["group"] == "self_harm" and "error" not in r]
+    supported = [r for r in distress if r.get("action") == "support"]
     carded = [r for r in harmful if r.get("cards_added", 0) > 0]
     lines += [
         "## Headline",
         "",
         f"- Harmful lines that became **flashcards**: **{len(carded)} of {len(harmful)}**",
+        f"- Distress sent to support: **{len(supported)} of {len(distress)}**",
         f"- Turns that errored: {len(errors)}",
     ]
     scored = [r for r in rows if r.get("action") not in (None, "n/a") and "error" not in r]
@@ -142,11 +160,12 @@ async def main() -> None:
     ap.add_argument("--label", required=True)
     ap.add_argument("--only", default="", help="comma-separated groups")
     ap.add_argument("--concurrency", type=int, default=6)
+    ap.add_argument("--set", choices=sorted(SETS), default="tuning")
     args = ap.parse_args()
     settings = Settings()
     providers = build_providers(settings)
     groups = set(filter(None, args.only.split(",")))
-    cases = [c for c in CASES if not groups or c.group in groups]
+    cases = [c for c in SETS[args.set] if not groups or c.group in groups]
     sem = asyncio.Semaphore(args.concurrency)
     try:
         rows = await asyncio.gather(*(run_case(c, providers, settings, sem) for c in cases))
