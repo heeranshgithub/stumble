@@ -5,7 +5,7 @@ Things decided against for the hackathon, on purpose, in the order they should b
 1. **An eval harness for the turn prompt** — every reply-quality bug so far was found by hand and fixed blind. The guardrails now have one (`backend/evals/guardrails`, see [guardrails.md](guardrails.md)); its runner and case format are the template for this.
 2. **Faster turns** — the wait is the one thing a learner feels on every turn; swapping the model is one env var, and unsafe without 1.
 3. **Speaking time on the debrief** — the only time figure that is about the learner; the data is already returned, just not stored.
-4. **Style is not an error** — parked until it is actually seen.
+4. **Corrections that aren't errors** — politeness logged as grammar (not seen yet), and a homophone the transcriber spelled wrong (seen; held by a prompt rule only).
 
 ## 1. An eval harness for the turn prompt
 
@@ -28,6 +28,10 @@ A turn is three sequential calls (Whisper, the chat model, ElevenLabs first byte
 
 The debrief used to show the scene's wall-clock length. Dropped: most of a scene's minutes are the character's (her line, the think gap, the learner reading), so the number said nothing about the learner. The number that would is how long the learner actually spoke. Whisper returns the audio duration on every turn (`Transcript.duration_s`); it isn't stored. Store it on the learner turn, sum it, and the debrief can say "you spoke for 1:12", a figure that should grow scene over scene. Typed turns count as zero, which is right.
 
-## 4. Style is not an error
+## 4. Corrections that aren't errors
 
-"Je veux un café" is correct French. In the *real* register the model may log it as a correction to *je voudrais*. That's politeness, not grammar, and it becomes a card. Not seen yet, so no rule for it; when it shows up, the fix is one line in `_RULES` and one eval case.
+Two ways a correction can be logged for something the learner didn't get wrong.
+
+**Style.** "Je veux un café" is correct French. In the *real* register the model may log it as a correction to *je voudrais*. That's politeness, not grammar, and it becomes a card. Not seen yet, so no rule for it; when it shows up, the fix is one line in `_RULES` and one eval case.
+
+**Homophones.** The model judges a transcript, not the audio. When the learner says *j'ai payé* and Whisper writes *je payé*, the model sees a grammar error and logs a correction for a mistake nobody made. This was seen, and a rule in `_RULES` now says a correction must be audible: if "said" and "target" sound the same (je/j'ai, et/est, ses/ces/c'est, -é/-er/-ez, a/à), log nothing. That rule only asks the model to behave, where most rules with a detectable shape are also enforced in code. The code version: encode both phrases phonetically for French and drop the correction when the encodings match. Worth building once the eval harness (1) shows the prompt rule leaking.
