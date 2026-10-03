@@ -26,11 +26,11 @@ async def today(db: DbDep, profile: ProfileDep, settings: SettingsDep) -> TodayD
     t = await track.load(db, profile, window)
     next_scene = None
     if t.next is not None:
-        due = await cards.due_cards(db, profile["_id"], window, limit=5)
+        due = await cards.scene_targets(db, profile["_id"], window, limit=5)
         next_scene = to_dto(
             t.next,
             status="next",
-            uses_due_cards=[c["target"] for c in due],
+            uses_due_cards=due,
             unlocked=t.unlocked,
             unlocks_at=t.unlocks_at,
         )

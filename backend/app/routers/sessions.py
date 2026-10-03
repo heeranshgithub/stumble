@@ -37,8 +37,8 @@ async def start_session(
     t = await track.load(db, profile, window)
     if not t.playable(scene):
         raise BadRequest("This scene isn't open yet.", code="scene_locked")
-    # The character is told which words are due, so the scene steers toward them.
-    due = [c["target"] for c in await cards.due_cards(db, profile["_id"], window, limit=5)]
+    # The character is told which words to ask for: due ones, and the ones just reviewed.
+    due = await cards.scene_targets(db, profile["_id"], window, limit=5)
     doc = await sessions.start(db, profile, scene, body.patience, due_cards=due)
     return sessions.to_dto(doc)
 

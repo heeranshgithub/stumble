@@ -4,7 +4,8 @@ Two gates, both server-side so the Scenes tab can't route around Today:
 - Review first: nothing may be due. A due word is reviewed before a new scene is played.
 - One new scene per session: the last cleared scene must be at least a session old. Without this a
   learner could clear all six in an hour with café-level French; the scenes climb on purpose.
-Cleared scenes are always replayable; that's where due words get steered into a scene.
+Cleared scenes are always replayable. Every scene, new or replayed, steers toward the words that
+are due or were reviewed this sitting (`cards.scene_targets`).
 """
 
 from dataclasses import dataclass

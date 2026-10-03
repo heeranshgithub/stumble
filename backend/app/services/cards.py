@@ -156,6 +156,50 @@ async def due_cards(
     return docs
 
 
+async def scene_targets(
+    db: Database, profile_id: ObjectId, due_window: timedelta, limit: int
+) -> list[str]:
+    """The words a scene steers toward: what's due, then what was reviewed this sitting.
+
+    A new scene only opens once nothing is due, so due cards alone would never reach one: the
+    words reviewed minutes ago are the ones the next scene should ask for. A second clean use
+    right after a review barely moves FSRS (recall is near certain), so crediting it is safe.
+    """
+    targets: list[str] = []
+    seen: set[str] = set()
+
+    def add(target: str) -> None:
+        key = target_key(target)
+        if key and key not in seen and len(targets) < limit:
+            seen.add(key)
+            targets.append(target)
+
+    for card in await due_cards(db, profile_id, due_window, limit):
+        add(card["target"])
+    if len(targets) < limit:
+        since = _now() - due_window
+        recent: list[Document] = (
+            await db.reviews.find(
+                {"profile_id": profile_id, "source": "review", "reviewed_at": {"$gte": since}},
+                {"card_id": 1},
+            )
+            .sort("reviewed_at", -1)
+            .to_list(length=200)
+        )
+        ids = list(dict.fromkeys(r["card_id"] for r in recent))
+        by_id = {
+            c["_id"]: c
+            async for c in db.cards.find(
+                {"_id": {"$in": ids}, "profile_id": profile_id, "mastered": False},
+                {"target": 1},
+            )
+        }
+        for card_id in ids:
+            if card_id in by_id:
+                add(by_id[card_id]["target"])
+    return targets
+
+
 async def next_review_at(db: Database, profile_id: ObjectId) -> datetime | None:
     doc: Document | None = await db.cards.find_one(
         {"profile_id": profile_id, "mastered": False}, sort=[("due", 1)]

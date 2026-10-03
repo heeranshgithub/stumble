@@ -158,6 +158,42 @@ async def test_scenes_track_and_due_words(
     assert doc["due_cards"] == ["café"]
 
 
+async def test_the_scene_after_a_review_asks_for_the_words_just_reviewed(
+    client: AsyncClient, mock_client: AsyncMongoMockClient
+) -> None:
+    db = mock_client["stumble_test"]
+    sid = (await client.post("/sessions", json={"sceneId": "cafe"}, headers=HEADERS)).json()["id"]
+    for text in ("Un coffee.", "Oui.", "Merci."):
+        await client.post(f"/sessions/{sid}/turns", data={"text": text}, headers=HEADERS)
+    await client.post(f"/sessions/{sid}/finish", headers=HEADERS)
+    await _make_due(mock_client)
+    # A sitting later: the review is due and the session gate is open.
+    await db.sessions.update_many(
+        {}, {"$set": {"finished_at": datetime.now(UTC) - timedelta(hours=9)}}
+    )
+
+    due = (await client.get("/reviews/due", headers=HEADERS)).json()["cards"]
+    assert [c["target"] for c in due] == ["café"]
+    await client.post(f"/reviews/{due[0]['id']}", json={"rating": "good"}, headers=HEADERS)
+
+    # Nothing is due now, which is what opens the scene; the word just reviewed still steers it.
+    scenes = (await client.get("/scenes", headers=HEADERS)).json()
+    assert scenes[1]["unlocked"] is True
+    assert scenes[1]["usesDueCards"] == ["café"]
+    started = await client.post("/sessions", json={"sceneId": "pharmacie"}, headers=HEADERS)
+    assert started.status_code == 200
+    doc = await db.sessions.find_one({"_id": ObjectId(started.json()["id"])})
+    assert doc is not None
+    assert doc["due_cards"] == ["café"]
+
+    # A review from an earlier sitting no longer counts.
+    await db.reviews.update_many(
+        {}, {"$set": {"reviewed_at": datetime.now(UTC) - timedelta(hours=9)}}
+    )
+    scenes = (await client.get("/scenes", headers=HEADERS)).json()
+    assert scenes[1]["usesDueCards"] == []
+
+
 async def _clear_cafe(client: AsyncClient) -> None:
     sid = (await client.post("/sessions", json={"sceneId": "cafe"}, headers=HEADERS)).json()["id"]
     for text in ("Un café.", "Oui.", "Merci."):
