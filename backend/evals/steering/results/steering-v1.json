@@ -1,0 +1,3110 @@
+[
+  {
+    "scene": "pharmacie",
+    "condition": "due",
+    "run": 1,
+    "targets": [
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe"
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe"
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Bonjour, je peux vous aider ?"
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, oui, s'il vous plaît. J'ai mal à la tête. Vous avez quelque chose pour ça ?"
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Et depuis quand avez-vous mal à la tête ?"
+      },
+      {
+        "role": "learner",
+        "text": "Depuis ce matin, madame. C'est un mal de tête assez fort."
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Avez-vous une ordonnance pour cela ?"
+      },
+      {
+        "role": "learner",
+        "text": "Non, je n'ai pas d'ordonnance. Je voudrais juste un médicament simple, s'il vous plaît."
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Préférez-vous un sirop ou des comprimés ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je préfère des comprimés, s'il vous plaît. C'est plus facile pour moi."
+      },
+      {
+        "role": "character",
+        "text": "Très bien. Alors, un comprimé, trois fois par jour, avec de l'eau. Ça coûte trois euros. Vous payez comment ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je paye en espèces, merci. Est-ce que je dois prendre le médicament avec de la nourriture ?"
+      },
+      {
+        "role": "character",
+        "text": "Non, ce n'est pas nécessaire de le prendre avec de la nourriture. Juste avec de l'eau. Voici votre boîte de comprimés. Au revoir et bonne journée !"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 5,
+    "error": null,
+    "words": [
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "pharmacie",
+    "condition": "due",
+    "run": 2,
+    "targets": [
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe"
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe"
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Bonjour, je peux vous aider ?"
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, oui, j'ai mal à la tête, vous avez un médicament pour ça ?"
+      },
+      {
+        "role": "character",
+        "text": "Oui, j'ai des médicaments pour ça. Depuis quand avez-vous mal à la tête ?"
+      },
+      {
+        "role": "learner",
+        "text": "Depuis ce matin, c'est un peu fort. Qu'est-ce que vous me conseillez ?"
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Et avez-vous une ordonnance pour un médicament ?"
+      },
+      {
+        "role": "learner",
+        "text": "Non, je n'ai pas d'ordonnance. C'est possible d'acheter un médicament sans ordonnance ?"
+      },
+      {
+        "role": "character",
+        "text": "Oui, c'est possible d'acheter des médicaments sans ordonnance. Préférez-vous un sirop ou des comprimés ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je préfère des comprimés, c'est plus facile pour moi. Combien je dois prendre ?"
+      },
+      {
+        "role": "character",
+        "text": "D'accord, des comprimés. Vous pouvez prendre un comprimé, trois fois par jour maximum, avec de l'eau. Une boîte coûte trois euros. Comment souhaitez-vous payer ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je vais payer en espèces, s'il vous plaît. Merci beaucoup, bonne journée !"
+      },
+      {
+        "role": "character",
+        "text": "Très bien. Voici votre boîte de comprimés. Bonne journée et bon rétablissement !"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 5,
+    "error": null,
+    "words": [
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe",
+        "opening": true,
+        "opening_turn": 4,
+        "quote": "Oui, c'est possible d'acheter des médicaments sans ordonnance. Préférez-vous un sirop ou des comprimés ?",
+        "learner_said": true,
+        "learner_said_turn": 4,
+        "character_said": false
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "pharmacie",
+    "condition": "due",
+    "run": 3,
+    "targets": [
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe"
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe"
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Bonjour, je peux vous aider ?"
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, oui, j'ai mal à la tête. Vous avez un médicament pour ça ?"
+      },
+      {
+        "role": "character",
+        "text": "Ah, vous avez mal à la tête. Depuis quand avez-vous mal ?"
+      },
+      {
+        "role": "learner",
+        "text": "Depuis ce matin, madame. Je veux quelque chose pour calmer la douleur."
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Avez-vous une ordonnance pour un médicament ?"
+      },
+      {
+        "role": "learner",
+        "text": "Non, je n'ai pas d'ordonnance. Est-ce que je peux prendre un médicament sans ordonnance ?"
+      },
+      {
+        "role": "character",
+        "text": "Oui, bien sûr. Nous avons des médicaments sans ordonnance pour le mal de tête. Préférez-vous un sirop ou des comprimés ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je préfère des comprimés, s'il vous plaît. C'est plus facile pour moi."
+      },
+      {
+        "role": "character",
+        "text": "Très bien. Alors, un comprimé, trois fois par jour, avec de l'eau. Ça coûte trois euros. Comment payez-vous ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je paye en espèces, voilà. Merci beaucoup pour votre aide. Bonne journée !"
+      },
+      {
+        "role": "character",
+        "text": "Merci. Voici votre boîte de comprimés. Bonne journée à vous aussi !"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 5,
+    "error": null,
+    "words": [
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "pharmacie",
+    "condition": "control",
+    "run": 1,
+    "targets": [
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe"
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe"
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Bonjour, je peux vous aider ?"
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, oui s'il vous plaît, j'ai mal à la tête. Vous avez quelque chose ?"
+      },
+      {
+        "role": "character",
+        "text": "Oui, j'ai quelque chose. Depuis quand avez-vous mal à la tête ?"
+      },
+      {
+        "role": "learner",
+        "text": "Depuis ce matin, je pense. C'est un peu fort."
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Avez-vous une ordonnance pour cela ?"
+      },
+      {
+        "role": "learner",
+        "text": "Non, je n'ai pas d'ordonnance. C'est juste un mal de tête normal."
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Préférez-vous un sirop ou des comprimés ?"
+      },
+      {
+        "role": "learner",
+        "text": "Des comprimés, s'il vous plaît. C'est plus facile pour moi."
+      },
+      {
+        "role": "character",
+        "text": "Très bien. Prenez un comprimé avec de l'eau. Vous pouvez en prendre jusqu'à trois fois par jour. Ça fait 3 euros. Comment payez-vous ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je paye en espèces, voilà. Merci beaucoup pour votre aide. Au revoir !"
+      },
+      {
+        "role": "character",
+        "text": "Voilà. Au revoir et bonne journée !"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 5,
+    "error": null,
+    "words": [
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "pharmacie",
+    "condition": "control",
+    "run": 2,
+    "targets": [
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe"
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe"
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Bonjour, je peux vous aider ?"
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, oui, j'ai mal à la tête, vous avez quelque chose pour ça ?"
+      },
+      {
+        "role": "character",
+        "text": "Ah, vous avez mal à la tête. Depuis quand avez-vous mal ?"
+      },
+      {
+        "role": "learner",
+        "text": "J'ai mal à la tête depuis ce matin, ça ne passe pas."
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Avez-vous une ordonnance pour cela ?"
+      },
+      {
+        "role": "learner",
+        "text": "Non, je n'ai pas d'ordonnance, c'est juste un mal de tête normal."
+      },
+      {
+        "role": "character",
+        "text": "D'accord, pas d'ordonnance. Préférez-vous un sirop ou des comprimés ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je préfère des comprimés, s'il vous plaît."
+      },
+      {
+        "role": "character",
+        "text": "Très bien. Alors, un comprimé, trois fois par jour, avec de l'eau. Ça coûte trois euros. Comment voulez-vous payer ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je paie en espèces, merci."
+      },
+      {
+        "role": "character",
+        "text": "Voilà. Trois euros, s'il vous plaît."
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 5,
+    "error": null,
+    "words": [
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "pharmacie",
+    "condition": "control",
+    "run": 3,
+    "targets": [
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe"
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe"
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Bonjour, je peux vous aider ?"
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, oui, s'il vous plaît. J'ai mal à la tête. Vous avez quelque chose pour ça ?"
+      },
+      {
+        "role": "character",
+        "text": "Vous avez mal à la tête. D'accord. Depuis quand avez-vous mal à la tête ?"
+      },
+      {
+        "role": "learner",
+        "text": "Depuis ce matin, madame. C'est un peu fort. Que me conseillez-vous ?"
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Avez-vous une ordonnance pour cela ?"
+      },
+      {
+        "role": "learner",
+        "text": "Non, je n'ai pas d'ordonnance. Est-ce que je peux acheter quelque chose sans ?"
+      },
+      {
+        "role": "character",
+        "text": "Oui, bien sûr. Je peux vous donner quelque chose sans ordonnance. Préférez-vous un sirop ou des comprimés ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je préfère des comprimés, s'il vous plaît. Merci beaucoup."
+      },
+      {
+        "role": "character",
+        "text": "Très bien, des comprimés. Vous pouvez prendre un comprimé, trois fois par jour maximum, avec de l'eau. Une boîte coûte trois euros. Comment souhaitez-vous payer ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je vais payer en espèces, s'il vous plaît. Voici l'argent. Merci beaucoup."
+      },
+      {
+        "role": "character",
+        "text": "Voilà. Tenez. Et n'oubliez pas de boire beaucoup d'eau. Au revoir et bonne journée !"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 5,
+    "error": null,
+    "words": [
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "apartment",
+    "condition": "due",
+    "run": 1,
+    "targets": [
+      {
+        "word": "s'il vous plaît",
+        "kind": "travels",
+        "source": "cafe"
+      },
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe"
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Entrez, entrez. Alors, voilà le salon. Vous cherchez depuis longtemps ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, je cherche depuis deux mois. Combien est le loyer, s’il vous plaît ?"
+      },
+      {
+        "role": "character",
+        "text": "Le loyer est de neuf cent cinquante euros par mois. Il y a aussi quatre-vingts euros de charges. Ça vous convient ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, c’est un peu cher, mais ça va. Quand est-ce que je peux emménager ?"
+      },
+      {
+        "role": "character",
+        "text": "L'appartement est libre à partir du premier du mois prochain. Est-ce que cette date vous arrange ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, c’est parfait. Je peux faire le contrat bientôt ?"
+      },
+      {
+        "role": "character",
+        "text": "Oui, bien sûr. Voulez-vous remplir le dossier de candidature maintenant ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, je veux bien. Merci beaucoup, madame Roux. Au revoir !"
+      },
+      {
+        "role": "character",
+        "text": "De rien. Au revoir et bonne journée !"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 4,
+    "error": null,
+    "words": [
+      {
+        "word": "s'il vous plaît",
+        "kind": "travels",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": true,
+        "learner_said_turn": 1,
+        "character_said": false
+      },
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe",
+        "opening": true,
+        "opening_turn": 1,
+        "quote": "Entrez, entrez. Alors, voilà le salon. Vous cherchez depuis longtemps ?",
+        "learner_said": true,
+        "learner_said_turn": 1,
+        "character_said": false
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "apartment",
+    "condition": "due",
+    "run": 2,
+    "targets": [
+      {
+        "word": "s'il vous plaît",
+        "kind": "travels",
+        "source": "cafe"
+      },
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe"
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Entrez, entrez. Alors, voilà le salon. Vous cherchez depuis longtemps ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, un mois. Madame, le loyer, c’est combien par mois ?"
+      },
+      {
+        "role": "character",
+        "text": "Ah, un mois, c'est déjà un peu long. Le loyer est de neuf cent cinquante euros par mois. Il y a aussi quatre-vingts euros de charges. Est-ce que cela vous convient ?"
+      },
+      {
+        "role": "learner",
+        "text": "C’est un peu cher, mais je comprends. Et la date pour emménager, c’est possible quand ?"
+      },
+      {
+        "role": "character",
+        "text": "L'appartement est libre à partir du premier du mois prochain. Est-ce que cette date vous arrange ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, c’est parfait. Je peux emménager le premier. Merci beaucoup, Madame. Au revoir!"
+      },
+      {
+        "role": "character",
+        "text": "Alors, voulez-vous faire une demande pour l'appartement ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, je veux faire la demande. Quels papiers il faut pour ça ?"
+      },
+      {
+        "role": "character",
+        "text": "Très bien ! Pour la demande, il faut une copie de votre pièce d'identité, vos trois dernières fiches de paie et votre dernier avis d'imposition. Est-ce que vous avez tout cela ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, j’ai tous ces papiers. Je peux vous les donner aujourd’hui ?"
+      },
+      {
+        "role": "character",
+        "text": "Oui, vous pouvez me les donner aujourd'hui. Je peux vous attendre ici, ou vous pouvez me les envoyer par e-mail. Qu'est-ce qui est le mieux pour vous ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je préfère vous donner les papiers aujourd’hui ici. Merci, Madame."
+      },
+      {
+        "role": "character",
+        "text": "Parfait ! Alors je vous attends ici. Merci à vous et à tout à l'heure !"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 6,
+    "error": null,
+    "words": [
+      {
+        "word": "s'il vous plaît",
+        "kind": "travels",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe",
+        "opening": true,
+        "opening_turn": 1,
+        "quote": "Entrez, entrez. Alors, voilà le salon. Vous cherchez depuis longtemps ?",
+        "learner_said": true,
+        "learner_said_turn": 1,
+        "character_said": false
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "apartment",
+    "condition": "due",
+    "run": 3,
+    "targets": [
+      {
+        "word": "s'il vous plaît",
+        "kind": "travels",
+        "source": "cafe"
+      },
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe"
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Entrez, entrez. Alors, voilà le salon. Vous cherchez depuis longtemps ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, je cherche un appartement depuis deux mois. Le loyer est combien ici ?"
+      },
+      {
+        "role": "character",
+        "text": "Ah, deux mois, c'est long. Alors, pour le loyer, c'est neuf cent cinquante euros par mois. Et il y a les charges en plus. Cela vous convient ?"
+      },
+      {
+        "role": "learner",
+        "text": "Neuf cent cinquante euros, c'est un peu cher, mais ça peut aller. Et la date pour emménager, c'est quand ?"
+      },
+      {
+        "role": "character",
+        "text": "L'appartement est libre à partir du premier du mois prochain. Ça vous arrange ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, c'est parfait pour moi. Je peux visiter les chambres maintenant ?"
+      },
+      {
+        "role": "character",
+        "text": "Oui, bien sûr. Suivez-moi. Nous allons visiter les chambres. Voulez-vous faire une demande pour l'appartement ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, je veux faire une demande. Quels documents vous faut-il ?"
+      },
+      {
+        "role": "character",
+        "text": "Très bien. Il me faut une copie de votre pièce d'identité, vos trois dernières fiches de paie et votre dernier avis d'imposition. Avez-vous tout cela ?"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 4,
+    "error": null,
+    "words": [
+      {
+        "word": "s'il vous plaît",
+        "kind": "travels",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe",
+        "opening": true,
+        "opening_turn": 1,
+        "quote": "Entrez, entrez. Alors, voilà le salon. Vous cherchez depuis longtemps ?",
+        "learner_said": true,
+        "learner_said_turn": 1,
+        "character_said": false
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "apartment",
+    "condition": "control",
+    "run": 1,
+    "targets": [
+      {
+        "word": "s'il vous plaît",
+        "kind": "travels",
+        "source": "cafe"
+      },
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe"
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Entrez, entrez. Alors, voilà le salon. Vous cherchez depuis longtemps ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, un peu. Combien coûte le loyer chaque mois ?"
+      },
+      {
+        "role": "character",
+        "text": "Le loyer est de neuf cent cinquante euros par mois. Et il y a quatre-vingts euros de charges en plus. Ça vous va ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, c'est bon. Et je peux entrer quand dans l'appartement ?"
+      },
+      {
+        "role": "character",
+        "text": "L'appartement est libre à partir du premier du mois prochain. Est-ce que cette date vous convient ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, parfait. Je peux signer le contrat bientôt ?"
+      },
+      {
+        "role": "character",
+        "text": "Oui, si vous le souhaitez. Voulez-vous déposer un dossier de candidature ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, je veux. Quels papiers il faut pour le dossier ?"
+      },
+      {
+        "role": "character",
+        "text": "Pour le dossier, il faut une pièce d'identité et vos trois dernières fiches de paie. Avez-vous ces documents ?"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 4,
+    "error": null,
+    "words": [
+      {
+        "word": "s'il vous plaît",
+        "kind": "travels",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe",
+        "opening": true,
+        "opening_turn": 1,
+        "quote": "Entrez, entrez. Alors, voilà le salon. Vous cherchez depuis longtemps ?",
+        "learner_said": true,
+        "learner_said_turn": 1,
+        "character_said": false
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "apartment",
+    "condition": "control",
+    "run": 2,
+    "targets": [
+      {
+        "word": "s'il vous plaît",
+        "kind": "travels",
+        "source": "cafe"
+      },
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe"
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Entrez, entrez. Alors, voilà le salon. Vous cherchez depuis longtemps ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, je cherche un appartement depuis deux mois. Le loyer, c'est combien, s'il vous plaît ?"
+      },
+      {
+        "role": "character",
+        "text": "Ah, deux mois, c'est long ! Le loyer est de neuf cent cinquante euros par mois. Et il y a quatre-vingts euros de charges en plus. Ça vous convient ?"
+      },
+      {
+        "role": "learner",
+        "text": "C'est un peu cher, mais ça va. Et la date d'entrée, c'est quand possible ?"
+      },
+      {
+        "role": "character",
+        "text": "L'appartement est libre à partir du premier du mois prochain. Est-ce que cette date vous convient ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, c'est bon pour moi. Je peux entrer le premier. Merci beaucoup !"
+      },
+      {
+        "role": "character",
+        "text": "Parfait ! Alors, souhaitez-vous déposer un dossier pour cet appartement ?"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 3,
+    "error": null,
+    "words": [
+      {
+        "word": "s'il vous plaît",
+        "kind": "travels",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": true,
+        "learner_said_turn": 1,
+        "character_said": false
+      },
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": true,
+        "learner_said_turn": 1,
+        "character_said": false
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "apartment",
+    "condition": "control",
+    "run": 3,
+    "targets": [
+      {
+        "word": "s'il vous plaît",
+        "kind": "travels",
+        "source": "cafe"
+      },
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe"
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Entrez, entrez. Alors, voilà le salon. Vous cherchez depuis longtemps ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, je cherche un appartement depuis deux mois. Quel est le loyer, s'il vous plaît ?"
+      },
+      {
+        "role": "character",
+        "text": "Le loyer est de neuf cent cinquante euros par mois. Et il y a quatre-vingts euros de charges. Ça vous convient ?"
+      },
+      {
+        "role": "learner",
+        "text": "C’est un peu cher, mais ça peut aller. Quand est-ce que je peux emménager ?"
+      },
+      {
+        "role": "character",
+        "text": "L'appartement est libre le premier du mois prochain. Est-ce que cette date vous arrange ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, c’est parfait. Je peux visiter la chambre maintenant ?"
+      },
+      {
+        "role": "character",
+        "text": "Oui, bien sûr. Suivez-moi. Voulez-vous déposer un dossier pour cet appartement ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, je veux déposer un dossier. Quels documents vous avez besoin ?"
+      },
+      {
+        "role": "character",
+        "text": "Très bien. Il me faut une copie de votre pièce d'identité, vos trois dernières fiches de paie et votre dernier avis d'imposition. Avez-vous tout cela ?"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 4,
+    "error": null,
+    "words": [
+      {
+        "word": "s'il vous plaît",
+        "kind": "travels",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": true,
+        "learner_said_turn": 1,
+        "character_said": false
+      },
+      {
+        "word": "combien",
+        "kind": "travels",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "bill",
+    "condition": "due",
+    "run": 1,
+    "targets": [
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment"
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe"
+      },
+      {
+        "word": "loyer",
+        "kind": "bound",
+        "source": "apartment"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Service client, bonjour. C'est à quel sujet ?"
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, je regarde ma facture, il y a un charge que je comprends pas."
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Sur quelle ligne est le problème ? C'est pour le mois dernier ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, c’est pour le mois dernier, la ligne avec 10 euros pour un appel que je n'ai pas fait."
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Je vois une option à 12 euros sur votre facture. Est-ce que c'est ça ? Avez-vous souscrit à cette option ?"
+      },
+      {
+        "role": "learner",
+        "text": "Non, je n'ai pas pris cette option, je pense que c'est une erreur. Pouvez-vous enlever cette charge, s'il vous plaît ?"
+      },
+      {
+        "role": "character",
+        "text": "Oui, je peux retirer cette option de votre facture. Je vais faire le nécessaire pour que les 12 euros soient remboursés sur votre prochaine facture. Y a-t-il autre chose que je puisse faire pour vous ?"
+      },
+      {
+        "role": "learner",
+        "text": "Merci beaucoup, c’est tout pour aujourd’hui. Bonne journée !"
+      },
+      {
+        "role": "character",
+        "text": "De rien ! Je suis contente d'avoir pu vous aider. Bonne journée à vous aussi !"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 4,
+    "error": null,
+    "words": [
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment",
+        "opening": true,
+        "opening_turn": 2,
+        "quote": "C'est pour le mois dernier ?",
+        "learner_said": true,
+        "learner_said_turn": 2,
+        "character_said": true
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "loyer",
+        "kind": "bound",
+        "source": "apartment",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "bill",
+    "condition": "due",
+    "run": 2,
+    "targets": [
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment"
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe"
+      },
+      {
+        "word": "loyer",
+        "kind": "bound",
+        "source": "apartment"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Service client, bonjour. C'est à quel sujet ?"
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, j’ai une question sur ma facture, il y a un charge que je ne comprends pas."
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Vous avez une question sur votre facture. Quelle ligne de la facture ne comprenez-vous pas ?"
+      },
+      {
+        "role": "learner",
+        "text": "C'est la ligne pour les appels internationaux. Je n'ai pas fait ces appels. Pouvez-vous enlever cette charge ?"
+      },
+      {
+        "role": "character",
+        "text": "D'accord, je vois. Cette ligne concerne une option d'appels internationaux. Avez-vous souscrit à cette option le mois dernier ?"
+      },
+      {
+        "role": "learner",
+        "text": "Non, je ne pense pas avoir souscrit à cette option. Je veux bien que vous vérifiez, s'il vous plaît."
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Je peux vérifier cela pour vous. Vous n'avez pas souscrit à cette option, c'est bien cela ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, c'est ça. Je demande que vous enlevez la charge pour cette option, parce que je ne l'ai pas utilisée."
+      },
+      {
+        "role": "character",
+        "text": "Je comprends. Cette option coûte 12 euros. Vous n'avez pas utilisé cette option, donc je peux la retirer de votre prochaine facture. Y a-t-il autre chose que je puisse faire pour vous aujourd'hui ?"
+      },
+      {
+        "role": "learner",
+        "text": "Merci beaucoup. Non, c'est tout pour aujourd'hui. Bonne journée !"
+      },
+      {
+        "role": "character",
+        "text": "De rien ! Bonne journée à vous aussi. Au revoir."
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 5,
+    "error": null,
+    "words": [
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": true
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "loyer",
+        "kind": "bound",
+        "source": "apartment",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "bill",
+    "condition": "due",
+    "run": 3,
+    "targets": [
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment"
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe"
+      },
+      {
+        "word": "loyer",
+        "kind": "bound",
+        "source": "apartment"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Service client, bonjour. C'est à quel sujet ?"
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, je regarde ma facture et il y a un charge que je ne comprends pas, s'il vous plaît."
+      },
+      {
+        "role": "character",
+        "text": "Je comprends. Sur quelle ligne est le problème, s'il vous plaît ?"
+      },
+      {
+        "role": "learner",
+        "text": "C'est la ligne avec les appels internationaux, je ne fais pas cet appel. Pouvez-vous l'enlever ?"
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Cette ligne, c'est une option pour les appels internationaux. Vous n'avez pas demandé cette option, n'est-ce pas ?"
+      },
+      {
+        "role": "learner",
+        "text": "Non, je n'ai pas demandé cette option. Je veux annuler cette charge, s'il vous plaît."
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Je peux annuler cette option pour vous. Je vais faire le nécessaire pour que le montant de 12 euros soit remboursé sur votre prochaine facture. Y a-t-il autre chose que je puisse faire pour vous aujourd'hui ?"
+      },
+      {
+        "role": "learner",
+        "text": "Non, merci beaucoup pour votre aide. Bonne journée !"
+      },
+      {
+        "role": "character",
+        "text": "De rien ! Je vous souhaite une très bonne journée également. Au revoir !"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 4,
+    "error": null,
+    "words": [
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "loyer",
+        "kind": "bound",
+        "source": "apartment",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "bill",
+    "condition": "control",
+    "run": 1,
+    "targets": [
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment"
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe"
+      },
+      {
+        "word": "loyer",
+        "kind": "bound",
+        "source": "apartment"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Service client, bonjour. C'est à quel sujet ?"
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, je regarde ma facture et il y a un charge que je ne comprends pas. Pouvez-vous m'aider ?"
+      },
+      {
+        "role": "character",
+        "text": "Oui, bien sûr. Je peux vous aider. De quelle ligne de la facture parlez-vous ?"
+      },
+      {
+        "role": "learner",
+        "text": "C'est la ligne pour un appel international. Je n'ai pas fait cet appel. Vous pouvez enlever ce charge, s'il vous plaît ?"
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Je vois la ligne dont vous parlez. C'est une option pour les appels internationaux. Vous n'avez pas souscrit à cette option ?"
+      },
+      {
+        "role": "learner",
+        "text": "Non, je n'ai pas souscrit à cette option. Je veux juste payer ce que j'ai utilisé, pas cette option."
+      },
+      {
+        "role": "character",
+        "text": "D'accord, je comprends. Vous n'avez pas demandé cette option. Je peux la retirer de votre prochaine facture. Y a-t-il autre chose que je puisse faire pour vous aujourd'hui ?"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 3,
+    "error": null,
+    "words": [
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "loyer",
+        "kind": "bound",
+        "source": "apartment",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "bill",
+    "condition": "control",
+    "run": 2,
+    "targets": [
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment"
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe"
+      },
+      {
+        "word": "loyer",
+        "kind": "bound",
+        "source": "apartment"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Service client, bonjour. C'est à quel sujet ?"
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, je regarde ma facture et il y a un charge que je ne comprends pas."
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Vous regardez votre facture. Quelle ligne de la facture ne comprenez-vous pas ?"
+      },
+      {
+        "role": "learner",
+        "text": "C'est la ligne avec un appel de 10 euros, mais je n'ai pas fait cet appel."
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Vous parlez de l'option à 12 euros, c'est bien ça ? Avez-vous souscrit à cette option ?"
+      },
+      {
+        "role": "learner",
+        "text": "Non, je n'ai pas pris cette option, alors ce charge est une erreur. Vous pouvez le supprimer ?"
+      },
+      {
+        "role": "character",
+        "text": "Je comprends. Cette option est une option de divertissement. Vous n'avez pas demandé cette option ? Nous pouvons la retirer de votre prochaine facture. Y a-t-il autre chose que je puisse faire pour vous ?"
+      },
+      {
+        "role": "learner",
+        "text": "Merci, mais je veux que vous enlevez le charge de cette facture, pas la prochaine. C'est important."
+      },
+      {
+        "role": "character",
+        "text": "Je comprends que c'est important pour vous. Je ne peux pas enlever le montant de cette facture, mais je peux vous rembourser les 12 euros sur votre prochaine facture. Est-ce que cela vous convient ?"
+      },
+      {
+        "role": "learner",
+        "text": "D'accord, merci pour le remboursement sur la prochaine facture. C'est mieux que rien. Au revoir."
+      },
+      {
+        "role": "character",
+        "text": "De rien. Au revoir et bonne journée !"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 5,
+    "error": null,
+    "words": [
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "loyer",
+        "kind": "bound",
+        "source": "apartment",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "bill",
+    "condition": "control",
+    "run": 3,
+    "targets": [
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment"
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe"
+      },
+      {
+        "word": "loyer",
+        "kind": "bound",
+        "source": "apartment"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Service client, bonjour. C'est à quel sujet ?"
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, je veux parler de ma facture, il y a un charge que je ne comprends pas."
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Vous parlez de quelle ligne sur votre facture ?"
+      },
+      {
+        "role": "learner",
+        "text": "C'est la ligne pour les appels à l'étranger, je n'ai pas fait ces appels."
+      },
+      {
+        "role": "character",
+        "text": "Je vois. Cette option coûte 12 euros. Vous avez souscrit à cette option pour les appels à l'étranger ?"
+      },
+      {
+        "role": "learner",
+        "text": "Non, je n'ai pas pris cette option, je demande de supprimer cette charge, s'il vous plaît."
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Je peux annuler cette option pour vous. Le remboursement sera sur votre prochaine facture. Y a-t-il autre chose que je peux faire pour vous ?"
+      },
+      {
+        "role": "learner",
+        "text": "Merci beaucoup, c'est tout pour moi. Au revoir !"
+      },
+      {
+        "role": "character",
+        "text": "De rien. Au revoir et bonne journée !"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 4,
+    "error": null,
+    "words": [
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "l'addition",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "loyer",
+        "kind": "bound",
+        "source": "apartment",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "doctor",
+    "condition": "due",
+    "run": 1,
+    "targets": [
+      {
+        "word": "mal à la tête",
+        "kind": "travels",
+        "source": "pharmacie"
+      },
+      {
+        "word": "rembourser",
+        "kind": "bound",
+        "source": "bill"
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Bonjour, asseyez-vous. Qu'est-ce qui vous amène ?"
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, docteur. J'ai mal à la tête depuis ce matin. Que dois-je faire ?"
+      },
+      {
+        "role": "character",
+        "text": "Vous avez mal à la tête depuis ce matin. Est-ce que la douleur est forte ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, la douleur est un peu forte, surtout quand je bouge la tête. Est-ce que je dois prendre des médicaments ?"
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Et où avez-vous mal exactement ? Est-ce que c'est sur le côté, ou plutôt derrière la tête ?"
+      },
+      {
+        "role": "learner",
+        "text": "C'est plutôt derrière la tête, un peu comme une pression. Est-ce que c'est grave ?"
+      },
+      {
+        "role": "character",
+        "text": "Je comprends. Et avez-vous de la fièvre ? Je veux dire, est-ce que votre température est élevée ?"
+      },
+      {
+        "role": "learner",
+        "text": "Non, je n'ai pas de fièvre, ma température est normale. Que me conseillez-vous, docteur ?"
+      },
+      {
+        "role": "character",
+        "text": "Bien. Alors, je pense que c'est une céphalée de tension. Reposez-vous bien, buvez beaucoup d'eau, et vous pouvez prendre du paracétamol. Avez-vous des questions ?"
+      },
+      {
+        "role": "learner",
+        "text": "Merci, docteur. Combien de temps je dois me reposer avant que ça aille mieux ?"
+      },
+      {
+        "role": "character",
+        "text": "Normalement, avec du repos et du paracétamol, ça devrait aller mieux en un jour ou deux. Si la douleur persiste après une semaine, revenez me voir. C'est clair pour vous ?"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 5,
+    "error": null,
+    "words": [
+      {
+        "word": "mal à la tête",
+        "kind": "travels",
+        "source": "pharmacie",
+        "opening": true,
+        "opening_turn": 1,
+        "quote": "Bonjour, asseyez-vous. Qu'est-ce qui vous amène ?",
+        "learner_said": true,
+        "learner_said_turn": 1,
+        "character_said": true
+      },
+      {
+        "word": "rembourser",
+        "kind": "bound",
+        "source": "bill",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "doctor",
+    "condition": "due",
+    "run": 2,
+    "targets": [
+      {
+        "word": "mal à la tête",
+        "kind": "travels",
+        "source": "pharmacie"
+      },
+      {
+        "word": "rembourser",
+        "kind": "bound",
+        "source": "bill"
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Bonjour, asseyez-vous. Qu'est-ce qui vous amène ?"
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, docteur, j'ai mal à la tête depuis deux jours. Que dois-je faire ?"
+      },
+      {
+        "role": "character",
+        "text": "Vous avez mal à la tête depuis deux jours, c'est ça ? Depuis quand exactement avez-vous cette douleur ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, docteur, la douleur a commencé il y a deux jours, surtout le matin. Que me conseillez-vous ?"
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Et où avez-vous mal exactement ? Est-ce que c'est sur le côté, derrière la tête, ou partout ?"
+      },
+      {
+        "role": "learner",
+        "text": "C'est surtout sur le côté droit de ma tête, parfois ça fait un peu mal derrière aussi. Que je dois prendre comme médicament ?"
+      },
+      {
+        "role": "character",
+        "text": "D'accord, c'est sur le côté droit. Et est-ce que vous avez de la fièvre avec cette douleur ?"
+      },
+      {
+        "role": "learner",
+        "text": "Non, je n'ai pas de fièvre, juste le mal de tête. Est-ce que je peux prendre du paracétamol ?"
+      },
+      {
+        "role": "character",
+        "text": "Oui, vous pouvez prendre du paracétamol. Reposez-vous bien et buvez beaucoup d'eau. Avez-vous d'autres questions ?"
+      },
+      {
+        "role": "learner",
+        "text": "Merci, docteur. Est-ce que je dois revenir si la douleur continue après trois jours ?"
+      },
+      {
+        "role": "character",
+        "text": "Oui, si la douleur continue après trois jours, il faut revenir me voir. Est-ce que c'est clair ?"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 5,
+    "error": null,
+    "words": [
+      {
+        "word": "mal à la tête",
+        "kind": "travels",
+        "source": "pharmacie",
+        "opening": true,
+        "opening_turn": 1,
+        "quote": "Bonjour, asseyez-vous. Qu'est-ce qui vous amène ?",
+        "learner_said": true,
+        "learner_said_turn": 1,
+        "character_said": true
+      },
+      {
+        "word": "rembourser",
+        "kind": "bound",
+        "source": "bill",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "doctor",
+    "condition": "due",
+    "run": 3,
+    "targets": [
+      {
+        "word": "mal à la tête",
+        "kind": "travels",
+        "source": "pharmacie"
+      },
+      {
+        "word": "rembourser",
+        "kind": "bound",
+        "source": "bill"
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Bonjour, asseyez-vous. Qu'est-ce qui vous amène ?"
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, docteur. J'ai mal à la tête depuis deux jours. Que dois-je faire ?"
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Vous avez mal à la tête. Depuis quand avez-vous cette douleur ?"
+      },
+      {
+        "role": "learner",
+        "text": "Depuis deux jours, chaque soir je sens la douleur. C'est très fatiguant."
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Et où avez-vous mal exactement ? Est-ce que la douleur est forte ?"
+      },
+      {
+        "role": "learner",
+        "text": "La douleur est surtout au front, et oui, c'est assez fort, surtout le soir."
+      },
+      {
+        "role": "character",
+        "text": "Je comprends. Est-ce que vous avez de la fièvre avec cette douleur ?"
+      },
+      {
+        "role": "learner",
+        "text": "Non, je n'ai pas de fièvre, mais je me sens un peu fatigué. Que me conseillez-vous ?"
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Donc, pas de fièvre. Je pense que c'est une céphalée de tension. Reposez-vous bien, buvez beaucoup d'eau et vous pouvez prendre du paracétamol. Avez-vous des questions ?"
+      },
+      {
+        "role": "learner",
+        "text": "Merci, docteur. Combien de temps je dois prendre le paracétamol ?"
+      },
+      {
+        "role": "character",
+        "text": "Vous pouvez prendre du paracétamol pendant deux ou trois jours. Si la douleur persiste, revenez me voir dans une semaine. Avez-vous d'autres questions ?"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 5,
+    "error": null,
+    "words": [
+      {
+        "word": "mal à la tête",
+        "kind": "travels",
+        "source": "pharmacie",
+        "opening": true,
+        "opening_turn": 1,
+        "quote": "Bonjour, asseyez-vous. Qu'est-ce qui vous amène ?",
+        "learner_said": true,
+        "learner_said_turn": 1,
+        "character_said": true
+      },
+      {
+        "word": "rembourser",
+        "kind": "bound",
+        "source": "bill",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "doctor",
+    "condition": "control",
+    "run": 1,
+    "targets": [
+      {
+        "word": "mal à la tête",
+        "kind": "travels",
+        "source": "pharmacie"
+      },
+      {
+        "word": "rembourser",
+        "kind": "bound",
+        "source": "bill"
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Bonjour, asseyez-vous. Qu'est-ce qui vous amène ?"
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, docteur. J'ai mal à la tête depuis deux jours. Que dois-je faire ?"
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Vous avez mal à la tête depuis deux jours. Où est-ce que ça fait mal exactement ?"
+      },
+      {
+        "role": "learner",
+        "text": "La douleur est surtout au front et un peu derrière les yeux. C'est très gênant."
+      },
+      {
+        "role": "character",
+        "text": "Je vois. Et avez-vous de la fièvre ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, j'ai un peu de fièvre, environ 38 degrés. Est-ce grave ?"
+      },
+      {
+        "role": "character",
+        "text": "Non, ce n'est probablement pas grave. Avez-vous d'autres symptômes ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, je suis un peu fatigué et j'ai aussi un peu de nez qui coule. Que me conseillez-vous ?"
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Je pense que vous avez une céphalée de tension. Je vous conseille de vous reposer, de boire beaucoup d'eau et de prendre du paracétamol. Avez-vous des questions ?"
+      },
+      {
+        "role": "learner",
+        "text": "Merci, docteur. Combien de temps je dois prendre le paracétamol ?"
+      },
+      {
+        "role": "character",
+        "text": "Vous pouvez prendre du paracétamol toutes les six heures, si la douleur persiste. Ne dépassez pas quatre doses par jour. Est-ce que c'est clair ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, c'est clair. Merci beaucoup pour votre aide, docteur. Au revoir."
+      },
+      {
+        "role": "character",
+        "text": "De rien. Si la douleur continue après une semaine, revenez me voir. Au revoir et bon rétablissement !"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 6,
+    "error": null,
+    "words": [
+      {
+        "word": "mal à la tête",
+        "kind": "travels",
+        "source": "pharmacie",
+        "opening": true,
+        "opening_turn": 1,
+        "quote": "Bonjour, asseyez-vous. Qu'est-ce qui vous amène ?",
+        "learner_said": true,
+        "learner_said_turn": 1,
+        "character_said": true
+      },
+      {
+        "word": "rembourser",
+        "kind": "bound",
+        "source": "bill",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "doctor",
+    "condition": "control",
+    "run": 2,
+    "targets": [
+      {
+        "word": "mal à la tête",
+        "kind": "travels",
+        "source": "pharmacie"
+      },
+      {
+        "word": "rembourser",
+        "kind": "bound",
+        "source": "bill"
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Bonjour, asseyez-vous. Qu'est-ce qui vous amène ?"
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, docteur. J'ai mal à la tête depuis deux jours. Que faire, s'il vous plaît ?"
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Vous avez mal à la tête depuis deux jours. Est-ce que la douleur est constante, ou est-ce qu'elle vient et elle part ?"
+      },
+      {
+        "role": "learner",
+        "text": "La douleur vient et elle part, mais parfois elle est très forte. Est-ce que je dois prendre des médicaments ?"
+      },
+      {
+        "role": "character",
+        "text": "Je comprends. Et où est-ce que ça vous fait mal exactement ? Est-ce que c'est sur le côté de la tête, ou plutôt derrière les yeux ?"
+      },
+      {
+        "role": "learner",
+        "text": "C'est plus derrière les yeux, surtout quand je regarde la lumière. Est-ce que c'est grave ?"
+      },
+      {
+        "role": "character",
+        "text": "D'accord, derrière les yeux. Et est-ce que vous avez de la fièvre ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, j'ai un peu de fièvre depuis ce matin. Que me conseillez-vous ?"
+      },
+      {
+        "role": "character",
+        "text": "D'accord, vous avez un peu de fièvre. Est-ce que vous avez d'autres symptômes, comme des nausées ou des vomissements ?"
+      },
+      {
+        "role": "learner",
+        "text": "Non, je n'ai pas de nausées ni vomissements. Je suis un peu fatigué aussi. Que dois-je faire ?"
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Alors, je pense que c'est une céphalée de tension. Je vous conseille de vous reposer, de boire beaucoup d'eau et de prendre du paracétamol. Avez-vous des questions ?"
+      },
+      {
+        "role": "learner",
+        "text": "Merci, docteur. Combien de fois par jour je peux prendre le paracétamol ?"
+      },
+      {
+        "role": "character",
+        "text": "Vous pouvez prendre un comprimé de paracétamol toutes les six heures, sans dépasser quatre comprimés par jour. Est-ce que c'est clair ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, c'est clair. Je vais suivre vos conseils. Merci beaucoup, docteur. Au revoir !"
+      },
+      {
+        "role": "character",
+        "text": "De rien. Si la douleur persiste après une semaine, revenez me voir. Au revoir !"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 7,
+    "error": null,
+    "words": [
+      {
+        "word": "mal à la tête",
+        "kind": "travels",
+        "source": "pharmacie",
+        "opening": true,
+        "opening_turn": 1,
+        "quote": "Bonjour, asseyez-vous. Qu'est-ce qui vous amène ?",
+        "learner_said": true,
+        "learner_said_turn": 1,
+        "character_said": true
+      },
+      {
+        "word": "rembourser",
+        "kind": "bound",
+        "source": "bill",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "doctor",
+    "condition": "control",
+    "run": 3,
+    "targets": [
+      {
+        "word": "mal à la tête",
+        "kind": "travels",
+        "source": "pharmacie"
+      },
+      {
+        "word": "rembourser",
+        "kind": "bound",
+        "source": "bill"
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Bonjour, asseyez-vous. Qu'est-ce qui vous amène ?"
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, docteur. J'ai mal à la tête depuis deux jours. Que dois-je faire ?"
+      },
+      {
+        "role": "character",
+        "text": "Vous avez mal à la tête depuis deux jours, c'est ça ? Où est-ce que ça fait mal exactement ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, c'est ça. La douleur est ici, au front. Est-ce que je peux prendre un médicament ?"
+      },
+      {
+        "role": "character",
+        "text": "D'accord, la douleur est au front. Avez-vous de la fièvre ?"
+      },
+      {
+        "role": "learner",
+        "text": "Non, je n'ai pas de fièvre. Mais je suis un peu fatigué aussi. Que conseillez-vous ?"
+      },
+      {
+        "role": "character",
+        "text": "D'accord, pas de fièvre. Je pense que c'est une céphalée de tension. Je vous conseille de vous reposer, de boire beaucoup d'eau et de prendre du paracétamol. Avez-vous des questions ?"
+      },
+      {
+        "role": "learner",
+        "text": "Merci, docteur. Combien de fois je peux prendre le paracétamol par jour ?"
+      },
+      {
+        "role": "character",
+        "text": "Vous pouvez prendre un comprimé de paracétamol toutes les six heures, sans dépasser quatre comprimés par jour. Est-ce que c'est clair ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, c'est clair. Je vais suivre vos conseils. Merci beaucoup, docteur. Au revoir !"
+      },
+      {
+        "role": "character",
+        "text": "De rien. Revenez me voir dans une semaine si la douleur persiste. Au revoir et bon rétablissement !"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 5,
+    "error": null,
+    "words": [
+      {
+        "word": "mal à la tête",
+        "kind": "travels",
+        "source": "pharmacie",
+        "opening": true,
+        "opening_turn": 1,
+        "quote": "Bonjour, asseyez-vous. Qu'est-ce qui vous amène ?",
+        "learner_said": true,
+        "learner_said_turn": 1,
+        "character_said": true
+      },
+      {
+        "word": "rembourser",
+        "kind": "bound",
+        "source": "bill",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "café",
+        "kind": "bound",
+        "source": "cafe",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "interview",
+    "condition": "due",
+    "run": 1,
+    "targets": [
+      {
+        "word": "je peux",
+        "kind": "travels",
+        "source": "apartment"
+      },
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment"
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Merci d'être venu. Pour commencer, parlez-moi un peu de vous."
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, je m'appelle Alex. J'aime travailler avec les gens et j'ai experience en service client."
+      },
+      {
+        "role": "character",
+        "text": "Alex. C'est très bien. Vous avez de l'expérience en service client. Pouvez-vous me parler de votre expérience ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, j'ai travaillé deux ans dans un magasin. J'aidais les clients et je répondais à leurs questions."
+      },
+      {
+        "role": "character",
+        "text": "D'accord, vous avez travaillé deux ans dans un magasin. C'est une bonne expérience. Et pourquoi ce poste vous intéresse-t-il ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je veux ce poste parce que j'aime aider les personnes et apprendre plus. C'est un bon travail pour moi."
+      },
+      {
+        "role": "character",
+        "text": "Je comprends. Vous aimez aider les personnes et apprendre. C'est important. Et quand seriez-vous disponible pour commencer ce poste ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je peux commencer la semaine prochaine. Je suis prêt à travailler tout de suite. Merci beaucoup pour cette opportunité. Au revoir!"
+      },
+      {
+        "role": "character",
+        "text": "D'accord. La semaine prochaine, c'est très bien. Le poste commence en novembre et c'est trois jours par semaine au bureau. Avez-vous des questions pour moi ?"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 4,
+    "error": null,
+    "words": [
+      {
+        "word": "je peux",
+        "kind": "travels",
+        "source": "apartment",
+        "opening": true,
+        "opening_turn": 4,
+        "quote": "Et quand seriez-vous disponible pour commencer ce poste ?",
+        "learner_said": true,
+        "learner_said_turn": 4,
+        "character_said": false
+      },
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "interview",
+    "condition": "due",
+    "run": 2,
+    "targets": [
+      {
+        "word": "je peux",
+        "kind": "travels",
+        "source": "apartment"
+      },
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment"
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Merci d'être venu. Pour commencer, parlez-moi un peu de vous."
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, je m'appelle Alex. J'aime travailler avec les gens et j'ai de l'expérience en service client."
+      },
+      {
+        "role": "character",
+        "text": "Alex. C'est très bien. Vous avez de l'expérience en service client, c'est parfait. Pouvez-vous me parler un peu plus de votre expérience ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, j'ai travaillé deux ans dans un magasin. J'ai aidé les clients avec leurs questions et résolu les problèmes."
+      },
+      {
+        "role": "character",
+        "text": "D'accord, vous avez travaillé deux ans dans un magasin. C'est une bonne expérience. Pourquoi avez-vous postulé pour ce poste ici ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je veux un nouveau défi et apprendre plus. Ce travail est intéressant pour moi et je peux utiliser mes compétences."
+      },
+      {
+        "role": "character",
+        "text": "Je vois. C'est bien de vouloir un nouveau défi. Et quand seriez-vous disponible pour commencer ce nouveau défi avec nous ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je suis disponible tout de suite. Je peux commencer la semaine prochaine, si vous voulez. Merci beaucoup. Au revoir."
+      },
+      {
+        "role": "character",
+        "text": "La semaine prochaine, c'est très bien. Le poste commence en novembre et il faut être trois jours par semaine au bureau. Avez-vous des questions pour moi ?"
+      },
+      {
+        "role": "learner",
+        "text": "Merci, non, je n'ai pas de questions. Le poste et le temps sont bien pour moi. Au revoir et merci beaucoup."
+      },
+      {
+        "role": "character",
+        "text": "D'accord, Alex. Merci beaucoup d'être venu. Nous vous recontacterons bientôt. Au revoir !"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 5,
+    "error": null,
+    "words": [
+      {
+        "word": "je peux",
+        "kind": "travels",
+        "source": "apartment",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": true,
+        "learner_said_turn": 3,
+        "character_said": false
+      },
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "interview",
+    "condition": "due",
+    "run": 3,
+    "targets": [
+      {
+        "word": "je peux",
+        "kind": "travels",
+        "source": "apartment"
+      },
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment"
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Merci d'être venu. Pour commencer, parlez-moi un peu de vous."
+      },
+      {
+        "role": "learner",
+        "text": "Merci. Je m'appelle Marie. J'ai vingt-cinq ans et je travaille comme assistante dans un bureau."
+      },
+      {
+        "role": "character",
+        "text": "D'accord, Marie. Et quelle est votre expérience professionnelle ? Qu'est-ce que vous avez fait avant ?"
+      },
+      {
+        "role": "learner",
+        "text": "Avant, j'ai travaillé dans un magasin pour deux ans. J'ai aidé les clients et j'ai organisé les produits."
+      },
+      {
+        "role": "character",
+        "text": "Très bien. Et pourquoi ce poste vous intéresse-t-il ?"
+      },
+      {
+        "role": "learner",
+        "text": "Ce poste m'intéresse parce que j'aime travailler avec les gens et apprendre de nouvelles choses. Je veux aussi améliorer mon français."
+      },
+      {
+        "role": "character",
+        "text": "C'est une bonne motivation. Et quand seriez-vous disponible pour commencer ce poste ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je suis disponible à partir de la semaine prochaine, si vous voulez. Merci beaucoup. Au revoir!"
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Le poste commence en novembre et il faut être au bureau trois jours par semaine. Est-ce que cela vous convient ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, c’est parfait pour moi. Je peux venir au bureau trois jours par semaine. Merci!"
+      },
+      {
+        "role": "character",
+        "text": "Très bien. Nous vous recontacterons bientôt. Merci d'être venue, Marie. Au revoir !"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 5,
+    "error": null,
+    "words": [
+      {
+        "word": "je peux",
+        "kind": "travels",
+        "source": "apartment",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": true,
+        "learner_said_turn": 5,
+        "character_said": false
+      },
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "interview",
+    "condition": "control",
+    "run": 1,
+    "targets": [
+      {
+        "word": "je peux",
+        "kind": "travels",
+        "source": "apartment"
+      },
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment"
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Merci d'être venu. Pour commencer, parlez-moi un peu de vous."
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, je m'appelle Alex. Je travaille dans un café et j'aime apprendre de nouvelles choses."
+      },
+      {
+        "role": "character",
+        "text": "Alex. C'est très bien. Vous travaillez dans un café. Et quelle est votre expérience professionnelle ?"
+      },
+      {
+        "role": "learner",
+        "text": "J'ai travaillé dans un café pendant deux ans. J'ai appris à servir les clients et à travailler vite."
+      },
+      {
+        "role": "character",
+        "text": "Très bien. Donc, vous avez de l'expérience dans le service client. C'est important pour ce poste. Pourquoi ce poste vous intéresse-t-il ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je veux ce poste parce que j'aime aider les gens. Aussi, je veux améliorer mon français avec le travail."
+      },
+      {
+        "role": "character",
+        "text": "C'est une bonne raison. Vous voulez aider les gens et pratiquer votre français. C'est clair. Et quand seriez-vous disponible pour commencer ce poste ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je peux commencer la semaine prochaine. Je suis libre tous les jours après midi. Merci beaucoup! Au revoir!"
+      },
+      {
+        "role": "character",
+        "text": "D'accord. Le poste commence en novembre et c'est trois jours par semaine au bureau. Nous vous contacterons bientôt. Merci d'être venu, Alex. Au revoir !"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 4,
+    "error": null,
+    "words": [
+      {
+        "word": "je peux",
+        "kind": "travels",
+        "source": "apartment",
+        "opening": true,
+        "opening_turn": 4,
+        "quote": "Et quand seriez-vous disponible pour commencer ce poste ?",
+        "learner_said": true,
+        "learner_said_turn": 4,
+        "character_said": false
+      },
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "interview",
+    "condition": "control",
+    "run": 2,
+    "targets": [
+      {
+        "word": "je peux",
+        "kind": "travels",
+        "source": "apartment"
+      },
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment"
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Merci d'être venu. Pour commencer, parlez-moi un peu de vous."
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, je m'appelle Alex. J'aime travailler avec les gens et j'ai de l'expérience en service client."
+      },
+      {
+        "role": "character",
+        "text": "Alex. C'est très bien. Vous avez de l'expérience en service client, c'est parfait. Pouvez-vous me parler un peu plus de votre expérience ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, j'ai travaillé deux ans dans un magasin. J'aidais les clients, je répondais à leurs questions et je faisais les ventes."
+      },
+      {
+        "role": "character",
+        "text": "D'accord, vous avez travaillé deux ans dans un magasin. C'est une bonne expérience. Et pourquoi ce poste vous intéresse-t-il ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je veux ce poste parce que j'aime aider les gens. Je veux aussi apprendre plus et travailler en équipe. Merci."
+      },
+      {
+        "role": "character",
+        "text": "C'est très bien, Alex. Vous voulez aider les gens et apprendre. C'est important. Et quand seriez-vous disponible pour commencer ce poste ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je peux commencer la semaine prochaine, ou plus tôt si vous voulez. Je suis prêt à travailler."
+      },
+      {
+        "role": "character",
+        "text": "D'accord, la semaine prochaine. Le poste commence en novembre. Il faut être au bureau trois jours par semaine. Est-ce que cela vous convient ?"
+      },
+      {
+        "role": "learner",
+        "text": "Oui, c'est bon pour moi. Trois jours au bureau, c'est parfait. Merci."
+      },
+      {
+        "role": "character",
+        "text": "Parfait, Alex. Trois jours par semaine, c'est bien. Merci beaucoup pour votre temps. Nous vous contacterons bientôt."
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 5,
+    "error": null,
+    "words": [
+      {
+        "word": "je peux",
+        "kind": "travels",
+        "source": "apartment",
+        "opening": true,
+        "opening_turn": 4,
+        "quote": "Et quand seriez-vous disponible pour commencer ce poste ?",
+        "learner_said": true,
+        "learner_said_turn": 4,
+        "character_said": false
+      },
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  },
+  {
+    "scene": "interview",
+    "condition": "control",
+    "run": 3,
+    "targets": [
+      {
+        "word": "je peux",
+        "kind": "travels",
+        "source": "apartment"
+      },
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment"
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie"
+      }
+    ],
+    "turns": [
+      {
+        "role": "character",
+        "text": "Merci d'être venu. Pour commencer, parlez-moi un peu de vous."
+      },
+      {
+        "role": "learner",
+        "text": "Bonjour, je m'appelle Alex. J'aime travailler avec les gens et je suis motivé pour apprendre."
+      },
+      {
+        "role": "character",
+        "text": "Alex. C'est bien. Et quelle est votre expérience professionnelle ?"
+      },
+      {
+        "role": "learner",
+        "text": "J'ai travaillé dans un café pendant un an. J'ai appris à parler avec les clients et à être rapide."
+      },
+      {
+        "role": "character",
+        "text": "D'accord, vous avez travaillé dans un café. C'est intéressant. Et pourquoi ce poste vous intéresse-t-il ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je veux un travail plus stable et j'aime votre entreprise. Je veux apprendre plus."
+      },
+      {
+        "role": "character",
+        "text": "C'est bien, Alex. Vous voulez un travail stable et vous aimez notre entreprise. Pourquoi est-ce important pour vous, la stabilité ?"
+      },
+      {
+        "role": "learner",
+        "text": "La stabilité est important parce que je veux un bon travail pour ma vie. C'est plus facile pour moi et ma famille."
+      },
+      {
+        "role": "character",
+        "text": "Je comprends. La stabilité est importante pour vous et votre famille. Et quand seriez-vous disponible pour commencer ce poste ?"
+      },
+      {
+        "role": "learner",
+        "text": "Je peux commencer la semaine prochaine. Je suis prêt et libre. Merci beaucoup pour cette opportunité. Au revoir!"
+      },
+      {
+        "role": "character",
+        "text": "D'accord, la semaine prochaine. Le poste commence en novembre et c'est trois jours par semaine au bureau. Merci beaucoup, Alex, et au revoir !"
+      }
+    ],
+    "goal_reached": true,
+    "learner_turns": 5,
+    "error": null,
+    "words": [
+      {
+        "word": "je peux",
+        "kind": "travels",
+        "source": "apartment",
+        "opening": true,
+        "opening_turn": 5,
+        "quote": "Et quand seriez-vous disponible pour commencer ce poste ?",
+        "learner_said": true,
+        "learner_said_turn": 5,
+        "character_said": false
+      },
+      {
+        "word": "mois",
+        "kind": "travels",
+        "source": "apartment",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      },
+      {
+        "word": "ordonnance",
+        "kind": "bound",
+        "source": "pharmacie",
+        "opening": false,
+        "opening_turn": null,
+        "quote": "",
+        "learner_said": false,
+        "learner_said_turn": null,
+        "character_said": false
+      }
+    ]
+  }
+]
