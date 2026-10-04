@@ -1,6 +1,8 @@
 """The one LLM prompt (the character's next line and the stumbles in one JSON response), and the
 short text that primes the transcriber for a learner who mixes French and English."""
 
+from typing import Any
+
 from app.scenes.data import Scene
 
 _PATIENCE = {
@@ -99,10 +101,30 @@ _LAST_TURN = (
 )
 
 
-def system_prompt(
-    scene: Scene, patience: str, due_cards: list[str], beat: int = 0, last_turn: bool = False
-) -> str:
+def _due_words(due_cards: list[str], steer_plan: list[dict[str, Any]], beat: int) -> str:
+    """With a plan, the character is told the concrete move for this beat, not a list of words:
+    a list alone was measured to steer almost nothing (evals/steering)."""
     due = ", ".join(due_cards) if due_cards else "none"
+    if not steer_plan:
+        return f"Words the learner is due to review; create natural openings for them: {due}.\n"
+    moves = "".join(
+        f'IN THIS BEAT, so the learner says "{s["word"]}": {s["move"]}\n'
+        for s in steer_plan
+        if s["beat"] == beat
+    )
+    return (
+        f"Words the learner is practising: {due}. Never say one yourself before they do.\n" + moves
+    )
+
+
+def system_prompt(
+    scene: Scene,
+    patience: str,
+    due_cards: list[str],
+    beat: int = 0,
+    last_turn: bool = False,
+    steer_plan: list[dict[str, Any]] | None = None,
+) -> str:
     beats = "; ".join(f"{i}: {b}" for i, b in enumerate(scene.beats))
     head = (
         f"You are {scene.character_name}, a {scene.character_role} in Paris, in a role-play "
@@ -115,12 +137,14 @@ def system_prompt(
         f"{', '.join(scene.vocab)}.\n"
         f"FACTS you know and the learner doesn't; state them when asked or when a beat says to: "
         f"{'; '.join(scene.facts)}.\n"
-        f"Words the learner is due to review; create natural openings for them: {due}.\n"
+    )
+    plan = (
         f"BEATS, in order: {beats}.\n"
         f"CURRENT BEAT: {beat}: {scene.beats[beat]}.\n"
         f"REGISTER: {_PATIENCE.get(patience, _PATIENCE['normal'])}\n\n"
     )
-    return head + _RULES + (_LAST_TURN if last_turn else "")
+    due = _due_words(due_cards, steer_plan or [], beat)
+    return head + due + plan + _RULES + (_LAST_TURN if last_turn else "")
 
 
 # Whisper takes a "previous transcript" as a style prompt. Forced to French with no prompt, it

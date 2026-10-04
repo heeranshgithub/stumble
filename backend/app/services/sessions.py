@@ -49,6 +49,7 @@ async def start(
     scene: Scene,
     patience: str,
     due_cards: list[str] | None = None,
+    steer_plan: list[Document] | None = None,
 ) -> Document:
     opening = _turn("character", scene.opening_line, 0.0, text_en=scene.opening_line_en)
     doc: Document = {
@@ -59,6 +60,8 @@ async def start(
         "goal_progress": 0.0,
         "beat": 0,
         "due_cards": due_cards or [],
+        # Where each due word is asked for (services/steering.py); empty when nothing fitted.
+        "steer_plan": steer_plan or [],
         "turns": [opening],
         "created_at": _now(),
         "finished_at": None,
@@ -154,6 +157,7 @@ def _messages(session: Document, scene: Scene, settings: Settings) -> list[ChatM
                 session["due_cards"],
                 session.get("beat", 0),
                 last_turn=_learner_turns(session) >= settings.scene_max_turns,
+                steer_plan=session.get("steer_plan") or [],
             ),
         )
     ]

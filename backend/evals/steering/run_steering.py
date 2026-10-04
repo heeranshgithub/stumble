@@ -35,7 +35,7 @@ from bson import ObjectId
 from mongomock_motor import AsyncMongoMockClient
 
 from app.scenes.data import Scene, get_scene
-from app.services import sessions
+from app.services import sessions, steering
 from app.services.cards import target_key
 from app.services.providers_fake import FakeGuard
 from app.services.registry import build_providers
@@ -123,7 +123,11 @@ async def play(
         }
         await db.profiles.insert_one(profile)
         due = [t.word for t in case.targets] if condition == "due" else []
-        session = await sessions.start(db, profile, scene, "relaxed", due_cards=due)
+        # The same plan the app makes at scene start (routers/sessions.py).
+        plan = await steering.plan(providers.chat, scene, due)
+        session = await sessions.start(
+            db, profile, scene, "relaxed", due_cards=due, steer_plan=plan
+        )
         system = _LEARNER.format(setting=_setting(scene), goal=scene.goal)
         convo: list[dict[str, str]] = [{"role": "system", "content": system}]
         error = None
@@ -148,6 +152,7 @@ async def play(
             "condition": condition,
             "run": run,
             "targets": [t.__dict__ for t in case.targets],
+            "plan": plan,
             "turns": turns,
             "goal_reached": session.get("goal_progress", 0.0) >= 0.999,
             "learner_turns": sum(t["role"] == "learner" for t in turns),

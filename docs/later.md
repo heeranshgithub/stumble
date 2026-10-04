@@ -3,7 +3,7 @@
 Things decided against for the hackathon, on purpose, in the order they should be taken on. The first one is the foundation: the others all change the prompt or the model, and without it there is no way to know a change didn't break something.
 
 1. **An eval harness for the turn prompt** — every reply-quality bug so far was found by hand and fixed blind. The guardrails now have one (`backend/evals/guardrails`, see [guardrails.md](guardrails.md)); its runner and case format are the template for this.
-2. **Make the next scene ask for your words** — measured: it barely does. A due word comes up about as often with the scene told about it as without, and a word tied to its first scene never comes up.
+2. **Make the next scene ask for your words** — measured: a list of due words in the prompt does nothing; a per-scene plan helps (on `feature/steering-eval`, not shipped), not yet enough.
 3. **Faster turns** — the wait is the one thing a learner feels on every turn; swapping the model is one env var, and unsafe without 1.
 4. **Speaking time on the debrief** — the only time figure that is about the learner; the data is already returned, just not stored.
 5. **Corrections that aren't errors** — politeness logged as grammar (not seen yet), and a homophone the transcriber spelled wrong (seen; held by a prompt rule only).
@@ -27,9 +27,16 @@ The pitch is that the words you stumble on come back: the next scene is told whi
 
 The scene barely steers. The character created an opening for 20% of due words, against 16% for the same words in the control, and most of those openings were the scene's fixed first line, there either way. Words that travel between scenes (prices, months, "je peux") came up about half the time, mostly because the scenes invite them anyway; words tied to the scene they came from (café, ordonnance) came up 0 times in 24. A sharper instruction, with what an opening is and a short aside for words that fit no beat, changed nothing (16% against 13%), and the one aside it produced was awkward ("vous avez une ordonnance pour des lunettes ?"). The model follows the beats, which are concrete, and lets the due words go.
 
-So the fix isn't another prompt line. In the order worth trying, each measured with the same eval:
+So the fix isn't another prompt line. A first version of the per-scene plan below is built on `feature/steering-eval` (`services/steering.py`), not shipped. Counting only openings beyond the scene's fixed first line, the judge counted 9 of 45 words against 3 in the control, but 3 of those 9 were the pharmacist stating the price, which isn't an opening: 6 against 3 by a strict reading. The learner said the word in 15 of 45 against 11. Real, and modest, on three runs a scene. Where it works, it reads well: the doctor asking whether they drink coffee, after a headache, got *café* back. Where it fails, the beat wins: the plan said "don't state the price, wait to be asked" and the pharmacist stated the price anyway, because the beat itself says to. It also made the character say a due word itself more often (9 of 45, against 3), and scenes ran about a turn longer.
 
-- **Plan per scene.** At scene start, once the due words are known, one call assigns each word that fits to a beat and writes the concrete move ("payment beat: let them ask the price"); each turn is told the move for its beat, not a list of words. One call per scene, hidden behind the opening line.
+What to try next, measured with the same eval:
+
+- **Let the plan rewrite the beat,** not sit beside it: where a word is planned, the beat text itself changes ("say how often to take it, and wait to be asked the price").
+- **Enforce "never say it first" in code:** if a reply contains a due word the learner hasn't said yet, retry once.
+- **More runs** before believing any of these numbers.
+
+The other options, in the order worth trying:
+
 - **Choose the scene by its words.** A word tied to its first scene goes back to a replay of that scene, where it belongs, instead of being forced into the next new one.
 - **Say what's true until then.** Review already makes the learner say every due word aloud, in its original sentence. That part of the claim holds; the scene steering is the part that doesn't yet.
 

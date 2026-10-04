@@ -9,7 +9,7 @@ from app.errors import BadRequest, NotFound
 from app.models.card import DebriefDto
 from app.models.session import SessionDto, StartSessionRequest
 from app.scenes.data import get_scene
-from app.services import cards, debrief, sessions, track, tts
+from app.services import cards, debrief, sessions, steering, track, tts
 from app.services.registry import Providers
 
 router = APIRouter()
@@ -39,7 +39,8 @@ async def start_session(
         raise BadRequest("This scene isn't open yet.", code="scene_locked")
     # The character is told which words to ask for: due ones, and the ones just reviewed.
     due = await cards.scene_targets(db, profile["_id"], window, limit=5)
-    doc = await sessions.start(db, profile, scene, body.patience, due_cards=due)
+    plan = await steering.plan(_providers(request).chat, scene, due)
+    doc = await sessions.start(db, profile, scene, body.patience, due_cards=due, steer_plan=plan)
     return sessions.to_dto(doc)
 
 
