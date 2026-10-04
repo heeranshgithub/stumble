@@ -3,9 +3,10 @@
 Things decided against for the hackathon, on purpose, in the order they should be taken on. The first one is the foundation: the others all change the prompt or the model, and without it there is no way to know a change didn't break something.
 
 1. **An eval harness for the turn prompt** — every reply-quality bug so far was found by hand and fixed blind. The guardrails now have one (`backend/evals/guardrails`, see [guardrails.md](guardrails.md)); its runner and case format are the template for this.
-2. **Faster turns** — the wait is the one thing a learner feels on every turn; swapping the model is one env var, and unsafe without 1.
-3. **Speaking time on the debrief** — the only time figure that is about the learner; the data is already returned, just not stored.
-4. **Corrections that aren't errors** — politeness logged as grammar (not seen yet), and a homophone the transcriber spelled wrong (seen; held by a prompt rule only).
+2. **Make the next scene ask for your words** — measured: it barely does. A due word comes up about as often with the scene told about it as without, and a word tied to its first scene never comes up.
+3. **Faster turns** — the wait is the one thing a learner feels on every turn; swapping the model is one env var, and unsafe without 1.
+4. **Speaking time on the debrief** — the only time figure that is about the learner; the data is already returned, just not stored.
+5. **Corrections that aren't errors** — politeness logged as grammar (not seen yet), and a homophone the transcriber spelled wrong (seen; held by a prompt rule only).
 
 ## 1. An eval harness for the turn prompt
 
@@ -20,15 +21,27 @@ The shape:
 
 What exists today instead, all deterministic: a confidence floor (`stumble_confidence_min`) and a target-length cap, so a hedged or whole-sentence stumble never becomes a card; one retry when a reply trails off mid-sentence; a due word said cleanly counted as a win even when the model forgets to report it; and the scene beats and facts, which remove the reason the character improvises rather than forbidding the result.
 
-## 2. Faster turns
+## 2. Make the next scene ask for your words
+
+The pitch is that the words you stumble on come back: the next scene is told which ones are due and steers you into saying them. `backend/evals/steering` measures it: every scene from the pharmacy on, played to the end by a simulated A2 learner who is never told the words, once handed three due words from earlier scenes and once handed none, three runs each, with a judge reading every transcript for openings.
+
+The scene barely steers. The character created an opening for 20% of due words, against 16% for the same words in the control, and most of those openings were the scene's fixed first line, there either way. Words that travel between scenes (prices, months, "je peux") came up about half the time, mostly because the scenes invite them anyway; words tied to the scene they came from (café, ordonnance) came up 0 times in 24. A sharper instruction, with what an opening is and a short aside for words that fit no beat, changed nothing (16% against 13%), and the one aside it produced was awkward ("vous avez une ordonnance pour des lunettes ?"). The model follows the beats, which are concrete, and lets the due words go.
+
+So the fix isn't another prompt line. In the order worth trying, each measured with the same eval:
+
+- **Plan per scene.** At scene start, once the due words are known, one call assigns each word that fits to a beat and writes the concrete move ("payment beat: let them ask the price"); each turn is told the move for its beat, not a list of words. One call per scene, hidden behind the opening line.
+- **Choose the scene by its words.** A word tied to its first scene goes back to a replay of that scene, where it belongs, instead of being forced into the next new one.
+- **Say what's true until then.** Review already makes the learner say every due word aloud, in its original sentence. That part of the claim holds; the scene steering is the part that doesn't yet.
+
+## 3. Faster turns
 
 A turn is three sequential calls (Whisper, the chat model, ElevenLabs first byte) and lands around 2.5–5 s. The thinking line makes the wait legible, and the voice now starts synthesizing as the reply goes out so the words and the sound land together; neither shortens the wait itself. In order of payoff: a faster chat model (one env var, and exactly where the evals earn their keep), then streaming the reply into TTS sentence by sentence, which means the reply can no longer be one JSON blob.
 
-## 3. Speaking time on the debrief
+## 4. Speaking time on the debrief
 
 The debrief used to show the scene's wall-clock length. Dropped: most of a scene's minutes are the character's (her line, the think gap, the learner reading), so the number said nothing about the learner. The number that would is how long the learner actually spoke. Whisper returns the audio duration on every turn (`Transcript.duration_s`); it isn't stored. Store it on the learner turn, sum it, and the debrief can say "you spoke for 1:12", a figure that should grow scene over scene. Typed turns count as zero, which is right.
 
-## 4. Corrections that aren't errors
+## 5. Corrections that aren't errors
 
 Two ways a correction can be logged for something the learner didn't get wrong.
 
