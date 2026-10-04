@@ -2,7 +2,7 @@
 
 **Speak French. The words you can't find become the words you review.**
 
-Stumble is a speaking-first language app. You talk your way through real scenes (a café, a pharmacy, an apartment viewing) with a character who answers out loud. Every moment you freeze, fall back to English, or get corrected is caught *in the sentence where it happened* and becomes a spaced-repetition card. The next scene is told which words are due and steers you into using them. Progress is your deck shrinking, not a streak.
+Stumble is a speaking-first language app. You talk your way through real scenes (a café, a pharmacy, an apartment viewing) with a character who answers out loud. Every moment you freeze, fall back to English, or get corrected is caught *in the sentence where it happened* and becomes a spaced-repetition card. You review those cards by saying them aloud. The next scene is told which words are due too, though it rarely steers you into them yet: that's measured in [docs/later.md](docs/later.md). Progress is your deck shrinking, not a streak.
 
 Built for the [Nerdy AI Hackathon](https://hackathon.nerdy.com/), Prompt 02 (language learning). Mobile-first web app, installable as a PWA; on a wide screen it renders in a phone frame with a QR code to open it on yours.
 
@@ -11,7 +11,7 @@ Built for the [Nerdy AI Hackathon](https://hackathon.nerdy.com/), Prompt 02 (lan
 ## The loop
 
 1. **Review** (~90 s): only the cards that are due, each shown as a cloze in your own sentence. You say the word; FSRS reschedules it.
-2. **Scene** (3–4 min): a voice conversation with a goal. The character has been told your due words.
+2. **Scene** (3–4 min): a voice conversation with a goal. The character has been told your due words, and the ones you just reviewed.
 3. **Stumble capture**: freezes, code-switches, corrections and misses are detected on every turn and never interrupt you. The character just recasts.
 4. **Debrief** (60 s): goal reached or not, what got caught, one win, cards added.
 5. **Escalate**: the next scene unlocks in your next sitting (at least eight hours on), and only once nothing is due. One new scene a sitting; the scenes climb on purpose. Cleared scenes replay anytime. Clean production of a due word in a scene counts as a review; mastery is clean production in two scenes.
