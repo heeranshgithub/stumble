@@ -5,6 +5,8 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # A "Run workflow" button on GitHub, for redeploying on purpose (after a secret changes, say).
+  workflow_dispatch:
 
 jobs:
   backend:
@@ -42,9 +44,31 @@ jobs:
         env:
           NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
 
+  # Only what goes into the image (Dockerfile COPY lines) is worth a new image; a docs or evals
+  # change would redeploy the same app.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/app/**'
+              - 'backend/pyproject.toml'
+              - 'backend/uv.lock'
+              - 'backend/Dockerfile'
+
   deploy-backend:
-    needs: [backend, frontend]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [backend, frontend, changes]
+    # A push to main deploys when the image's contents changed; a manual run always deploys.
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      ((github.event_name == 'push' && needs.changes.outputs.backend == 'true') ||
+       github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     permissions:
       id-token: write
