@@ -11,6 +11,27 @@ from app.db import Database, Document
 from app.services import fsrs_engine
 
 MASTERY_SESSIONS = 2  # produced cleanly in this many distinct scenes → mastered
+# ...or FSRS is this sure of it on recall alone. Production is the better evidence, but the scenes
+# only steer toward five words at a time, so a word they never reach would otherwise sit in the deck
+# for ever: reviewed, plainly known, and never counted.
+MASTERY_STABILITY_DAYS = 90.0
+
+
+def mastery(
+    card: Document, produced_sessions: list[Any], state: Any, now: datetime
+) -> tuple[bool, datetime | None]:
+    """(mastered, mastered_at): two clean productions in different scenes, or a months-deep memory.
+
+    A lapse — a stumble in a scene or an Again in the review — clears `produced_sessions` and
+    collapses stability, so both paths reverse together and the word has to be earned again.
+    """
+    done = len(produced_sessions) >= MASTERY_SESSIONS
+    if not done:
+        stability = (state or {}).get("stability")
+        done = stability is not None and float(stability) >= MASTERY_STABILITY_DAYS
+    if not done:
+        return False, None
+    return True, now if not card.get("mastered") else card.get("mastered_at")
 
 
 def _now() -> datetime:
@@ -49,6 +70,9 @@ async def upsert_from_stumble(
                     "last_context": stumble["context"],
                     "last_session_id": session["_id"],
                     **({"context_en": stumble["context_en"]} if stumble.get("context_en") else {}),
+                    # The flag alone wasn't enough: `produced_sessions` survived the lapse, so a
+                    # single clean production re-mastered the card instead of the two it asks for.
+                    "produced_sessions": [],
                     "mastered": False,
                     "mastered_at": None,
                 },
@@ -109,8 +133,8 @@ async def apply_win(db: Database, session: Document, match: Document) -> Documen
     sessions = list(match.get("produced_sessions", []))
     if session["_id"] not in sessions:
         sessions.append(session["_id"])
-    mastered = len(sessions) >= MASTERY_SESSIONS
     state, due = fsrs_engine.review(match.get("fsrs"), "good", now)
+    mastered, mastered_at = mastery(match, sessions, state, now)
     await db.cards.update_one(
         {"_id": match["_id"]},
         {
@@ -120,12 +144,23 @@ async def apply_win(db: Database, session: Document, match: Document) -> Documen
                 "updated_at": now,
                 "produced_sessions": sessions,
                 "mastered": mastered,
-                "mastered_at": now
-                if mastered and not match.get("mastered")
-                else match.get("mastered_at"),
+                "mastered_at": mastered_at,
             },
             "$inc": {"produced": 1, "reps": 1},
         },
+    )
+    # The progress chart recovers a card's past due dates from this log. Without a row here, a card
+    # matured only in scenes has no history and reads as never-due on every past day.
+    await db.reviews.insert_one(
+        {
+            "profile_id": match["profile_id"],
+            "card_id": match["_id"],
+            "rating": "good",
+            "reviewed_at": now,
+            "due_before": match["due"],
+            "due_after": due,
+            "source": "win",
+        }
     )
     refreshed: Document | None = await db.cards.find_one({"_id": match["_id"]})
     return refreshed

@@ -72,8 +72,10 @@ async def _history(db: Database, profile: Document) -> dict[str, Any]:
     sessions: list[Document] = await db.sessions.find(
         {"profile_id": profile["_id"], "status": "finished"}, {"scene_id": 1, "goal_progress": 1}
     ).to_list(length=500)
+    # Scene wins log a row too (source "win"); "review_grades" means the buttons the learner
+    # actually pressed, and `produced_clean` already carries the spoken ones.
     reviews: list[Document] = await db.reviews.find(
-        {"profile_id": profile["_id"]}, {"card_id": 1, "rating": 1}
+        {"profile_id": profile["_id"], "source": "review"}, {"card_id": 1, "rating": 1}
     ).to_list(length=2000)
     by_card: dict[str, list[str]] = {}
     for r in reviews:

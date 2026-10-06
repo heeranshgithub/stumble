@@ -78,11 +78,23 @@ async def grade(
     now = _now()
     before: datetime = card["due"]
     state, due_at = fsrs_engine.review(card.get("fsrs"), rating, now)
+    # Again is a lapse wherever it comes from, so it clears the mastery evidence the same way a
+    # stumble does. Good and Easy can now reach mastery on their own: see cards.mastery().
+    sessions = [] if rating == "again" else list(card.get("produced_sessions", []))
+    mastered, mastered_at = cards.mastery(card, sessions, state, now)
     inc = {"reps": 1, "lapses": 1} if rating == "again" else {"reps": 1}
     await db.cards.update_one(
         {"_id": card["_id"]},
         {
-            "$set": {"fsrs": state, "due": due_at, "updated_at": now, "last_rating": rating},
+            "$set": {
+                "fsrs": state,
+                "due": due_at,
+                "updated_at": now,
+                "last_rating": rating,
+                "produced_sessions": sessions,
+                "mastered": mastered,
+                "mastered_at": mastered_at,
+            },
             "$inc": inc,
         },
     )
